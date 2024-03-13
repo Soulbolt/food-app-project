@@ -3,3 +3,4 @@ backend/__pycache__
 backend/requirements.txt
 backend/instance
 backend/.env
+.venv
