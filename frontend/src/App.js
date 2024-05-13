@@ -2,7 +2,7 @@ import "./App.css";
 import axios from "axios";
 import { useState, useEffect } from "react";
 
-function App() {
+export default function App() {
   const [people, setPeople] = useState([]);
 
   useEffect(() => {
@@ -13,16 +13,17 @@ function App() {
     });
   }, []);
 
-  return people.map((person, index) => {
-    return (
-      (<h3>People Data Test</h3>),
-      (
-        <p key={index}>
+  return (
+    <>
+      <h3 className=" text-3xl font-bold text-cyan-500 underline">
+        People Data Test
+      </h3>
+
+      {people.map((person, index) => (
+        <p key={index} className=" text-3xl font-bold text-cyan-500">
           {person.id} {person.name} {person.age}
         </p>
-      )
-    );
-  });
+      ))}
+    </>
+  );
 }
-
-export default App;

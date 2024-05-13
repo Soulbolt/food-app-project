@@ -2,7 +2,7 @@
 
 ## CURRENT TECH STACK
 
-React v5.0.1, Axios v1.6.7, Node.js v18.14.2, Python v3.12.1 (Make Sure you have Node.js and Python installed in your system.)
+React v5.0.1, Axios v1.6.7, Node.js v18.14.2, Python v3.12.1, Tailwind CSS v3.4.3 (Make Sure you have Node.js and Python installed in your system.)
 
 ## Change directory to frontend directory
 
@@ -31,3 +31,5 @@ To learn React, check out the [React documentation](https://reactjs.org/).
 To learn more about Axios, check out the [Axiios documenation](https://axios-http.com/docs/intro).
 
 To learn more about FastAPI, check out the [FastAPI documentation](https://fastapi.tiangolo.com/).
+
+To learn more about Tailwind CSS, check out the [Tailwind CSS documentation](https://tailwindcss.com/docs/).
