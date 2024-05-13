@@ -1,4 +1,3 @@
-import "./App.css";
 import axios from "axios";
 import { useState, useEffect } from "react";
 
@@ -15,12 +14,15 @@ export default function App() {
 
   return (
     <>
-      <h3 className=" text-3xl font-bold text-cyan-500 underline">
+      <h1 className="mx-auto mb-10 text-5xl text-cyan-600 lg:text-6xl">
+        Welcome to Food App
+      </h1>
+      <h3 className="mx-auto flex items-center justify-center text-3xl text-cyan-500 underline lg:text-6xl">
         People Data Test
       </h3>
 
       {people.map((person, index) => (
-        <p key={index} className=" text-3xl font-bold text-cyan-500">
+        <p key={index} className=" text-3xl text-cyan-500 lg:text-6xl">
           {person.id} {person.name} {person.age}
         </p>
       ))}
