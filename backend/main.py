@@ -7,14 +7,15 @@ app = FastAPI()
 
 class Person(BaseModel):
     id: int
-    name: str
+    first_name: str
+    last_name: str
     age: int
 
 DB: List[Person] = [
-    Person(id=1, name="John", age=20),
-    Person(id=2, name="Jane", age=21),
-    Person(id=3, name="Joe", age=22),
-    Person(id=4, name="Jill", age=23),
+    Person(id=1, first_name="John", last_name="Duh", age=20),
+    Person(id=2, first_name="Jane", last_name="Flex", age=21),
+    Person(id=3, first_name="Joe", last_name="Muff", age=22),
+    Person(id=4, first_name="Jill", last_name="Dill", age=23),
 ]
 
 @app.get("/api")
