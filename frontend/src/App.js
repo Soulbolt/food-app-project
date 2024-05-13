@@ -21,23 +21,24 @@ export default function App() {
         Data Test
       </h3>
 
-      {people.map((person, index) => (
-        <table
-          key={index}
-          className="mx-auto border-separate border-spacing-2 bg-slate-500 text-2xl text-cyan-500 lg:text-4xl"
-        >
+      <table className="mx-auto border-separate border-spacing-2 border border-slate-500 text-2xl text-cyan-500 lg:text-4xl">
+        <thead>
           <tr>
             <th className="pr-5">ID</th>
             <th className="pr-5">Name</th>
             <th className="pr-5">Last Name</th>
             <th className="pr-5">Age</th>
           </tr>
-          <td>{person.id}</td>
-          <td>{person.first_name}</td>
-          <td>{person.last_name}</td>
-          <td>{person.age}</td>
-        </table>
-      ))}
+        </thead>
+        {people.map((person, index) => (
+          <tbody key={index}>
+            <td>{person.id}</td>
+            <td>{person.first_name}</td>
+            <td>{person.last_name}</td>
+            <td>{person.age}</td>
+          </tbody>
+        ))}
+      </table>
     </>
   );
 }
