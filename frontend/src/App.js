@@ -1,4 +1,5 @@
 import axios from "axios";
+import Login from "./components/Login";
 import { useState, useEffect } from "react";
 
 function App() {
@@ -12,16 +13,19 @@ function App() {
     });
   }, []);
 
-  return (
-    <>
-      <h1 className="mx-auto mb-10 text-5xl text-cyan-600 lg:text-6xl">
+  return <Login />;
+}
+
+export default App;
+
+/* <h1 className="mx-auto mb-10 text-5xl text-cyan-600 lg:text-6xl">
         Welcome to Food App
       </h1>
-      <h3 className="mx-auto mb-5 flex items-center justify-center text-3xl text-cyan-500 underline lg:text-5xl">
+      <h3 className="mx-auto mb-5 items-center justify-center text-3xl text-cyan-500 underline lg:text-5xl">
         Data Test
       </h3>
 
-      <table className="mx-auto border-separate border-spacing-2 border border-slate-500 text-2xl text-cyan-500 lg:text-4xl">
+      <tabe className="mx-auto border-separate border-spacing-2 border border-slate-500 text-2xl text-cyan-500 lg:text-4xl">
         <thead>
           <tr>
             <th className="pr-5">ID</th>
@@ -38,9 +42,4 @@ function App() {
             <td>{person.age}</td>
           </tbody>
         ))}
-      </table>
-    </>
-  );
-}
-
-export default App;
+      </tabe> */
