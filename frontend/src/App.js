@@ -1,19 +1,26 @@
-import axios from "axios";
+// import axios from "axios";
 import Login from "./components/Login";
-import { useState, useEffect } from "react";
+import Dashboard from "./components/Dashboard";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+// import { useState, useEffect } from "react";
 
 function App() {
-  const [people, setPeople] = useState([]);
+  // const [people, setPeople] = useState([]);
 
-  useEffect(() => {
-    console.log("insde the useEffect");
-    axios.get("/api").then((res) => {
-      setPeople(res.data);
-      console.log(res.data);
-    });
-  }, []);
+  // useEffect(() => {
+  //   console.log("insde the useEffect");
+  //   axios.get("/api").then((res) => {
+  //     setPeople(res.data);
+  //     console.log(res.data);
+  //   });
+  // }, []);
 
-  return <Login />;
+  return (<BrowserRouter>
+  <Routes>
+    <Route path="/" element={<Login />} />
+    <Route path="/dashboard" element={<Dashboard />} />
+  </Routes>
+  </BrowserRouter>);
 }
 
 export default App;

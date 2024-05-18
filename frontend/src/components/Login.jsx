@@ -1,7 +1,22 @@
-import React from "react";
+import React, { useState } from "react";
 import LoginImg from "../assets/login-healthy-options.jpg";
+import { useNavigate } from "react-router-dom";
 
-export default function login() {
+function Login() {
+  
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    if (username === "user" && password === "admin") {
+      navigate("/dashboard");
+    } else {
+      alert("Wrong username or password");
+    }
+  }
+
   return (
     <div className="grid h-screen w-full grid-cols-1 sm:grid-cols-2">
       <div className="hidden sm:block">
@@ -16,15 +31,18 @@ export default function login() {
         <form
           action="submit"
           className="mx-auto w-full max-w-[400px] bg-white p-4"
+          onSubmit={handleSubmit}
         >
           <h2 className="py-6 text-center text-4xl font-bold">My Food</h2>
           <div className="flex flex-col py-2">
             <label>Username</label>
-            <input type="text" className="border border-slate-300 p-2" />
+            <input type="text" value={username} 
+            onChange={(e) => setUsername(e.target.value)}
+            className="border border-slate-300 p-2" />
           </div>
           <div className="flex flex-col py-2">
             <label>Password</label>
-            <input type="password" className="border border-slate-300 p-2" />
+            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="border border-slate-300 p-2" />
           </div>
           <button className="my-5 w-full border bg-indigo-600 py-2 text-white hover:bg-indigo-500">
             Login
@@ -41,3 +59,5 @@ export default function login() {
     </div>
   );
 }
+
+export default Login;
