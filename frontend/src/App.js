@@ -1,5 +1,5 @@
 // import axios from "axios";
-import Login from "./components/Login";
+import Login2 from "./components/Login2";
 import Dashboard from "./components/Dashboard";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 // import { useState, useEffect } from "react";
@@ -15,12 +15,14 @@ function App() {
   //   });
   // }, []);
 
-  return (<BrowserRouter>
-  <Routes>
-    <Route path="/" element={<Login />} />
-    <Route path="/dashboard" element={<Dashboard />} />
-  </Routes>
-  </BrowserRouter>);
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Login2 />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
 export default App;
