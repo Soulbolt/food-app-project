@@ -2,8 +2,12 @@ import React from "react";
 
 function Dashboard() {
   return (
-    <div>
-      <h1 className="text-4xl text-cyan-500">Welcome To your DashBoard</h1>
+    <div className="relative h-screen w-full bg-zinc-900/90">
+      <img
+        className="abosulute h-full w-full object-cover"
+        src="https://source.unsplash.com/random"
+        alt=""
+      />
     </div>
   );
 }
