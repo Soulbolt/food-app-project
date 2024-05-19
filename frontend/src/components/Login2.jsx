@@ -10,9 +10,9 @@ function Login2() {
         alt=""
       />
 
-      <div>
-        <form>
-          <h2>My Food</h2>
+      <div className="flex h-full items-center justify-center">
+        <form className="mx-auto w-full max-w-[400px] bg-white p-8">
+          <h2 className="py-8 text-center text-4xl font-bold">My Food</h2>
           <div>
             <p>ICON. Facebook</p>
             <p>ICON. Google</p>
@@ -25,6 +25,12 @@ function Login2() {
             <label>Password</label>
             <input type="password" />
           </div>
+          <button>Sign In</button>
+          <p>
+            <input type="checkbox" />
+            Remember Me
+          </p>
+          <p>Not a member? Sign up now</p>
         </form>
       </div>
     </div>
