@@ -1,7 +1,7 @@
 // import axios from "axios";
-import Login3 from "./components/Login3";
 import Dashboard from "./components/Dashboard";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Login from "./components/Login";
 // import { useState, useEffect } from "react";
 
 function App() {
@@ -18,7 +18,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Login3 />} />
+        <Route path="/" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     </BrowserRouter>
