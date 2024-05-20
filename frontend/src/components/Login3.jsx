@@ -27,9 +27,9 @@ function Login3() {
             <button className="my-4 w-full bg-green-600 py-2 hover:bg-green-500">
               Sign In
             </button>
-            <p>Forgot Username or Password?</p>
+            <p className="text-center">Forgot Username or Password?</p>
           </form>
-          <p>Don't have an account? Sign Up Here!</p>
+          <p className="text-center">Don't have an account? Sign Up Here!</p>
         </div>
       </div>
     </div>
