@@ -2,8 +2,8 @@ import React from "react";
 import kabobs from "../assets/kabobs.jpg";
 function Login3() {
   return (
-    <div>
-      <div>
+    <div className="flex h-screen w-full">
+      <div className="md:grid-cols2 grid grid-cols-2">
         <img src={kabobs} alt="kabobs" />
       </div>
       <div>
