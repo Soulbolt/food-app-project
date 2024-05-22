@@ -46,7 +46,7 @@ function Dashboard() {
             <input
               type="search"
               id="default-search"
-              class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-4 ps-10 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+              class="mb-8 block w-full rounded-lg border border-gray-300 bg-gray-50 p-4 ps-10 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
               placeholder="Search Breakfast, Lunch or Dinner..."
               required
             />
@@ -58,6 +58,15 @@ function Dashboard() {
             </button>
           </div>
         </form>
+
+        <div className="flex h-full items-center justify-center">
+          <h2 className="mb-8 text-4xl text-indigo-400">
+            Previous searches...
+          </h2>
+        </div>
+        <table className="border border-slate-200">
+          <th className="text-indigo-300">Restaurant</th>
+        </table>
       </div>
     </div>
   );
