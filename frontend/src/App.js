@@ -14,7 +14,7 @@ function App() {
 
   const fetchRestaurants = async () => {
     try {
-      const response = await axios.get("/api");
+      const response = await axios.get("/api/restaurants");
       setRestaurants(response.data);
       console.log(response.data);
     } catch (error) {
