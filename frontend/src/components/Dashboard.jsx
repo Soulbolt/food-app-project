@@ -64,26 +64,57 @@ function Dashboard() {
             Previous searches...
           </h2>
         </div>
-        <table className="mx-auto justify-center border-collapse">
+
+        {/* Previous Seaches - Table Data */}
+        <div className="container mx-auto p-4">
+          <div className="overflow-x-auto">
+            <table className="min-w-full bg-white">
+              <thead className="bg-gray-800 text-white">
+                <tr>
+                  <th className="w-1/5 px-4 py-2">Name</th>
+                  <th className="w-1/5 px-4 py-2">Address</th>
+                  <th className="w-1/5 px-4 py-2">Contact Number</th>
+                  <th className="w-1/5 px-4 py-2">Rating</th>
+                  <th className="w-1/5 px-4 py-2">Reviews</th>
+                </tr>
+              </thead>
+              <tbody className="text-gray-700">
+                <tr>
+                  <td className="border px-4 py-2">The Gourmet Kitchen</td>
+                  <td className="border px-4 py-2">
+                    123 Maple Street, Springfiel, IL 62705
+                  </td>
+                  <td className="border px-4 py-2">(215) 555-0198</td>
+                  <td className="border px-4 py-2">4.5</td>
+                  <td className="border px-4 py-2">
+                    Amazing food and great ambiance!
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* <table className="table-auto">
           <thead>
-          <tr>
-          <th className="text-indigo-300 p-8 border">Restaurant</th>
-          <th className="text-indigo-300 p-8 border">Address</th>
-          <th className="text-indigo-300 p-8 border">City</th>
-          <th className="text-indigo-300 p-8 border">Zip Code</th>
-          <th className="text-indigo-300 p-8 border">Phone</th>
-          </tr>
+            <tr className="flex-cols-2 sm:flex-cols-5 overflow-x-hidden">
+              <th className="border p-8 text-indigo-300">Restaurant</th>
+              <th className="border p-8 text-indigo-300">Address</th>
+              <th className="border p-8 text-indigo-300">City</th>
+              <th className="border p-8 text-indigo-300">Zip Code</th>
+              <th className="border p-8 text-indigo-300">Phone</th>
+            </tr>
           </thead>
           <tbody>
-          <tr>
-            <td className="text-indigo-300 p-8 border">PlaceHolder</td>
-            <td className="text-indigo-300 p-8 border">PlaceHolder</td>
-            <td className="text-indigo-300 p-8 border">PlaceHolder</td>
-            <td className="text-indigo-300 p-8 border">PlaceHolder</td>
-            <td className="text-indigo-300 p-8 border">PlaceHolder</td>
-          </tr>
+            <tr>
+              <td className="border p-8 text-indigo-300">PlaceHolder</td>
+              <td className="border p-8 text-indigo-300">PlaceHolder</td>
+              <td className="border p-8 text-indigo-300">PlaceHolder</td>
+              <td className="border p-8 text-indigo-300">PlaceHolder</td>
+              <td className="border p-8 text-indigo-300">PlaceHolder</td>
+            </tr>
           </tbody>
-        </table>
+        </table> */}
       </div>
     </div>
   );
