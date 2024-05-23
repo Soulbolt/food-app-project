@@ -6,10 +6,11 @@ from pydantic import BaseModel
 app = FastAPI()
 
 class Restaurant(BaseModel):
-    id: int
-    first_name: str
-    last_name: str
-    age: int
+    name: str
+    address: str
+    contact_number: str
+    rating: float
+    reviews: List
 
 # DB: List[Restaurant] = [
 #     Restaurant(id=1, first_name="John", last_name="Duh", age=20),

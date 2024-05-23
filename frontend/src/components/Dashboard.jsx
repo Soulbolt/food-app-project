@@ -1,8 +1,8 @@
+import { GoSearch } from "react-icons/go";
 import React from "react";
 import LoginImg from "../assets/breakfast.jpg";
-import { GoSearch } from "react-icons/go";
 
-function Dashboard() {
+function Dashboard({ restaurants }) {
   return (
     <div className="relative h-screen w-full bg-zinc-900/90">
       <img
@@ -60,14 +60,14 @@ function Dashboard() {
         </form>
 
         <div className="flex h-full items-center justify-center">
-          <h2 className="mb-8 text-4xl text-indigo-400">
-            Previous searches...
+          <h2 className="mb-8 text-3xl text-indigo-300">
+            Recommendations For You!
           </h2>
         </div>
 
-        {/* Previous Seaches - Table Data */}
+        {/* Recommended - Table Data */}
         <div className="container mx-auto p-4">
-          <div className="overflow-x-auto">
+          <div className="max-h-[500px] overflow-x-auto">
             <table className="min-w-full bg-white">
               <thead className="bg-gray-800 text-white">
                 <tr>
@@ -79,17 +79,28 @@ function Dashboard() {
                 </tr>
               </thead>
               <tbody className="text-gray-700">
-                <tr>
-                  <td className="border px-4 py-2">The Gourmet Kitchen</td>
-                  <td className="border px-4 py-2">
-                    123 Maple Street, Springfiel, IL 62705
-                  </td>
-                  <td className="border px-4 py-2">(215) 555-0198</td>
-                  <td className="border px-4 py-2">4.5</td>
-                  <td className="border px-4 py-2">
-                    Amazing food and great ambiance!
-                  </td>
-                </tr>
+                {Array.isArray(restaurants) &&
+                  restaurants.map((restaurant, index) => (
+                    <tr
+                      key={index}
+                      className={index % 2 === 0 ? "bg-gray-200" : ""}
+                    >
+                      <td className="border px-4 py-2">{restaurant.name}</td>
+                      <td className="border px-4 py-2">{restaurant.address}</td>
+                      <td className="border px-4 py-2">
+                        {restaurant.contact_number}
+                      </td>
+                      <td className="border px-4 py-2">{restaurant.rating}</td>
+                      <td className="border px-4 py-2">
+                        {restaurant.reviews.map((review, index) => (
+                          <p key={index}>
+                            <strong>{review.username}:</strong> {review.review}
+                            (Rating: {review.rating})
+                          </p>
+                        ))}
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>

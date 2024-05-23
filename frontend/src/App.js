@@ -1,25 +1,35 @@
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Dashboard from "./components/Dashboard";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./components/Login";
-import { useState, useEffect } from "react";
 
 function App() {
   const [restaurants, setRestaurants] = useState([]);
 
   useEffect(() => {
     console.log("insde the useEffect");
-    axios.get("/api").then((res) => {
-      setRestaurants(res.data);
-      console.log(res.data);
-    });
+    fetchRestaurants();
   }, []);
+
+  const fetchRestaurants = async () => {
+    try {
+      const response = await axios.get("/api");
+      setRestaurants(response.data);
+      console.log(response.data);
+    } catch (error) {
+      console.log("Error fetching data", error);
+    }
+  };
 
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Login />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route
+          path="/dashboard"
+          element={<Dashboard restaurants={restaurants} />}
+        />
       </Routes>
     </BrowserRouter>
   );
