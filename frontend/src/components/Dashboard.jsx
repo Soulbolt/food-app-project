@@ -64,8 +64,25 @@ function Dashboard() {
             Previous searches...
           </h2>
         </div>
-        <table className="border border-slate-200">
-          <th className="text-indigo-300">Restaurant</th>
+        <table className="mx-auto justify-center border-collapse">
+          <thead>
+          <tr>
+          <th className="text-indigo-300 p-8 border">Restaurant</th>
+          <th className="text-indigo-300 p-8 border">Address</th>
+          <th className="text-indigo-300 p-8 border">City</th>
+          <th className="text-indigo-300 p-8 border">Zip Code</th>
+          <th className="text-indigo-300 p-8 border">Phone</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td className="text-indigo-300 p-8 border">PlaceHolder</td>
+            <td className="text-indigo-300 p-8 border">PlaceHolder</td>
+            <td className="text-indigo-300 p-8 border">PlaceHolder</td>
+            <td className="text-indigo-300 p-8 border">PlaceHolder</td>
+            <td className="text-indigo-300 p-8 border">PlaceHolder</td>
+          </tr>
+          </tbody>
         </table>
       </div>
     </div>
