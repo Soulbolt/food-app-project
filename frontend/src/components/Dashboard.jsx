@@ -105,27 +105,6 @@ function Dashboard({ restaurants }) {
             </table>
           </div>
         </div>
-
-        {/* <table className="table-auto">
-          <thead>
-            <tr className="flex-cols-2 sm:flex-cols-5 overflow-x-hidden">
-              <th className="border p-8 text-indigo-300">Restaurant</th>
-              <th className="border p-8 text-indigo-300">Address</th>
-              <th className="border p-8 text-indigo-300">City</th>
-              <th className="border p-8 text-indigo-300">Zip Code</th>
-              <th className="border p-8 text-indigo-300">Phone</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td className="border p-8 text-indigo-300">PlaceHolder</td>
-              <td className="border p-8 text-indigo-300">PlaceHolder</td>
-              <td className="border p-8 text-indigo-300">PlaceHolder</td>
-              <td className="border p-8 text-indigo-300">PlaceHolder</td>
-              <td className="border p-8 text-indigo-300">PlaceHolder</td>
-            </tr>
-          </tbody>
-        </table> */}
       </div>
     </div>
   );

@@ -12,13 +12,7 @@ class Restaurant(BaseModel):
     rating: float
     reviews: List
 
-# DB: List[Restaurant] = [
-#     Restaurant(id=1, first_name="John", last_name="Duh", age=20),
-#     Restaurant(id=2, first_name="Jane", last_name="Flex", age=21),
-#     Restaurant(id=3, first_name="Joe", last_name="Muff", age=22),
-#     Restaurant(id=4, first_name="Jill", last_name="Dill", age=23),
-# ]
-
+# Mock database in json format
 DB: list[Restaurant] = [{
         "name": "The Gourmet Kitchen",
         "address": "123 Maple Street, Springfield, IL 62704",
