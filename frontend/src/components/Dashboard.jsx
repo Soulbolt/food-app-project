@@ -1,4 +1,6 @@
 import { GoSearch } from "react-icons/go";
+import { FaHeartCirclePlus } from "react-icons/fa6";
+import { FaMapMarkerAlt } from "react-icons/fa";
 import React from "react";
 import LoginImg from "../assets/breakfast.jpg";
 import CardImage from "../assets/kabobs.jpg";
@@ -148,7 +150,7 @@ function Dashboard({ restaurants }) {
             <div class="group">
               <button class="w-full rounded-lg border-b-8 border-b-blue-700 bg-blue-700 text-white transition-all duration-150 group-hover:border-b-0 group-hover:border-t-8 group-hover:border-t-blue-700 group-hover:bg-blue-700 group-hover:shadow-lg">
                 <div class="rounded-lg bg-blue-500 px-8 py-4 duration-150 group-hover:bg-blue-700">
-                  Add to cart
+                  Visit Restaurant
                 </div>
               </button>
             </div>
@@ -161,14 +163,14 @@ function Dashboard({ restaurants }) {
             {/*<!-- Bottom Buttons Container -->*/}
             <div class="flex flex-col space-y-4 md:flex-row md:space-x-4 md:space-y-0">
               <button class="flex items-center justify-center space-x-3 rounded-lg border-2 border-gray-300 px-5 py-3 shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:bg-opacity-30 hover:shadow-lg">
-                <img src="images/weight.png" alt="weight" class="w-8" />
-                <span>Add to cart</span>
+                <FaMapMarkerAlt class="w-8 text-3xl" />
+                <span>Get Directions</span>
               </button>
 
               <div class="flex flex-col space-y-4 md:flex-row md:space-x-4 md:space-y-0">
                 <button class="flex items-center justify-center space-x-3 rounded-lg border-2 border-gray-300 px-5 py-3 shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:bg-opacity-30 hover:shadow-lg">
-                  <img src="images/heart.png" alt="heart" class="w-8" />
-                  <span>Add to whishlist</span>
+                  <FaHeartCirclePlus class="w-8 text-4xl text-red-600" />
+                  <span>Add to Favorites</span>
                 </button>
               </div>
             </div>
