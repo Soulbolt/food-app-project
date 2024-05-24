@@ -118,7 +118,7 @@ function Dashboard({ restaurants }) {
       {/*<!-- Glboal Container -->*/}
       {Array.isArray(restaurants) &&
         restaurants.map((restaurant, index) => (
-          <div class="flex min-h-screen items-center justify-center">
+          <div class="mb-3 flex items-center justify-center">
             {/* <!-- Card Container --> */}
             <div class="m-3 flex flex-col space-y-10 rounded-2xl bg-white p-6 shadow-2xl md:m-0 md:flex-row md:space-x-10 md:space-y-0 md:p-16">
               {/*<!-- Image Container -->*/}
@@ -165,7 +165,7 @@ function Dashboard({ restaurants }) {
                   </button>
                 </div>
 
-                {/*<!-- Stock Availability -->*/}
+                {/*<!-- Rating Score -->*/}
                 <div class="group flex items-center space-x-3">
                   <div class="h-3 w-3 rounded-full bg-green-400 group-hover:animate-ping"></div>
                   <div class="text-sm">
