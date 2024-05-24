@@ -113,70 +113,85 @@ function Dashboard({ restaurants }) {
         </div>
       </div>
       {/*<!-- Glboal Container -->*/}
-      <div class="flex min-h-screen items-center justify-center">
-        {/* <!-- Card Container --> */}
-        <div class="m-3 flex flex-col space-y-10 rounded-2xl bg-white p-6 shadow-2xl md:m-0 md:flex-row md:space-x-10 md:space-y-0 md:p-16">
-          {/*<!-- Image Container -->*/}
-          <div>
-            <img
-              src={CardImage}
-              alt="kabobs"
-              class="mx-auto w-60 duration-200 hover:scale-105"
-            />
-          </div>
-
-          {/*<!-- Content -->*/}
-          <div class="flex flex-col space-y-6">
-            {/*<!-- Label & Title Container-->*/}
-            <div class="mb-4 flex flex-col space-y-3 text-center md:text-left">
-              <div class="inline-block rounded-full bg-black px-3 py-1 text-sm text-white">
-                Free Shipping
+      {Array.isArray(restaurants) &&
+        restaurants.map((restaurant, index) => (
+          <div class="flex min-h-screen items-center justify-center">
+            {/* <!-- Card Container --> */}
+            <div class="m-3 flex flex-col space-y-10 rounded-2xl bg-white p-6 shadow-2xl md:m-0 md:flex-row md:space-x-10 md:space-y-0 md:p-16">
+              {/*<!-- Image Container -->*/}
+              <div>
+                <img
+                  src={CardImage}
+                  alt="kabobs"
+                  class="mx-auto w-60 duration-200 hover:scale-105"
+                />
               </div>
-            </div>
 
-            {/*<!-- Title -->*/}
-            <div class="max-w-sm text-center text-2xl font-medium md:text-left">
-              Razer Kraken Kitty Edition Gaming Headset Quartz
-            </div>
-            {/*<!-- Price -->*/}
-            <div class="mb-4 flex flex-col space-y-3 text-center md:text-left">
-              <p class="line-through">$799</p>
-              <p class="text-5xl font-bold">$599</p>
-              <p class="text-sm-font-light text-gray-400">
-                This offer is valid until April 3rd or as long as stock lasts!
-              </p>
-            </div>
-            {/*<!-- Button Group -->*/}
-            <div class="group">
-              <button class="w-full rounded-lg border-b-8 border-b-blue-700 bg-blue-700 text-white transition-all duration-150 group-hover:border-b-0 group-hover:border-t-8 group-hover:border-t-blue-700 group-hover:bg-blue-700 group-hover:shadow-lg">
-                <div class="rounded-lg bg-blue-500 px-8 py-4 duration-150 group-hover:bg-blue-700">
-                  Visit Restaurant
+              {/*<!-- Content -->*/}
+              <div class="flex flex-col space-y-6">
+                {/*<!-- Label & Title Container-->*/}
+                <div class="mb-4 flex flex-col space-y-3 text-center md:text-left">
+                  <div class="inline-block rounded-full bg-black px-3 py-1 text-sm text-white">
+                    Free Shipping
+                  </div>
                 </div>
-              </button>
-            </div>
 
-            {/*<!-- Stock Availability -->*/}
-            <div class="group flex items-center space-x-3">
-              <div class="h-3 w-3 rounded-full bg-green-400 group-hover:animate-ping"></div>
-              <div class="text-sm">50+ pcs. in stock</div>
-            </div>
-            {/*<!-- Bottom Buttons Container -->*/}
-            <div class="flex flex-col space-y-4 md:flex-row md:space-x-4 md:space-y-0">
-              <button class="flex items-center justify-center space-x-3 rounded-lg border-2 border-gray-300 px-5 py-3 shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:bg-opacity-30 hover:shadow-lg">
-                <FaMapMarkerAlt class="w-8 text-3xl" />
-                <span>Get Directions</span>
-              </button>
+                {/*<!-- Title -->*/}
+                <div
+                  key={index}
+                  class="max-w-sm text-center text-2xl font-medium md:text-left"
+                >
+                  {restaurant.name}
+                </div>
+                {/*<!-- Price -->*/}
+                <div class="mb-4 flex flex-col space-y-3 text-center md:text-left">
+                  <p class="line-through">$799</p>
+                  <p class="text-5xl font-bold">$599</p>
+                  <p class="text-sm-font-light text-gray-400">
+                    This offer is valid until April 3rd or as long as stock
+                    lasts!
+                  </p>
+                </div>
 
-              <div class="flex flex-col space-y-4 md:flex-row md:space-x-4 md:space-y-0">
-                <button class="flex items-center justify-center space-x-3 rounded-lg border-2 border-gray-300 px-5 py-3 shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:bg-opacity-30 hover:shadow-lg">
-                  <FaHeartCirclePlus class="w-8 text-4xl text-red-600" />
-                  <span>Add to Favorites</span>
-                </button>
+                {/*<!-- Button Group -->*/}
+                <div class="group">
+                  <button class="w-full rounded-lg border-b-8 border-b-blue-700 bg-blue-700 text-white transition-all duration-150 group-hover:border-b-0 group-hover:border-t-8 group-hover:border-t-blue-700 group-hover:bg-blue-700 group-hover:shadow-lg">
+                    <div class="rounded-lg bg-blue-500 px-8 py-4 duration-150 group-hover:bg-blue-700">
+                      Check out the reviews!
+                    </div>
+                  </button>
+                </div>
+
+                {/*<!-- Stock Availability -->*/}
+                <div class="group flex items-center space-x-3">
+                  <div class="h-3 w-3 rounded-full bg-green-400 group-hover:animate-ping"></div>
+                  <div class="text-sm">
+                    {restaurant.reviews.map((review, index) => (
+                      <p key={index}>
+                        <strong>{review.username}:</strong> {review.review}
+                        (Rating: {review.rating})
+                      </p>
+                    ))}
+                  </div>
+                </div>
+                {/*<!-- Bottom Buttons Container -->*/}
+                <div class="flex flex-col space-y-4 md:flex-row md:space-x-4 md:space-y-0">
+                  <button class="flex items-center justify-center space-x-3 rounded-lg border-2 border-gray-300 px-5 py-3 shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:bg-opacity-30 hover:shadow-lg">
+                    <FaMapMarkerAlt class="w-8 text-3xl" />
+                    <span>Get Directions</span>
+                  </button>
+
+                  <div class="flex flex-col space-y-4 md:flex-row md:space-x-4 md:space-y-0">
+                    <button class="flex items-center justify-center space-x-3 rounded-lg border-2 border-gray-300 px-5 py-3 shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:bg-opacity-30 hover:shadow-lg">
+                      <FaHeartCirclePlus class="w-8 text-4xl text-red-600" />
+                      <span>Add to Favorites</span>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
+        ))}
     </div>
   );
 }
