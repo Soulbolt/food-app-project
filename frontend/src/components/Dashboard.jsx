@@ -9,7 +9,10 @@ function Dashboard({ restaurants }) {
   return (
     <div
       className="h-screen-full relative w-full bg-zinc-900/90 bg-cover bg-center bg-no-repeat"
-      style={{ backgroundImage: `url(${LoginImg})` }}
+      style={{
+        backgroundImage: `url(${LoginImg})`,
+        backgroundAttachment: "fixed",
+      }}
     >
       {/* <img
         className="absolute h-full w-full object-cover mix-blend-overlay"
@@ -132,24 +135,24 @@ function Dashboard({ restaurants }) {
                 {/*<!-- Label & Title Container-->*/}
                 <div class="mb-4 flex flex-col space-y-3 text-center md:text-left">
                   <div class="inline-block rounded-full bg-black px-3 py-1 text-sm text-white">
-                    Free Shipping
+                    Free Delivery on Orders Above $50
                   </div>
                 </div>
 
                 {/*<!-- Title -->*/}
                 <div
                   key={index}
-                  class="max-w-sm text-center text-2xl font-medium md:text-left"
+                  class="max-w-sm text-center text-4xl font-medium md:text-left"
                 >
                   {restaurant.name}
                 </div>
                 {/*<!-- Price -->*/}
                 <div class="mb-4 flex flex-col space-y-3 text-center md:text-left">
-                  <p class="line-through">$799</p>
-                  <p class="text-5xl font-bold">$599</p>
+                  <p class="text-2xl font-bold">Lunch Special!</p>
+                  <p class="line-through">$79</p>
+                  <p class="text-4xl font-bold">$49</p>
                   <p class="text-sm-font-light text-gray-400">
-                    This offer is valid until April 3rd or as long as stock
-                    lasts!
+                    This offer is valid until the 4th of July!
                   </p>
                 </div>
 
@@ -166,12 +169,7 @@ function Dashboard({ restaurants }) {
                 <div class="group flex items-center space-x-3">
                   <div class="h-3 w-3 rounded-full bg-green-400 group-hover:animate-ping"></div>
                   <div class="text-sm">
-                    {restaurant.reviews.map((review, index) => (
-                      <p key={index}>
-                        <strong>{review.username}:</strong> {review.review}
-                        (Rating: {review.rating})
-                      </p>
-                    ))}
+                    <p key={index}>Rating: {restaurant.rating}</p>
                   </div>
                 </div>
                 {/*<!-- Bottom Buttons Container -->*/}
