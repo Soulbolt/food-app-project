@@ -1,15 +1,19 @@
 import { GoSearch } from "react-icons/go";
 import React from "react";
 import LoginImg from "../assets/breakfast.jpg";
+import CardImage from "../assets/kabobs.jpg";
 
 function Dashboard({ restaurants }) {
   return (
-    <div className="relative h-screen w-full bg-zinc-900/90">
-      <img
+    <div
+      className="h-screen-full relative w-full bg-zinc-900/90 bg-cover bg-center bg-no-repeat"
+      style={{ backgroundImage: `url(${LoginImg})` }}
+    >
+      {/* <img
         className="absolute h-full w-full object-cover mix-blend-overlay"
         src={LoginImg}
         alt="breakfast"
-      />
+      /> */}
 
       <div>
         <h2 className="mb-8 py-8 text-5xl text-indigo-300">
@@ -103,6 +107,71 @@ function Dashboard({ restaurants }) {
                   ))}
               </tbody>
             </table>
+          </div>
+        </div>
+      </div>
+      {/*<!-- Glboal Container -->*/}
+      <div class="flex min-h-screen items-center justify-center">
+        {/* <!-- Card Container --> */}
+        <div class="m-3 flex flex-col space-y-10 rounded-2xl bg-white p-6 shadow-2xl md:m-0 md:flex-row md:space-x-10 md:space-y-0 md:p-16">
+          {/*<!-- Image Container -->*/}
+          <div>
+            <img
+              src={CardImage}
+              alt="kabobs"
+              class="mx-auto w-60 duration-200 hover:scale-105"
+            />
+          </div>
+
+          {/*<!-- Content -->*/}
+          <div class="flex flex-col space-y-6">
+            {/*<!-- Label & Title Container-->*/}
+            <div class="mb-4 flex flex-col space-y-3 text-center md:text-left">
+              <div class="inline-block rounded-full bg-black px-3 py-1 text-sm text-white">
+                Free Shipping
+              </div>
+            </div>
+
+            {/*<!-- Title -->*/}
+            <div class="max-w-sm text-center text-2xl font-medium md:text-left">
+              Razer Kraken Kitty Edition Gaming Headset Quartz
+            </div>
+            {/*<!-- Price -->*/}
+            <div class="mb-4 flex flex-col space-y-3 text-center md:text-left">
+              <p class="line-through">$799</p>
+              <p class="text-5xl font-bold">$599</p>
+              <p class="text-sm-font-light text-gray-400">
+                This offer is valid until April 3rd or as long as stock lasts!
+              </p>
+            </div>
+            {/*<!-- Button Group -->*/}
+            <div class="group">
+              <button class="w-full rounded-lg border-b-8 border-b-blue-700 bg-blue-700 text-white transition-all duration-150 group-hover:border-b-0 group-hover:border-t-8 group-hover:border-t-blue-700 group-hover:bg-blue-700 group-hover:shadow-lg">
+                <div class="rounded-lg bg-blue-500 px-8 py-4 duration-150 group-hover:bg-blue-700">
+                  Add to cart
+                </div>
+              </button>
+            </div>
+
+            {/*<!-- Stock Availability -->*/}
+            <div class="group flex items-center space-x-3">
+              <div class="h-3 w-3 rounded-full bg-green-400 group-hover:animate-ping"></div>
+              <div class="text-sm">50+ pcs. in stock</div>
+            </div>
+            {/*<!-- Bottom Buttons Container -->*/}
+            <div class="flex flex-col space-y-4 md:flex-row md:space-x-4 md:space-y-0">
+              <button class="flex items-center justify-center space-x-3 rounded-lg border-2 border-gray-300 px-5 py-3 shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:bg-opacity-30 hover:shadow-lg">
+                <img src="images/weight.png" alt="weight" class="w-8" />
+                <span>Add to cart</span>
+              </button>
+
+              <div class="flex flex-col space-y-4 md:flex-row md:space-x-4 md:space-y-0">
+                <button class="flex items-center justify-center space-x-3 rounded-lg border-2 border-gray-300 px-5 py-3 shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:bg-opacity-30 hover:shadow-lg">
+                  <img src="images/heart.png" alt="heart" class="w-8" />
+                  <span>Add to whishlist</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
