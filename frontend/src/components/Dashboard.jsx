@@ -26,7 +26,7 @@ function Dashboard({ restaurants }) {
         </h2>
       </div>
       <div className="relative">
-        <form class="mx-auto max-w-md">
+        <form class=" sticky top-0 z-50 mx-auto max-w-md">
           <label
             for="default-search"
             class="sr-only mb-2 text-sm font-medium text-gray-900 dark:text-white"
