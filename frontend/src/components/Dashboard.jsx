@@ -1,11 +1,76 @@
 import { GoSearch } from "react-icons/go";
 import { FaHeartCirclePlus } from "react-icons/fa6";
 import { FaMapMarkerAlt } from "react-icons/fa";
-import React from "react";
+import React, { useState } from "react";
 import LoginImg from "../assets/breakfast.jpg";
 import CardImage from "../assets/kabobs.jpg";
 
 function Dashboard({ restaurants }) {
+  const [search, setSearch] = useState("");
+  const [filteredRestaurants, setFilteredRestaurants] = useState(restaurants);
+
+  const handleSearch = (e) => {
+    setSearch(e.target.value);
+    const filtered = restaurants.filter((restaurant) =>
+      restaurant.name.toLowerCase().includes(search.toLowerCase())
+    );
+    setFilteredRestaurants(filtered);
+  };
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+  };
+
+  const handleAddToFavorites = (id) => {
+    const updatedRestaurants = restaurants.map((restaurant) => {
+      if (restaurant.id === id) {
+        return { ...restaurant, isFavorite: !restaurant.isFavorite };
+      }
+      return restaurant;
+    });
+    setFilteredRestaurants(updatedRestaurants);
+  };
+
+  const handleRemoveFromFavorites = (id) => {
+    const updatedRestaurants = restaurants.map((restaurant) => {
+      if (restaurant.id === id) {
+        return { ...restaurant, isFavorite: !restaurant.isFavorite };
+      }
+      return restaurant;
+    });
+    setFilteredRestaurants(updatedRestaurants);
+  };
+
+  const handleMarkerClick = (id) => {
+    const updatedRestaurants = restaurants.map((restaurant) => {
+      if (restaurant.id === id) {
+        return { ...restaurant, isMarkerClicked: !restaurant.isMarkerClicked };
+      }
+      return restaurant;
+    });
+    setFilteredRestaurants(updatedRestaurants);
+  };
+
+  const handleMarkerHover = (id) => {
+    const updatedRestaurants = restaurants.map((restaurant) => {
+      if (restaurant.id === id) {
+        return { ...restaurant, isMarkerHovered: !restaurant.isMarkerHovered };
+      }
+      return restaurant;
+    });
+    setFilteredRestaurants(updatedRestaurants);
+  };
+
+  const handleMarkerLeave = (id) => {
+    const updatedRestaurants = restaurants.map((restaurant) => {
+      if (restaurant.id === id) {
+        return { ...restaurant, isMarkerHovered: !restaurant.isMarkerHovered };
+      }
+      return restaurant;
+    });
+    setFilteredRestaurants(updatedRestaurants);
+  };
+
   return (
     <div
       className="h-screen-full relative w-full bg-zinc-900/90 bg-cover bg-center bg-no-repeat"
