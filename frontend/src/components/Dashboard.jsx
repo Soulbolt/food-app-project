@@ -9,6 +9,12 @@ function Dashboard({ restaurants }) {
   const [search, setSearch] = useState("");
   const [filteredRestaurants, setFilteredRestaurants] = useState(restaurants);
 
+/**
+ * Handles the search functionality by updating the search state and filtering the restaurants based on the search input.
+ *
+ * @param {Event} e - The event object triggered by the search input.
+ * @return {void} This function does not return anything.
+ */
   const handleSearch = (e) => {
     setSearch(e.target.value);
     const filtered = restaurants.filter((restaurant) =>
@@ -17,10 +23,28 @@ function Dashboard({ restaurants }) {
     setFilteredRestaurants(filtered);
   };
 
+  /**
+   * Handles the submission of the search form by preventing the default form submission behavior.
+   *
+   * @param {Event} e - The event object representing the form submission event.
+   * @return {void} This function does not return anything.
+   */
   const handleSearchSubmit = (e) => {
     e.preventDefault();
   };
 
+/**
+ * Handles the addition of a restaurant to favorites.
+ *
+ * @param {number} id - The ID of the restaurant to be added to favorites.
+ * @return {void} This function does not return anything.
+ */
+/**
+ * Handles the addition of a restaurant to favorites.
+ *
+ * @param {number} id - The ID of the restaurant to be added to favorites.
+ * @return {void} This function does not return anything.
+ */
   const handleAddToFavorites = (id) => {
     const updatedRestaurants = restaurants.map((restaurant) => {
       if (restaurant.id === id) {
@@ -31,6 +55,12 @@ function Dashboard({ restaurants }) {
     setFilteredRestaurants(updatedRestaurants);
   };
 
+/**
+ * Handles the removal of a restaurant from favorites.
+ *
+ * @param {number} id - The ID of the restaurant to be removed from favorites.
+ * @return {void} This function does not return anything.
+ */
   const handleRemoveFromFavorites = (id) => {
     const updatedRestaurants = restaurants.map((restaurant) => {
       if (restaurant.id === id) {
@@ -41,6 +71,12 @@ function Dashboard({ restaurants }) {
     setFilteredRestaurants(updatedRestaurants);
   };
 
+/**
+ * Handles the click event on a marker and updates the state of the filteredRestaurants array.
+ *
+ * @param {number} id - The ID of the restaurant associated with the clicked marker.
+ * @return {void} This function does not return anything.
+ */
   const handleMarkerClick = (id) => {
     const updatedRestaurants = restaurants.map((restaurant) => {
       if (restaurant.id === id) {
@@ -51,6 +87,12 @@ function Dashboard({ restaurants }) {
     setFilteredRestaurants(updatedRestaurants);
   };
 
+/**
+ * Handles the hover event on a marker and updates the state of the filtered restaurants.
+ *
+ * @param {number} id - The ID of the restaurant marker being hovered.
+ * @return {void} This function does not return anything.
+ */
   const handleMarkerHover = (id) => {
     const updatedRestaurants = restaurants.map((restaurant) => {
       if (restaurant.id === id) {
@@ -61,6 +103,12 @@ function Dashboard({ restaurants }) {
     setFilteredRestaurants(updatedRestaurants);
   };
 
+  /**
+   * Handles the mouse leave event on a marker and updates the state of the filtered restaurants.
+   *
+   * @param {number} id - The ID of the restaurant marker being hovered.
+   * @return {void} This function does not return anything.
+   */
   const handleMarkerLeave = (id) => {
     const updatedRestaurants = restaurants.map((restaurant) => {
       if (restaurant.id === id) {
