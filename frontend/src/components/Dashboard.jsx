@@ -39,12 +39,6 @@ function Dashboard({ restaurants }) {
  * @param {number} id - The ID of the restaurant to be added to favorites.
  * @return {void} This function does not return anything.
  */
-/**
- * Handles the addition of a restaurant to favorites.
- *
- * @param {number} id - The ID of the restaurant to be added to favorites.
- * @return {void} This function does not return anything.
- */
   const handleAddToFavorites = (id) => {
     const updatedRestaurants = restaurants.map((restaurant) => {
       if (restaurant.id === id) {
