@@ -133,9 +133,9 @@ function Dashboard({ restaurants }) {
           Welcome To Your Dashboard
         </h2>
       </div>
-      <div className="relative">
+      <div>
         {/* Search Bar Compnent */}
-        <SearchBar />
+        <SearchBar search={search} handleSearch={handleSearch} />
 
         <div className="flex h-full items-center justify-center">
           <h2 className="mb-8 text-3xl text-indigo-300">
@@ -144,7 +144,7 @@ function Dashboard({ restaurants }) {
         </div>
 
         {/* Recommended - Table Data */}
-        <div className="container mx-auto p-4">
+        {/* <div className="container mx-auto p-4">
           <div className="max-h-[500px] overflow-x-auto">
             <table className="min-w-full bg-white">
               <thead className="bg-gray-800 text-white">
@@ -182,7 +182,7 @@ function Dashboard({ restaurants }) {
               </tbody>
             </table>
           </div>
-        </div>
+        </div> */}
       </div>
       {/*<!-- Glboal Container -->*/}
       {Array.isArray(restaurants) &&
