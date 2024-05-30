@@ -1,8 +1,7 @@
-// import { GoSearch } from "react-icons/go";
 import { FaHeartCirclePlus } from "react-icons/fa6";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import React, { useState } from "react";
-import SearchBar from "./SearchBar"
+import SearchBar from "./SearchBar";
 import LoginImg from "../assets/breakfast.jpg";
 import CardImage from "../assets/kabobs.jpg";
 
@@ -10,16 +9,16 @@ function Dashboard({ restaurants }) {
   const [search, setSearch] = useState("");
   const [filteredRestaurants, setFilteredRestaurants] = useState(restaurants);
 
-/**
- * Handles the search functionality by updating the search state and filtering the restaurants based on the search input.
- *
- * @param {Event} e - The event object triggered by the search input.
- * @return {void} This function does not return anything.
- */
+  /**
+   * Handles the search functionality by updating the search state and filtering the restaurants based on the search input.
+   *
+   * @param {Event} e - The event object triggered by the search input.
+   * @return {void} This function does not return anything.
+   */
   const handleSearch = (e) => {
     setSearch(e.target.value);
     const filtered = restaurants.filter((restaurant) =>
-      restaurant.name.toLowerCase().includes(search.toLowerCase())
+      restaurant.name.toLowerCase().includes(search.toLowerCase()),
     );
     setFilteredRestaurants(filtered);
   };
@@ -34,12 +33,12 @@ function Dashboard({ restaurants }) {
     e.preventDefault();
   };
 
-/**
- * Handles the addition of a restaurant to favorites.
- *
- * @param {number} id - The ID of the restaurant to be added to favorites.
- * @return {void} This function does not return anything.
- */
+  /**
+   * Handles the addition of a restaurant to favorites.
+   *
+   * @param {number} id - The ID of the restaurant to be added to favorites.
+   * @return {void} This function does not return anything.
+   */
   const handleAddToFavorites = (id) => {
     const updatedRestaurants = restaurants.map((restaurant) => {
       if (restaurant.id === id) {
@@ -50,12 +49,12 @@ function Dashboard({ restaurants }) {
     setFilteredRestaurants(updatedRestaurants);
   };
 
-/**
- * Handles the removal of a restaurant from favorites.
- *
- * @param {number} id - The ID of the restaurant to be removed from favorites.
- * @return {void} This function does not return anything.
- */
+  /**
+   * Handles the removal of a restaurant from favorites.
+   *
+   * @param {number} id - The ID of the restaurant to be removed from favorites.
+   * @return {void} This function does not return anything.
+   */
   const handleRemoveFromFavorites = (id) => {
     const updatedRestaurants = restaurants.map((restaurant) => {
       if (restaurant.id === id) {
@@ -66,12 +65,12 @@ function Dashboard({ restaurants }) {
     setFilteredRestaurants(updatedRestaurants);
   };
 
-/**
- * Handles the click event on a marker and updates the state of the filteredRestaurants array.
- *
- * @param {number} id - The ID of the restaurant associated with the clicked marker.
- * @return {void} This function does not return anything.
- */
+  /**
+   * Handles the click event on a marker and updates the state of the filteredRestaurants array.
+   *
+   * @param {number} id - The ID of the restaurant associated with the clicked marker.
+   * @return {void} This function does not return anything.
+   */
   const handleMarkerClick = (id) => {
     const updatedRestaurants = restaurants.map((restaurant) => {
       if (restaurant.id === id) {
@@ -82,12 +81,12 @@ function Dashboard({ restaurants }) {
     setFilteredRestaurants(updatedRestaurants);
   };
 
-/**
- * Handles the hover event on a marker and updates the state of the filtered restaurants.
- *
- * @param {number} id - The ID of the restaurant marker being hovered.
- * @return {void} This function does not return anything.
- */
+  /**
+   * Handles the hover event on a marker and updates the state of the filtered restaurants.
+   *
+   * @param {number} id - The ID of the restaurant marker being hovered.
+   * @return {void} This function does not return anything.
+   */
   const handleMarkerHover = (id) => {
     const updatedRestaurants = restaurants.map((restaurant) => {
       if (restaurant.id === id) {
@@ -136,8 +135,7 @@ function Dashboard({ restaurants }) {
       <div>
         {/* Search Bar Compnent */}
         <SearchBar search={search} handleSearch={handleSearch} />
-
-        <div className="flex h-full items-center justify-center">
+        <div className="relative flex h-full items-center justify-center">
           <h2 className="mb-8 text-3xl text-indigo-300">
             Recommendations For You!
           </h2>
