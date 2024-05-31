@@ -132,9 +132,11 @@ function Dashboard({ restaurants }) {
           Welcome To Your Dashboard
         </h2>
       </div>
-      <div>
+      <div className="sticky top-0 z-50">
         {/* Search Bar Compnent */}
         <SearchBar search={search} handleSearch={handleSearch} />
+      </div>
+      <div>
         <div className="relative flex h-full items-center justify-center">
           <h2 className="mb-8 text-3xl text-indigo-300">
             Recommendations For You!
