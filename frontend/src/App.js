@@ -15,8 +15,15 @@ function App() {
   const fetchRestaurants = async () => {
     try {
       const response = await axios.get("/api/restaurants");
-      setRestaurants(response.data);
-      console.log(response.data);
+      const restaurantList = response.data.map((restaurant) => {
+        return {
+          ...restaurant,
+          isFavorite: false,
+          id: restaurant.id,
+        };
+      });
+      setRestaurants(restaurantList);
+      console.log(restaurantList);
     } catch (error) {
       console.log("Error fetching data", error);
     }

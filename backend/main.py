@@ -121,12 +121,29 @@ DB: list[Restaurant] = [{
     }]
 
 
-@app.get("/restaurants")
+@app.get("/api/restaurants")
 def read_root():
-    return DB
+    restaurant_list = [
+        {
+            "id": restaurant["id"],
+            "name": restaurant["name"],
+            "address": restaurant["address"],
+            "contact_number": restaurant["contact_number"],
+            "rating": restaurant["rating"],
+            "reviews": restaurant["reviews"]
+        }
+        for restaurant in DB
+    ]
+    return restaurant_list
 
 
-@app.put("/restaurants/{id}")
+@app.get("/api/restaurants/{id}")
+def read_restaurant(id: int):
+    for restaurant in DB:
+        if restaurant["id"] == id:
+            return restaurant
+
+@app.put("/api/restaurants/{id}")
 def update_restaurant(id: int, restaurant: Restaurant):
     for r in DB:
         if r["id"] == id:
