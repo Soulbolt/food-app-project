@@ -7,7 +7,7 @@ function SearchBar() {
       <form className="mx-auto max-w-md">
         <label
           htmlFor="default-search"
-          class="sr-only mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          className="sr-only mb-2 text-sm font-medium text-gray-900 dark:text-white"
         >
           Search
         </label>

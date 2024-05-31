@@ -1,12 +1,14 @@
 import { FaHeartCirclePlus } from "react-icons/fa6";
 import { FaMapMarkerAlt } from "react-icons/fa";
-import React, { useState } from "react";
+import { fetchRestaurants } from "../services/apiRestaurants";
+import React, { useState, useEffect } from "react";
 import SearchBar from "./SearchBar";
 import LoginImg from "../assets/breakfast.jpg";
 import CardImage from "../assets/kabobs.jpg";
 
-function Dashboard({ restaurants }) {
+function Dashboard() {
   const [search, setSearch] = useState("");
+  const [restaurants, setRestaurants] = useState([]);
   const [filteredRestaurants, setFilteredRestaurants] = useState(restaurants);
 
   /**
@@ -65,53 +67,16 @@ function Dashboard({ restaurants }) {
     setFilteredRestaurants(updatedRestaurants);
   };
 
-  /**
-   * Handles the click event on a marker and updates the state of the filteredRestaurants array.
-   *
-   * @param {number} id - The ID of the restaurant associated with the clicked marker.
-   * @return {void} This function does not return anything.
-   */
-  const handleMarkerClick = (id) => {
-    const updatedRestaurants = restaurants.map((restaurant) => {
-      if (restaurant.id === id) {
-        return { ...restaurant, isMarkerClicked: !restaurant.isMarkerClicked };
-      }
-      return restaurant;
-    });
-    setFilteredRestaurants(updatedRestaurants);
-  };
-
-  /**
-   * Handles the hover event on a marker and updates the state of the filtered restaurants.
-   *
-   * @param {number} id - The ID of the restaurant marker being hovered.
-   * @return {void} This function does not return anything.
-   */
-  const handleMarkerHover = (id) => {
-    const updatedRestaurants = restaurants.map((restaurant) => {
-      if (restaurant.id === id) {
-        return { ...restaurant, isMarkerHovered: !restaurant.isMarkerHovered };
-      }
-      return restaurant;
-    });
-    setFilteredRestaurants(updatedRestaurants);
-  };
-
-  /**
-   * Handles the mouse leave event on a marker and updates the state of the filtered restaurants.
-   *
-   * @param {number} id - The ID of the restaurant marker being hovered.
-   * @return {void} This function does not return anything.
-   */
-  const handleMarkerLeave = (id) => {
-    const updatedRestaurants = restaurants.map((restaurant) => {
-      if (restaurant.id === id) {
-        return { ...restaurant, isMarkerHovered: !restaurant.isMarkerHovered };
-      }
-      return restaurant;
-    });
-    setFilteredRestaurants(updatedRestaurants);
-  };
+  useEffect(() => {
+    console.log("insde the useEffect");
+    if (restaurants.length === 0) {
+      fetchRestaurants().then((restaurantList) => {
+        setRestaurants(restaurantList);
+      });
+    } else {
+      setFilteredRestaurants(restaurants);
+    }
+  }, [restaurants]);
 
   return (
     <div
@@ -145,8 +110,11 @@ function Dashboard({ restaurants }) {
       </div>
       {/*<!-- Glboal Container -->*/}
       {Array.isArray(restaurants) &&
-        restaurants.map((restaurant, index) => (
-          <div className="mb-3 flex items-center justify-center">
+        restaurants.map((restaurant) => (
+          <div
+            key={restaurant.id}
+            className="mb-3 flex items-center justify-center"
+          >
             {/* <!-- Card Container --> */}
             <div className="m-3 flex flex-col space-y-10 rounded-2xl bg-white p-6 shadow-2xl md:m-0 md:flex-row md:space-x-10 md:space-y-0 md:p-16">
               {/*<!-- Image Container -->*/}
@@ -168,10 +136,7 @@ function Dashboard({ restaurants }) {
                 </div>
 
                 {/*<!-- Title -->*/}
-                <div
-                  key={index}
-                  className="max-w-sm text-center text-4xl font-medium md:text-left"
-                >
+                <div className="max-w-sm text-center text-4xl font-medium md:text-left">
                   {restaurant.name}
                 </div>
                 {/*<!-- Price -->*/}
@@ -197,7 +162,7 @@ function Dashboard({ restaurants }) {
                 <div className="group flex items-center space-x-3">
                   <div className="h-3 w-3 rounded-full bg-green-400 group-hover:animate-ping"></div>
                   <div className="text-sm">
-                    <p key={index}>Rating: {restaurant.rating}</p>
+                    <p key={restaurant.id}>Rating: {restaurant.rating}</p>
                   </div>
                 </div>
                 {/*<!-- Bottom Buttons Container -->*/}
