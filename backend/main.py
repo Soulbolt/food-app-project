@@ -16,6 +16,7 @@ app.add_middleware(
 )
 
 class Restaurant(BaseModel):
+    id: int
     name: str
     address: str
     contact_number: str
@@ -24,6 +25,7 @@ class Restaurant(BaseModel):
 
 # Mock database in json format
 DB: list[Restaurant] = [{
+        "id": 1,
         "name": "The Gourmet Kitchen",
         "address": "123 Maple Street, Springfield, IL 62704",
         "contact_number": "(217) 555-1234",
@@ -42,6 +44,7 @@ DB: list[Restaurant] = [{
         ]
     },
 {
+        "id": 2,
         "name": "Pizza Paradise",
         "address": "456 Elm Avenue, Springfield, IL 62705",
         "contact_number": "(217) 555-5678",
@@ -60,6 +63,7 @@ DB: list[Restaurant] = [{
         ]
     },
 {
+        "id": 3,
         "name": "Sushi World",
         "address": "789 Oak Street, Springfield, IL 62706",
         "contact_number": "(217) 555-9012",
@@ -78,6 +82,7 @@ DB: list[Restaurant] = [{
         ]
     },
 {
+        "id": 4,
         "name": "Curry House",
         "address": "101 Pine Lane, Springfield, IL 62707",
         "contact_number": "(217) 555-3456",
@@ -96,6 +101,7 @@ DB: list[Restaurant] = [{
         ]
     },
 {
+        "id": 5,
         "name": "Burger Barn",
         "address": "202 Birch Road, Springfield, IL 62708",
         "contact_number": "(217) 555-7890",
@@ -115,11 +121,14 @@ DB: list[Restaurant] = [{
     }]
 
 
-@app.get("/api/restaurants")
+@app.get("/restaurants")
 def read_root():
     return DB
 
 
-# @app.get("/api/people")
-# def read_people():
-#     return DB
+@app.put("/restaurants/{id}")
+def update_restaurant(id: int, restaurant: Restaurant):
+    for r in DB:
+        if r["id"] == id:
+            r.update(restaurant)
+    return DB
