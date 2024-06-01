@@ -99,12 +99,10 @@ function Dashboard() {
         {/* Search Bar Compnent */}
         <SearchBar search={search} handleSearch={handleSearch} />
       </div>
-      <div>
-        <div className="relative flex h-full items-center justify-center">
-          <h2 className="mb-8 text-3xl text-indigo-300">
-            Recommendations For You!
-          </h2>
-        </div>
+      <div className="relative flex h-full items-center justify-center">
+        <h2 className="mb-8 text-3xl text-indigo-300">
+          Recommendations For You!
+        </h2>
       </div>
       {/*<!-- Glboal Container -->*/}
       {Array.isArray(restaurants) &&
