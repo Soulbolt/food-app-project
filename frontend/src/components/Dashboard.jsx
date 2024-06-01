@@ -73,10 +73,8 @@ function Dashboard() {
       fetchRestaurants().then((restaurantList) => {
         setRestaurants(restaurantList);
       });
-    } else {
-      setFilteredRestaurants(restaurants);
     }
-  }, [restaurants]);
+  }, []);
 
   return (
     <div
