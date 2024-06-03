@@ -74,7 +74,7 @@ function Dashboard() {
         setRestaurants(restaurantList);
       });
     }
-  }, []);
+  }, [restaurants.length]);
 
   return (
     <div
