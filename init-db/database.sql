@@ -72,6 +72,11 @@ BEGIN;
       generate_phone_number(),
       generate_random_rating()
     );
+
+    -- Insert random number of reviews for each restaurant
+    INSERT INTO restaurants_database.reviews (restaurant_id, username, review, rating)
+    SELECT currval('restaurant_id_seq'), generate_random_string(), generate_random_string(100), generate_random_rating()
+    FROM generate_series(1, generate_random_number_reviews_count());
   END LOOP;
   COMMIT;
   $$;
