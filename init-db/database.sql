@@ -42,3 +42,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql VOLATILE COST 100;
 $$
+
+-- Function to generate random ratings
+CREATE OR REPLACE FUNCTION generate_random_rating()
+RETURNS DECIMAL(2, 1) AS $$
+BEGIN
+  RETURN floor(random() * (50 - 30) + 30) / 10.0;
+END;
+$$ LANGUAGE plpgsql VOLATILE COST 100;
+$$
