@@ -60,3 +60,18 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql VOLATILE COST 100;
 $$
+
+-- Insert 100 random restaurants data into restaurants table
+BEGIN;
+  FOR i IN 1..100 LOOP
+    INSERT INTO restaurants_database.restaurants (name, address, contact_number, rating)
+    VALUES
+    (
+      generate_random_string(),
+      generate_random_string(50),
+      generate_phone_number(),
+      generate_random_rating()
+    );
+  END LOOP;
+  COMMIT;
+  $$;
