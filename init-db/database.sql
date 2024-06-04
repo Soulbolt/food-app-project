@@ -51,3 +51,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql VOLATILE COST 100;
 $$
+
+-- Function to generate random number of reviews for a restaurant (1-5)
+CREATE OR REPLACE FUNCTION generate_random_number_reviews_count()
+RETURNS DECIMAL(2, 1) AS $$
+BEGIN
+  RETURN floor(random() * (5 - 1) + 1);
+END;
+$$ LANGUAGE plpgsql VOLATILE COST 100;
+$$
