@@ -8,3 +8,13 @@ CREATE TABLE IF NOT EXISTS restaurants_database.restaurants
     contact_number VARCHAR(255) NOT NULL,
     rating DECIMAL(2, 1) DEFAULT NULL
 );
+
+CREATE TABLE IF NOT EXISTS restaurants_database.reviews
+(
+    id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    restaurant_id BIGINT NOT NULL,
+    username VARCHAR(255) NOT NULL,
+    review TEXT NOT NULL,
+    rating DECIMAL(2, 1) NOT NULL,
+    FOREIGN KEY (restaurant_id) REFERENCES restaurants_database.restaurants (id)
+)
