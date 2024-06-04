@@ -1,6 +1,11 @@
-FROM python:3.12
-WORKDIR /api
-COPY ./requirements.txt /api/requirements.txt
-RUN pip install --no-cache-dir --upgrade -r /api/requirements.txt
-COPY . /api
-CMD [ "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000" ]
+FROM postgres:latest
+
+ENV POSTGRES_USER=postgres
+ENV POSTGRES_PASSWORD=myfoodapp
+ENV POSTGRES_DB=food-app-db
+
+RUN mkdir /docker-entrypoint-initdb.d
+
+COPY data.sql /docker-entrypoint-initdb.d
+
+CMD ["postgres", "-h", "localhost", "-p", "5432"]
