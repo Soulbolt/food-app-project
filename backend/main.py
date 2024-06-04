@@ -17,9 +17,9 @@ app.add_middleware(
 )
 
 #### DATABASE ####
-dbname = "database-postgres"
+dbname = "food-app-db"
 user = "postgres"
-password = "password"
+password = "myfoodapp"
 host = "localhost"
 port = "5432"
 
@@ -37,6 +37,13 @@ except psycopg2.Error as e:
 
 ### CURSOR ###
 cur = conn.cursor()
+
+cur.execute("SELECT * FROM restaurants")
+rows = cur.fetchall()
+print("rows: ", rows)
+
+cur.close()
+conn.close()
 
 class Restaurant(BaseModel):
     id: int
