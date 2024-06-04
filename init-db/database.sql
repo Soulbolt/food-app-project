@@ -80,3 +80,5 @@ BEGIN;
   END LOOP;
   COMMIT;
   $$;
+
+  DROP FUNCTION generate_random_string, generate_phone_number, generate_random_rating, generate_random_number_reviews_count;
