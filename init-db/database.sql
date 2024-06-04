@@ -28,3 +28,17 @@ RETURNS VARCHAR(length) AS $$
 SELECT floor(random() * (26^length))::text || repeat('a', length);
 $$ LANGUAGE plpgsql VOLATILE COST 100;
 $$
+
+-- Function to generate random phone numbers
+CREATE OR REPLACE FUNCTION generate_phone_number()
+RETURNS VARCHAR(20) AS $$
+DECLARE
+  phone_number VARCHAR(20);
+BEGIN
+  phone_number := '(' || floor(random() * 900) + 100 || ') ';
+  phone_number := phone_number || floor(random() * 9000) + 1000 || '-';
+  phone_number := phone_number || floor(random() * 9000) + 1000;
+  RETURN phone_number;
+END;
+$$ LANGUAGE plpgsql VOLATILE COST 100;
+$$
