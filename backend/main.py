@@ -2,6 +2,7 @@ from typing import List
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+import psycopg2
 
 app = FastAPI()
 
@@ -14,6 +15,28 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+#### DATABASE ####
+dbname = "database-postgres"
+user = "postgres"
+password = "password"
+host = "localhost"
+port = "5432"
+
+try:
+    conn = psycopg2.connect(
+    dbname=dbname,
+    user=user,
+    password=password,
+    host=host,
+    port=port
+)
+except psycopg2.Error as e:
+    print("Error connecting to database: ", e)
+    exit()
+
+### CURSOR ###
+cur = conn.cursor()
 
 class Restaurant(BaseModel):
     id: int
