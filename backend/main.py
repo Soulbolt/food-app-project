@@ -38,7 +38,7 @@ except psycopg2.Error as e:
 ### CURSOR ###
 cur = conn.cursor()
 
-cur.execute("SELECT * FROM restaurants")
+cur.execute("SELECT * FROM restaurant_schema.restaurants")
 rows = cur.fetchall()
 print("rows: ", rows)
 

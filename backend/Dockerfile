@@ -4,8 +4,8 @@ ENV POSTGRES_USER=postgres
 ENV POSTGRES_PASSWORD=myfoodapp
 ENV POSTGRES_DB=food-app-db
 
-RUN mkdir /docker-entrypoint-initdb.d
+RUN mkdir -p /docker-entrypoint-initdb.d
 
-COPY data.sql /docker-entrypoint-initdb.d
+COPY init-db/database.sql /docker-entrypoint-initdb.d/
 
 CMD ["postgres", "-h", "localhost", "-p", "5432"]
