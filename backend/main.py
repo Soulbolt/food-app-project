@@ -1,6 +1,8 @@
+from decimal import Decimal
 from typing import List
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 import psycopg2
 from psycopg2 import sql
@@ -30,35 +32,16 @@ db_config = {
     'port': os.getenv('DB_PORT'),
 }
 
-try:
-    print("Connecting to the PostgreSQL database...")
-    # Establish connection
-    conn = psycopg2.connect(**db_config)
-    # Cursor
-    cur = conn.cursor()
+def connect_to_database():
+    try:
+        print("Connecting to the PostgreSQL database...")
+        # Establish connection
+        conn = psycopg2.connect(**db_config)
+        return conn
 
-    # Print PostgreSQL Connection Properties
-    print("connection parameters:", conn.get_dsn_parameters(), "\n")
-
-    # Execute a test query
-    cur.execute("SELECT version();")
-
-    # Fetch a single row
-    record = cur.fetchone()
-    print("You are connected to - ", record, "\n")
-
-
-except psycopg2.Error as e:
-    print("Error connecting to PostgreSQL database: ", e)
-    exit()
-
-
-cur.execute("SELECT * FROM restaurant_schema.restaurants")
-rows = cur.fetchall()
-print("rows: ", rows)
-
-cur.close()
-conn.close()
+    except Exception as e:
+        print("Error connecting to PostgreSQL database: ", e)
+        return None
 
 class Restaurant(BaseModel):
     id: int
@@ -167,23 +150,47 @@ DB: list[Restaurant] = [{
 
 """ Returns the entire list of restaurants """
 @app.get("/api/restaurants")
-def read_root():
-    restaurant_list = [
-        {
-            "id": restaurant["id"],
-            "name": restaurant["name"],
-            "address": restaurant["address"],
-            "contact_number": restaurant["contact_number"],
-            "rating": restaurant["rating"],
-            "reviews": restaurant["reviews"]
-        }
-        for restaurant in DB
-    ]
-    return restaurant_list
+async def get_restaurants():
+    conn = connect_to_database()
+    if not conn:
+        raise HTTPException(status_code=500, detail="Could not connect to the database")
+    try:
+        print("Connected to the database!")
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM restaurant_schema.restaurants")
+        rows = cursor.fetchall()
+        colnames = [desc[0] for desc in cursor.description]
+        result = []
+        for row in rows:
+            record = dict(zip(colnames, row))
+            # Convert Decimal to float for JSON serialization
+            for key, value in record.items():
+                if isinstance(value, Decimal):
+                    record[key] = float(value)
+            result.append(record)
+        return JSONResponse(content=result)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+        conn.close()
+
+    # restaurant_list = [
+    #     {
+    #         "id": restaurant["id"],
+    #         "name": restaurant["name"],
+    #         "address": restaurant["address"],
+    #         "contact_number": restaurant["contact_number"],
+    #         "rating": restaurant["rating"],
+    #         "reviews": restaurant["reviews"]
+    #     }
+    #     for restaurant in DB
+    # ]
+    # return restaurant_list
 
 """ Returns the restaurant with the specified ID """
 @app.get("/api/restaurants/{id}")
-def read_restaurant(id: int):
+def get_restaurant(id: int):
     for restaurant in DB:
         if restaurant["id"] == id:
             return restaurant
