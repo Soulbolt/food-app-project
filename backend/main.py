@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import psycopg2
+from psycopg2 import sql
 
 app = FastAPI()
 
@@ -16,27 +17,36 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-#### DATABASE ####
-dbname = "food-app-db"
-user = "postgres"
-password = "myfoodapp"
-host = "localhost"
-port = "5432"
+# Database configuration
+db_config = {
+    "dbname": "postgres",
+    "user": "postgres",
+    "password": "Heater589![tango]",
+    "host": "localhost",
+    "port": "5432"
+}
 
 try:
-    conn = psycopg2.connect(
-    dbname=dbname,
-    user=user,
-    password=password,
-    host=host,
-    port=port
-)
+    # Establish connection
+    conn = psycopg2.connect(**db_config)
+    # Cursor
+    cur = conn.cursor()
+
+    # Print PostgreSQL Connection Properties
+    print("connection parameters:", conn.get_dsn_parameters(), "\n")
+
+    # Execute a test query
+    cur.execute("SELECT version();")
+
+    # Fetch a single row
+    record = cur.fetchone()
+    print("You are connected to - ", record, "\n")
+
+
 except psycopg2.Error as e:
-    print("Error connecting to database: ", e)
+    print("Error connecting to PostgreSQL database: ", e)
     exit()
 
-### CURSOR ###
-cur = conn.cursor()
 
 cur.execute("SELECT * FROM restaurant_schema.restaurants")
 rows = cur.fetchall()

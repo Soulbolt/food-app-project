@@ -1,5 +1,5 @@
 -- Create a new schema
-CREATE SCHEMA restaurant_schema;
+CREATE SCHEMA IF NOT EXISTS restaurant_schema;
 
 -- Create the restaurants table
 CREATE TABLE restaurant_schema.restaurants (
