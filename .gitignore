@@ -3,4 +3,5 @@ backend/__pycache__
 backend/requirements.txt
 backend/instance
 backend/.env
+backend/docker-compose.yml
 .venv

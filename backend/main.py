@@ -4,6 +4,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import psycopg2
 from psycopg2 import sql
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = FastAPI()
 
@@ -19,14 +23,15 @@ app.add_middleware(
 
 # Database configuration
 db_config = {
-    "dbname": "postgres",
-    "user": "postgres",
-    "password": "Heater589![tango]",
-    "host": "localhost",
-    "port": "5432"
+    'host': os.getenv('DB_HOST'),
+    'dbname': os.getenv('DB_NAME'),
+    'user': os.getenv('DB_USER'),
+    'password': os.getenv('DB_PASSWORD'),
+    'port': os.getenv('DB_PORT'),
 }
 
 try:
+    print("Connecting to the PostgreSQL database...")
     # Establish connection
     conn = psycopg2.connect(**db_config)
     # Cursor
