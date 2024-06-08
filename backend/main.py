@@ -157,17 +157,51 @@ async def get_restaurants():
     try:
         print("Connected to the database!")
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM restaurant_schema.restaurants")
+        query = """
+            SELECT 
+                r.id AS restaurant_id,
+                r.name AS restaurant_name,
+                r.address,
+                r.contact_number,
+                r.rating AS restaurant_rating,
+                rv.id AS review_id,
+                rv.username,
+                rv.review,
+                rv.rating AS review_rating
+            FROM 
+                restaurant_schema.restaurants r
+            LEFT JOIN 
+                restaurant_schema.reviews rv ON r.id = rv.restaurant_id;
+        """
+        cursor.execute(query)
         rows = cursor.fetchall()
         colnames = [desc[0] for desc in cursor.description]
-        result = []
+        result_dict = {}
         for row in rows:
             record = dict(zip(colnames, row))
             # Convert Decimal to float for JSON serialization
             for key, value in record.items():
                 if isinstance(value, Decimal):
                     record[key] = float(value)
-            result.append(record)
+            restaurant_id = record["restaurant_id"]
+            if restaurant_id not in result_dict:
+                result_dict[restaurant_id] = {
+                    "id": record["restaurant_id"],
+                    "name": record["restaurant_name"],
+                    "address": record["address"],
+                    "contact_number": record["contact_number"],
+                    "rating": record["restaurant_rating"],
+                    "reviews": []
+                }
+            if record["review_id"] is not None:
+                review = {
+                    "username": record["username"],
+                    "review": record["review"],
+                    "rating": record["review_rating"]
+                }
+                result_dict[restaurant_id]["reviews"].append(review)
+        
+        result = list(result_dict.values())
         return JSONResponse(content=result)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
