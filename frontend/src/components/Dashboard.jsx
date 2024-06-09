@@ -8,6 +8,7 @@ import Spinner from "./Spinner";
 import React, { useState, useEffect } from "react";
 import SearchBar from "./SearchBar";
 import LoginImg from "../assets/breakfast.jpg";
+import RestaurantCard from "./RestaurantCard";
 import CardImage from "../assets/kabobs.jpg";
 
 function Dashboard() {
@@ -45,13 +46,11 @@ function Dashboard() {
    * @return {void} This function does not return anything.
    */
   const handleAddToFavorites = (id) => {
-    const updatedRestaurants = restaurants.map((restaurant) => {
-      if (restaurant.id === id) {
-        return { ...restaurant, isFavorite: !restaurant.isFavorite };
-      }
-      return restaurant;
-    });
-    setFilteredRestaurants(updatedRestaurants);
+    setRestaurants((prevRestaurants) =>
+      prevRestaurants.map((restaurant) =>
+        restaurant.id === id ? { ...restaurant, isFavorite: true } : restaurant,
+      ),
+    );
   };
 
   /**
@@ -61,13 +60,13 @@ function Dashboard() {
    * @return {void} This function does not return anything.
    */
   const handleRemoveFromFavorites = (id) => {
-    const updatedRestaurants = restaurants.map((restaurant) => {
-      if (restaurant.id === id) {
-        return { ...restaurant, isFavorite: !restaurant.isFavorite };
-      }
-      return restaurant;
-    });
-    setFilteredRestaurants(updatedRestaurants);
+    setRestaurants((prevRestaurants) =>
+      prevRestaurants.map((restaurant) =>
+        restaurant.id === id
+          ? { ...restaurant, isFavorite: false }
+          : restaurant,
+      ),
+    );
   };
 
   useEffect(() => {
