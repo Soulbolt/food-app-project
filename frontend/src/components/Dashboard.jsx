@@ -1,6 +1,9 @@
 import { FaHeartCirclePlus } from "react-icons/fa6";
 import { FaMapMarkerAlt } from "react-icons/fa";
-import { fetchRestaurants } from "../services/apiRestaurants";
+import {
+  fetchRestaurants,
+  fetchRecommendedRestaurants,
+} from "../services/apiRestaurants";
 import Spinner from "./Spinner";
 import React, { useState, useEffect } from "react";
 import SearchBar from "./SearchBar";
@@ -19,11 +22,9 @@ function Dashboard() {
    * @param {Event} e - The event object triggered by the search input.
    * @return {void} This function does not return anything.
    */
-  const handleSearch = (e) => {
+  const handleSearch = async (e) => {
     setSearch(e.target.value);
-    const filtered = restaurants.filter((restaurant) =>
-      restaurant.name.toLowerCase().includes(search.toLowerCase()),
-    );
+    const filtered = await fetchRestaurants();
     setFilteredRestaurants(filtered);
   };
 
