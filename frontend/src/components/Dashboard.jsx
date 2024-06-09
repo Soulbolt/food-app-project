@@ -4,7 +4,7 @@ import {
   fetchRestaurantById,
 } from "../services/apiRestaurants";
 import Spinner from "./Spinner";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import SearchBar from "./SearchBar";
 import LoginImg from "../assets/breakfast.jpg";
 import RestaurantCard from "./RestaurantCard";
@@ -16,21 +16,30 @@ function Dashboard() {
   const [recommendedRestaurants, setRecommendedRestaurants] = useState([]);
   const [filteredRestaurants, setFilteredRestaurants] = useState([]);
 
+  /**
+   * Handles the search functionality by fetching a restaurant by ID and updating the filtered restaurants state.
+   *
+   * @param {Event} e - The event object triggered by the search input.
+   * @return {Promise<void>} A promise that resolves when the search is complete.
+   */
   const handleSearch = async (e) => {
     e.preventDefault();
-    const searchTerm = e.target.value;
-    setSearch(searchTerm);
+    setSearch(search);
 
-    if (searchTerm.trim() === "") {
+    if (search.trim() === "" || !search) {
       setFilteredRestaurants(recommendedRestaurants);
       return;
     }
 
+    setIsLoading(true);
+
     try {
-      const filtered = await fetchRestaurantById(searchTerm);
+      const filtered = await fetchRestaurantById(search);
       setFilteredRestaurants([filtered]);
     } catch (error) {
       console.error("Error fetching data:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -98,7 +107,11 @@ function Dashboard() {
           </div>
           <div className="sticky top-0 z-50">
             {/* Search Bar Compnent */}
-            <SearchBar search={search} handleSearch={handleSearch} />
+            <SearchBar
+              search={search}
+              setSearch={setSearch}
+              handleSearch={handleSearch}
+            />
           </div>
           <div className="relative flex h-full items-center justify-center">
             <h2 className="mb-8 text-3xl text-indigo-300">
