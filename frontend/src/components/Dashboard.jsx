@@ -74,7 +74,7 @@ function Dashboard() {
     console.log("inside the useEffect");
     fetchRecommendedRestaurants().then((restaurantList) => {
       setRestaurants(restaurantList);
-      setFilteredRestaurants(restaurantList);
+      // setFilteredRestaurants(restaurantList);
       setIsLoading(false);
     });
   }, []);
