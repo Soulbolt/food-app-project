@@ -209,18 +209,21 @@ async def get_restaurants():
         cursor.close()
         conn.close()
 
-    # restaurant_list = [
-    #     {
-    #         "id": restaurant["id"],
-    #         "name": restaurant["name"],
-    #         "address": restaurant["address"],
-    #         "contact_number": restaurant["contact_number"],
-    #         "rating": restaurant["rating"],
-    #         "reviews": restaurant["reviews"]
-    #     }
-    #     for restaurant in DB
-    # ]
-    # return restaurant_list
+""" Returns the recommended list of restaurants """
+@app.get("/api/restaurants/recommended")
+def get_recommended_restaurants():
+    restaurant_list = [
+        {
+            "id": restaurant["id"],
+            "name": restaurant["name"],
+            "address": restaurant["address"],
+            "contact_number": restaurant["contact_number"],
+            "rating": restaurant["rating"],
+            "reviews": restaurant["reviews"]
+        }
+        for restaurant in DB
+    ]
+    return restaurant_list
 
 """ Returns the restaurant with the specified ID """
 @app.get("/api/restaurants/{id}")
