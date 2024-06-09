@@ -16,12 +16,6 @@ function Dashboard() {
   const [recommendedRestaurants, setRecommendedRestaurants] = useState([]);
   const [filteredRestaurants, setFilteredRestaurants] = useState([]);
 
-  /**
-   * Handles the search functionality by updating the search state and filtering the restaurants based on the search input.
-   *
-   * @param {Event} e - The event object triggered by the search input.
-   * @return {void} This function does not return anything.
-   */
   const handleSearch = async (e) => {
     e.preventDefault();
     const searchTerm = e.target.value;
@@ -47,7 +41,7 @@ function Dashboard() {
    * @return {void} This function does not return anything.
    */
   const handleAddToFavorites = (id) => {
-    setRestaurant((prevRestaurants) =>
+    setFilteredRestaurants((prevRestaurants) =>
       prevRestaurants.map((restaurant) =>
         restaurant.id === id ? { ...restaurant, isFavorite: true } : restaurant,
       ),
@@ -61,7 +55,7 @@ function Dashboard() {
    * @return {void} This function does not return anything.
    */
   const handleRemoveFromFavorites = (id) => {
-    setRestaurant((prevRestaurants) =>
+    setFilteredRestaurants((prevRestaurants) =>
       prevRestaurants.map((restaurant) =>
         restaurant.id === id
           ? { ...restaurant, isFavorite: false }
@@ -74,35 +68,10 @@ function Dashboard() {
     console.log("inside the useEffect");
     fetchRecommendedRestaurants().then((restaurantList) => {
       setRecommendedRestaurants(restaurantList);
-      // setFilteredRestaurants(restaurantList);
+      setFilteredRestaurants(restaurantList);
       setIsLoading(false);
     });
   }, []);
-
-  useEffect(() => {
-    console.log("inside the useEffect for fetchById with id", id);
-    if (id === 0) {
-      return;
-    }
-    const fetchData = async () => {
-      console.log("inside the useEffect for fetchById");
-      try {
-        const response = await fetchRestaurantById(id);
-        setRestaurant(response);
-      } catch (error) {
-        console.log("Error fetching data", error);
-      }
-    };
-    fetchData();
-  }, [id]);
-
-  if (!restaurant) {
-    return (
-      <div>
-        <Spinner />
-      </div>
-    );
-  }
 
   return (
     <div>
@@ -137,15 +106,16 @@ function Dashboard() {
             </h2>
           </div>
           {/*<!-- Glboal Container -->*/}
-          {Array.isArray(recommendedRestaurants) &&
-            recommendedRestaurants.map((restaurant) => (
-              <RestaurantCard
-                key={restaurant.id}
-                {...restaurant}
-                onAddToFavorites={handleAddToFavorites}
-                onRemoveFromFavorites={handleRemoveFromFavorites}
-              />
-            ))}
+          {filteredRestaurants.map((restaurant) => (
+            <RestaurantCard
+              key={restaurant.id}
+              {...restaurant}
+              onAddToFavorites={() => handleAddToFavorites(restaurant.id)}
+              onRemoveFromFavorites={() =>
+                handleRemoveFromFavorites(restaurant.id)
+              }
+            />
+          ))}
         </div>
       )}
     </div>
