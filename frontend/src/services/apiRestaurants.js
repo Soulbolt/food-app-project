@@ -33,7 +33,7 @@ export async function fetchRecommendedRestaurants() {
   }
 }
 
-export async function fetchRestaurant(id) {
+export async function fetchRestaurantById(id) {
   try {
     const response = await axios.get(`/api/restaurants/${id}`);
     const restaurant = response.data;

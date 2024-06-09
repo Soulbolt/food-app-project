@@ -1,9 +1,10 @@
 import {
   fetchRestaurants,
   fetchRecommendedRestaurants,
+  fetchRestaurantById,
 } from "../services/apiRestaurants";
 import Spinner from "./Spinner";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import SearchBar from "./SearchBar";
 import LoginImg from "../assets/breakfast.jpg";
 import RestaurantCard from "./RestaurantCard";
@@ -11,7 +12,8 @@ import RestaurantCard from "./RestaurantCard";
 function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [restaurants, setRestaurants] = useState([]);
+  const [restaurant, setRestaurant] = useState([]);
+  const [recommendedRestaurants, setRecommendedRestaurants] = useState([]);
   const [filteredRestaurants, setFilteredRestaurants] = useState([]);
 
   /**
@@ -22,9 +24,20 @@ function Dashboard() {
    */
   const handleSearch = async (e) => {
     e.preventDefault();
-    setSearch(e.target.value);
-    const filtered = await fetchRestaurants();
-    setFilteredRestaurants(filtered);
+    const searchTerm = e.target.value;
+    setSearch(searchTerm);
+
+    if (searchTerm.trim() === "") {
+      setFilteredRestaurants(recommendedRestaurants);
+      return;
+    }
+
+    try {
+      const filtered = await fetchRestaurantById(searchTerm);
+      setFilteredRestaurants([filtered]);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
   };
 
   /**
@@ -34,7 +47,7 @@ function Dashboard() {
    * @return {void} This function does not return anything.
    */
   const handleAddToFavorites = (id) => {
-    setRestaurants((prevRestaurants) =>
+    setRestaurant((prevRestaurants) =>
       prevRestaurants.map((restaurant) =>
         restaurant.id === id ? { ...restaurant, isFavorite: true } : restaurant,
       ),
@@ -48,7 +61,7 @@ function Dashboard() {
    * @return {void} This function does not return anything.
    */
   const handleRemoveFromFavorites = (id) => {
-    setRestaurants((prevRestaurants) =>
+    setRestaurant((prevRestaurants) =>
       prevRestaurants.map((restaurant) =>
         restaurant.id === id
           ? { ...restaurant, isFavorite: false }
@@ -60,11 +73,36 @@ function Dashboard() {
   useEffect(() => {
     console.log("inside the useEffect");
     fetchRecommendedRestaurants().then((restaurantList) => {
-      setRestaurants(restaurantList);
+      setRecommendedRestaurants(restaurantList);
       // setFilteredRestaurants(restaurantList);
       setIsLoading(false);
     });
   }, []);
+
+  useEffect(() => {
+    console.log("inside the useEffect for fetchById with id", id);
+    if (id === 0) {
+      return;
+    }
+    const fetchData = async () => {
+      console.log("inside the useEffect for fetchById");
+      try {
+        const response = await fetchRestaurantById(id);
+        setRestaurant(response);
+      } catch (error) {
+        console.log("Error fetching data", error);
+      }
+    };
+    fetchData();
+  }, [id]);
+
+  if (!restaurant) {
+    return (
+      <div>
+        <Spinner />
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -99,8 +137,8 @@ function Dashboard() {
             </h2>
           </div>
           {/*<!-- Glboal Container -->*/}
-          {Array.isArray(restaurants) &&
-            restaurants.map((restaurant) => (
+          {Array.isArray(recommendedRestaurants) &&
+            recommendedRestaurants.map((restaurant) => (
               <RestaurantCard
                 key={restaurant.id}
                 {...restaurant}
