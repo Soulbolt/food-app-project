@@ -14,7 +14,7 @@ function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [restaurants, setRestaurants] = useState([]);
-  const [filteredRestaurants, setFilteredRestaurants] = useState(restaurants);
+  const [filteredRestaurants, setFilteredRestaurants] = useState([]);
 
   /**
    * Handles the search functionality by updating the search state and filtering the restaurants based on the search input.
@@ -72,7 +72,7 @@ function Dashboard() {
 
   useEffect(() => {
     console.log("inside the useEffect");
-    fetchRestaurants().then((restaurantList) => {
+    fetchRecommendedRestaurants().then((restaurantList) => {
       setRestaurants(restaurantList);
       setFilteredRestaurants(restaurantList);
       setIsLoading(false);

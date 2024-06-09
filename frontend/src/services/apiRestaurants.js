@@ -27,7 +27,6 @@ export async function fetchRecommendedRestaurants() {
         id: restaurant.id,
       };
     });
-    console.log("The list:", restaurantList);
     return restaurantList;
   } catch (error) {
     console.log("Error fetching data", error);
