@@ -21,19 +21,10 @@ function Dashboard() {
    * @return {void} This function does not return anything.
    */
   const handleSearch = async (e) => {
+    e.preventDefault();
     setSearch(e.target.value);
     const filtered = await fetchRestaurants();
     setFilteredRestaurants(filtered);
-  };
-
-  /**
-   * Handles the submission of the search form by preventing the default form submission behavior.
-   *
-   * @param {Event} e - The event object representing the form submission event.
-   * @return {void} This function does not return anything.
-   */
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
   };
 
   /**
