@@ -1,5 +1,5 @@
 import React from "react";
-import { FaHeartCirclePlus } from "react-icons/fa6";
+import { FaHeartCirclePlus, FaHeartCrack } from "react-icons/fa6";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import CardImage from "../assets/kabobs.jpg";
 
@@ -72,13 +72,23 @@ function RestaurantCard({
             </button>
 
             <div className="flex flex-col space-y-4 md:flex-row md:space-x-4 md:space-y-0">
-              <button
-                onClick={onAddToFavorites}
-                className="flex items-center justify-center space-x-3 rounded-lg border-2 border-gray-300 px-5 py-3 shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:bg-opacity-30 hover:shadow-lg"
-              >
-                <FaHeartCirclePlus className="w-8 text-4xl text-red-600" />
-                <span>Add to Favorites</span>
-              </button>
+              {isFavorite ? (
+                <button
+                  onClick={onRemoveFromFavorites}
+                  className="flex items-center justify-center space-x-3 rounded-lg border-2 border-gray-300 px-5 py-3 shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:bg-opacity-30 hover:shadow-lg"
+                >
+                  <FaHeartCrack className="w-8 text-4xl text-red-600" />
+                  <span>Remove from Favorites</span>
+                </button>
+              ) : (
+                <button
+                  onClick={onAddToFavorites}
+                  className="flex items-center justify-center space-x-3 rounded-lg border-2 border-gray-300 px-5 py-3 shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:bg-opacity-30 hover:shadow-lg"
+                >
+                  <FaHeartCirclePlus className="w-8 text-4xl text-red-600" />
+                  <span>Add to Favorites</span>
+                </button>
+              )}
             </div>
           </div>
         </div>
