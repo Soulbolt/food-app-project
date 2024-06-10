@@ -26,6 +26,19 @@ def generate_restaurant(num_restaurants):
     return restaurants
 
 # Geenerate 100 random restaurants
-num_restaurants = 100
-restaurants = generate_restaurant(num_restaurants)
-print(restaurants)
+restaurant_data = generate_restaurant(100)
+# num_restaurants = 100
+# restaurants = generate_restaurant(num_restaurants)
+# print(restaurants)
+
+# Generate SQL INSERT statements
+insert_statements = []
+for data in restaurant_data:
+    category, name, address, contact_number, rating = data
+    insert_statements.append(f"INSERT INTO restaurants (category, name, address, contact_number, rating) VALUES ('{category}', '{name}', '{address}', '{contact_number}', {rating});")
+
+# Write SQL INSERT statements to file   
+with open("insert_restaurants.sql", "w") as file:
+    file.write("\n".join(insert_statements))
+
+print("SQL statements written to insert_restaurants.sql successfully")
