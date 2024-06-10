@@ -33,20 +33,34 @@ def generate_restaurant(num_restaurants):
         restaurants.append((category, name, address, contact_number, rating))
     return restaurants
 
-# Geenerate 100 random restaurants
-restaurant_data = generate_restaurant(100)
+def generate_reviews(num_reviews):
+    reviews = []
+    for i in range(num_reviews):
+        restaurant_id = random.randint(1, 100)
+        username = fake.name().replace("'", "''")
+        review = fake.text().replace("\n", ", ").replace("'", "''") # Replace single quotes with two single quotes
+        rating = round(random.uniform(1.0, 5.0), 1)
+        reviews.append((restaurant_id, username, review, rating))
+    return reviews
+
+# Generate 100 random reviews
+num_reviews = 100
+reviews = generate_reviews(num_reviews)
+print(reviews)
+# Generate 100 random restaurants
+# restaurant_data = generate_restaurant(100)
 # num_restaurants = 100
 # restaurants = generate_restaurant(num_restaurants)
 # print(restaurants)
 
 # Generate SQL INSERT statements
-insert_statements = []
-for data in restaurant_data:
-    category, name, address, contact_number, rating = data
-    insert_statements.append(f"INSERT INTO restaurants (category, name, address, contact_number, rating) VALUES ('{category}', '{name}', '{address}', '{contact_number}', {rating});")
+# insert_statements = []
+# for data in restaurant_data:
+    # category, name, address, contact_number, rating = data
+    # insert_statements.append(f"INSERT INTO restaurant_schema.restaurants (category, name, address, contact_number, rating) VALUES ('{category}', '{name}', '{address}', '{contact_number}', {rating});")
 
 # Write SQL INSERT statements to file   
-with open("insert_restaurants.sql", "w") as file:
-    file.write("\n".join(insert_statements))
+# with open("insert_restaurants.sql", "w") as file:
+    # file.write("\n".join(insert_statements))
 
-print("SQL statements written to insert_restaurants.sql successfully")
+# print("SQL statements written to insert_restaurants.sql successfully")
