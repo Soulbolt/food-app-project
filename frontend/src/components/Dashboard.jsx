@@ -17,12 +17,6 @@ function Dashboard() {
   const [filteredRestaurants, setFilteredRestaurants] = useState([]);
   const [error, setError] = useState(null);
 
-  /**
-   * Handles the search functionality by fetching a restaurant by ID and updating the filtered restaurants state.
-   *
-   * @param {Event} e - The event object triggered by the search input.
-   * @return {Promise<void>} A promise that resolves when the search is complete.
-   */
   const handleSearch = async (e) => {
     e.preventDefault();
     setSearch(search);
@@ -85,11 +79,17 @@ function Dashboard() {
 
   useEffect(() => {
     console.log("inside the useEffect");
-    fetchRecommendedRestaurants().then((restaurantList) => {
-      setRecommendedRestaurants(restaurantList);
-      setFilteredRestaurants(restaurantList);
-      setIsLoading(false);
-    });
+    fetchRecommendedRestaurants()
+      .then((restaurantList) => {
+        setRecommendedRestaurants(restaurantList);
+        setFilteredRestaurants(restaurantList);
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching recommended restaurants:", error);
+        setError("An error occurred while fetching recommended restaurants.");
+        setIsLoading(false);
+      });
   }, []);
 
   return (
