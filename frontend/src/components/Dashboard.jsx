@@ -15,6 +15,7 @@ function Dashboard() {
   const [restaurant, setRestaurant] = useState([]);
   const [recommendedRestaurants, setRecommendedRestaurants] = useState([]);
   const [filteredRestaurants, setFilteredRestaurants] = useState([]);
+  const [error, setError] = useState(null);
 
   /**
    * Handles the search functionality by fetching a restaurant by ID and updating the filtered restaurants state.
@@ -26,7 +27,7 @@ function Dashboard() {
     e.preventDefault();
     setSearch(search);
 
-    if (search.trim() === "" || !search) {
+    if (search.trim() === "") {
       setFilteredRestaurants(recommendedRestaurants);
       return;
     }
@@ -35,9 +36,18 @@ function Dashboard() {
 
     try {
       const filtered = await fetchRestaurantById(search);
-      setFilteredRestaurants([filtered]);
+
+      if (!filtered) {
+        // Handle not found error
+        setError("No restaurant found with the given ID.");
+        setFilteredRestaurants([]);
+      } else {
+        setError(null); // Clear any previous error
+        setFilteredRestaurants([filtered]);
+      }
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("Error fetching restaurant by ID:", error);
+      setError("An error occurred while fetching the restaurant.");
     } finally {
       setIsLoading(false);
     }
