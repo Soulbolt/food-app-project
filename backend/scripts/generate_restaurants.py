@@ -16,9 +16,17 @@ Returns:
 """
 def generate_restaurant(num_restaurants):
     restaurants = []
+
+    # Read CSV file
+    restaurant_names = []
+    with open('restaurant_names.csv', 'r') as file:
+        restaurant_names_list = file.readlines()
+        for name in restaurant_names_list:
+            restaurant_names.append(name.strip())
+
     for i in range(num_restaurants):
         category = random.choice(categories)
-        name = fake.name().replace("'", "''") # Replace single quotes with two single quotes
+        name = restaurant_names[i]
         address = fake.address().replace("\n", ", ").replace("'", "''") # Replace single quotes with two single quotes
         contact_number = fake.phone_number().replace("'", "''") # Replace single quotes with two single quotes
         rating = round(random.uniform(1.0, 5.0), 1)
