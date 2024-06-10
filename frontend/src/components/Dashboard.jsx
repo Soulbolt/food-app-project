@@ -17,6 +17,12 @@ function Dashboard() {
   const [filteredRestaurants, setFilteredRestaurants] = useState([]);
   const [error, setError] = useState(null);
 
+  /**
+   * Handles the search functionality.
+   *
+   * @param {Event} e - The event object.
+   * @return {Promise<void>} A promise that resolves when the search is complete.
+   */
   const handleSearch = async (e) => {
     e.preventDefault();
     setSearch(search);
