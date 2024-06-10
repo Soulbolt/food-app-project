@@ -1,7 +1,7 @@
 import React from "react";
 import { GoSearch } from "react-icons/go";
 
-function SearchBar({ search, setSearch, handleSearch }) {
+function SearchBar({ search, setSearch, handleSearch, error }) {
   return (
     <div className="relative">
       <form onSubmit={handleSearch} className="mx-auto max-w-md">
@@ -45,6 +45,10 @@ function SearchBar({ search, setSearch, handleSearch }) {
             Search
           </button>
         </div>
+
+        {error && (
+          <div className="bg-gray-50 text-red-500 dark:bg-red-200">{error}</div>
+        )}
       </form>
     </div>
   );

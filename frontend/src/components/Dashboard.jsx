@@ -40,7 +40,7 @@ function Dashboard() {
       if (!filtered) {
         // Handle not found error
         setError("No restaurant found with the given ID.");
-        setFilteredRestaurants([]);
+        setFilteredRestaurants([recommendedRestaurants]);
       } else {
         setError(null); // Clear any previous error
         setFilteredRestaurants([filtered]);
@@ -127,6 +127,7 @@ function Dashboard() {
               search={search}
               setSearch={setSearch}
               handleSearch={handleSearch}
+              error={error}
             />
           </div>
           <div className="relative flex h-full items-center justify-center">
