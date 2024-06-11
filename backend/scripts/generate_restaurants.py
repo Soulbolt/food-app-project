@@ -44,23 +44,28 @@ def generate_reviews(num_reviews):
     return reviews
 
 # Generate 100 random reviews
-num_reviews = 100
-reviews = generate_reviews(num_reviews)
-print(reviews)
+review_data = generate_reviews(100)
+# num_reviews = 100
+# reviews = generate_reviews(num_reviews)
+# print(reviews)
 # Generate 100 random restaurants
-# restaurant_data = generate_restaurant(100)
+restaurant_data = generate_restaurant(100)
 # num_restaurants = 100
 # restaurants = generate_restaurant(num_restaurants)
 # print(restaurants)
 
 # Generate SQL INSERT statements
-# insert_statements = []
-# for data in restaurant_data:
-    # category, name, address, contact_number, rating = data
-    # insert_statements.append(f"INSERT INTO restaurant_schema.restaurants (category, name, address, contact_number, rating) VALUES ('{category}', '{name}', '{address}', '{contact_number}', {rating});")
+insert_statements = []
+for data in restaurant_data:
+    category, name, address, contact_number, rating = data
+    insert_statements.append(f"INSERT INTO restaurant_schema.restaurants (category, name, address, contact_number, rating) VALUES ('{category}', '{name}', '{address}', '{contact_number}', {rating});")
+
+for data in review_data:
+    restaurant_id, username, review, rating = data
+    insert_statements.append(f"INSERT INTO restaurant_schema.reviews (restaurant_id, username, review, rating) VALUES ({restaurant_id}, '{username}', '{review}', {rating});")
 
 # Write SQL INSERT statements to file   
-# with open("insert_restaurants.sql", "w") as file:
-    # file.write("\n".join(insert_statements))
+with open("insert_restaurants.sql", "w") as file:
+    file.write("\n".join(insert_statements))
 
-# print("SQL statements written to insert_restaurants.sql successfully")
+print("SQL statements written to insert_restaurants.sql successfully")
