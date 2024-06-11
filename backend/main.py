@@ -232,7 +232,7 @@ def create_restaurant(restaurant: Restaurant):
         conn.close()
 
 """ Returns the restaurant with the specified ID """
-@app.get("/api/restaurants/{id}")
+@app.get("/api/restaurant/{id}")
 def get_restaurant(id: int):
     conn = connect_to_database()
     if not conn:
@@ -291,14 +291,14 @@ def get_recommended_restaurants():
     return restaurant_list
 
 """ Returns the restaurant with the specified ID """
-@app.get("/api/restaurants/{id}")
+@app.get("/api/recommended_restaurant/{id}")
 def get_restaurant(id: int):
     for restaurant in DB:
         if restaurant["id"] == id:
             return restaurant
 
 """ Updates the restaurant with the specified ID """
-@app.put("/api/restaurants/{id}")
+@app.put("/api/update_restaurant/{id}")
 def update_restaurant(id: int, restaurant: Restaurant):
     for restaurant in DB:
         if restaurant["id"] == id:
