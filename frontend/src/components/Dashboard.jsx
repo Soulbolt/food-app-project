@@ -22,37 +22,67 @@ function Dashboard() {
    * @param {Event} e - The event object.
    * @return {Promise<void>} A promise that resolves when the search is complete.
    */
-  const handleSearch = useCallback((e) => {
-    e.preventDefault();
-    setSearch(e.target.value);
-  }, []);
+  const handleSearch = useCallback(
+    async (e) => {
+      e.preventDefault();
+      setSearch(e.target.value);
 
-  //   if (search.trim() === "") {
-  //     setFilteredRestaurants(recommendedRestaurants);
+      if (search.trim() === "") {
+        setFilteredRestaurants(recommendedRestaurants);
+        return;
+      }
+
+      setIsLoading(true);
+
+      try {
+        const filtered = await fetchRestaurantById(search);
+
+        if (!filtered) {
+          // Handle not found error
+          setError("No restaurant found with the given ID.");
+          setFilteredRestaurants([recommendedRestaurants]);
+        } else {
+          setError(null); // Clear any previous error
+          setFilteredRestaurants([filtered]);
+        }
+      } catch (error) {
+        console.error("Error fetching restaurant by ID:", error);
+        setError("An error occurred while fetching the restaurant.");
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [search, recommendedRestaurants],
+  );
+
+  // May need a single search function.
+  // const handleSearchSubmit = useCallback(async () => {
+  //   if (!search) {
+  //     setFilteredRestaurants(null);
+  //     setError(null);
   //     return;
   //   }
 
-  //   setIsLoading(true);
-
-  //   try {
-  //     const filtered = await fetchRestaurantById(search);
-
-  //     if (!filtered) {
-  //       // Handle not found error
-  //       setError("No restaurant found with the given ID.");
-  //       setFilteredRestaurants([recommendedRestaurants]);
-  //     } else {
-  //       setError(null); // Clear any previous error
-  //       setFilteredRestaurants([filtered]);
+  //   const fetchData = async () => {
+  //     try {
+  //       const response = await fetchRestaurantById(search);
+  //       if (response) {
+  //         setFilteredRestaurants([response]);
+  //         setError(null); // Clear any previous error
+  //       } else {
+  //         // Handle not found error
+  //         setFilteredRestaurants(null);
+  //         setError("No restaurant found with the given ID.");
+  //       }
+  //     } catch (error) {
+  //       setFilteredRestaurants(null);
+  //       console.error("Error fetching restaurant by ID:", error);
+  //       setError("An error occurred while fetching the restaurant.");
   //     }
-  //   } catch (error) {
-  //     console.error("Error fetching restaurant by ID:", error);
-  //     setError("An error occurred while fetching the restaurant.");
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // });
+  //   };
 
+  //   fetchData();
+  // }, [search]);
   /**
    * Handles the addition of a restaurant to favorites.
    *
@@ -97,34 +127,6 @@ function Dashboard() {
       });
   }, []);
 
-  useEffect(() => {
-    if (!search) {
-      setFilteredRestaurants(null);
-      setError(null);
-      return;
-    }
-
-    const fetchData = async () => {
-      try {
-        const response = await fetchRestaurantById(search);
-        if (response) {
-          setFilteredRestaurants([response]);
-          setError(null); // Clear any previous error
-        } else {
-          // Handle not found error
-          setFilteredRestaurants(null);
-          setError("No restaurant found with the given ID.");
-        }
-      } catch (error) {
-        setFilteredRestaurants(null);
-        console.error("Error fetching restaurant by ID:", error);
-        setError("An error occurred while fetching the restaurant.");
-      }
-    };
-
-    fetchData();
-  }, [search]);
-
   if (isLoading) {
     return <Spinner />;
   }
@@ -151,7 +153,11 @@ function Dashboard() {
         </div>
         <div className="sticky top-0 z-50">
           {/* Search Bar Compnent */}
-          <SearchBar search={search} handleSearch={handleSearch} />
+          <SearchBar
+            search={search}
+            setSearch={setSearch}
+            handleSearch={handleSearch}
+          />
         </div>
         <div className="relative flex h-full items-center justify-center">
           <h2 className="mb-8 text-3xl text-indigo-300">

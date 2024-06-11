@@ -1,7 +1,7 @@
 import React from "react";
 import { GoSearch } from "react-icons/go";
 
-function SearchBar({ search, handleSearch, error }) {
+function SearchBar({ search, setSearch, handleSearch, error }) {
   return (
     <div className="relative">
       <form onSubmit={handleSearch} className="mx-auto max-w-md">
@@ -33,7 +33,7 @@ function SearchBar({ search, handleSearch, error }) {
           <input
             type="text"
             value={search || ""}
-            onChange={handleSearch}
+            onChange={(e) => setSearch(e.target.value)}
             className="mb-8 block w-full rounded-lg border border-gray-300 bg-gray-50 p-4 ps-10 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
             placeholder="Search By ID"
             required

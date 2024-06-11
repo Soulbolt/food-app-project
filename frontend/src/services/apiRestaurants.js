@@ -37,6 +37,7 @@ export async function fetchRestaurantById(id) {
   try {
     const response = await axios.get(`/api/restaurant/${id}`);
     const restaurant = response.data;
+    console.log(restaurant);
     return restaurant;
   } catch (error) {
     console.log("Error fetching data", error);
