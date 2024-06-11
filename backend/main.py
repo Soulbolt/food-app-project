@@ -209,6 +209,28 @@ async def get_restaurants():
         cursor.close()
         conn.close()
 
+""" Creates a new restaurant """
+@app.post("/api/restaurants")
+def create_restaurant(restaurant: Restaurant):
+    conn = connect_to_database()
+    if not conn:
+        raise HTTPException(status_code=500, detail="Could not connect to the database")
+    try:
+        print("Connected to the database!")
+        cursor = conn.cursor()
+        query = """
+            INSERT INTO restaurant_schema.restaurants (name, address, contact_number, rating)
+            VALUES (%s, %s, %s, %s);
+        """
+        cursor.execute(query, (restaurant.name, restaurant.address, restaurant.contact_number, restaurant.rating))
+        conn.commit()
+        return JSONResponse(content={"message": "Restaurant created successfully!"})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+        conn.close()
+
 """ Returns the recommended list of restaurants """
 @app.get("/api/restaurants/recommended")
 def get_recommended_restaurants():
