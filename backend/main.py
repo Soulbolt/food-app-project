@@ -231,6 +231,49 @@ def create_restaurant(restaurant: Restaurant):
         cursor.close()
         conn.close()
 
+""" Returns the restaurant with the specified ID """
+@app.get("/api/restaurants/{id}")
+def get_restaurant(id: int):
+    conn = connect_to_database()
+    if not conn:
+        raise HTTPException(status_code=500, detail="Could not connect to the database")
+    try:
+        print("Connected to the database!")
+        cursor = conn.cursor()
+        query = """
+            SELECT 
+                r.id AS restaurant_id,
+                r.name AS restaurant_name,
+                r.address,
+                r.contact_number,
+                r.rating AS restaurant_rating,
+                rv.id AS review_id,
+                rv.username,
+                rv.review,
+                rv.rating AS review_rating
+            FROM 
+                restaurant_schema.restaurants r
+            LEFT JOIN 
+                restaurant_schema.reviews rv ON r.id = rv.restaurant_id
+            WHERE r.id = %s;
+        """
+        cursor.execute(query, (id,))
+        row = cursor.fetchone()
+        if row is None:
+            raise HTTPException(status_code=404, detail="Restaurant not found")
+        colnames = [desc[0] for desc in cursor.description]
+        record = dict(zip(colnames, row))
+        # Convert Decimal to float for JSON serialization
+        for key, value in record.items():
+            if isinstance(value, Decimal):
+                record[key] = float(value)
+        return record
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+        conn.close()
+
 """ Returns the recommended list of restaurants """
 @app.get("/api/restaurants/recommended")
 def get_recommended_restaurants():
