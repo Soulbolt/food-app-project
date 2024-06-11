@@ -35,7 +35,17 @@ export async function fetchRecommendedRestaurants() {
 
 export async function fetchRestaurantById(id) {
   try {
-    const response = await axios.get(`/api/restaurants/${id}`);
+    const response = await axios.get(`/api/restaurant/${id}`);
+    const restaurant = response.data;
+    return restaurant;
+  } catch (error) {
+    console.log("Error fetching data", error);
+  }
+}
+
+export async function fetchRecommendedRestaurantById(id) {
+  try {
+    const response = await axios.get(`/api/recommended_restaurant/${id}`);
     const restaurant = response.data;
     return restaurant;
   } catch (error) {
