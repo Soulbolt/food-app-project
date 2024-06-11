@@ -4,6 +4,7 @@ import { FaMapMarkerAlt } from "react-icons/fa";
 import CardImage from "../assets/kabobs.jpg";
 
 function RestaurantCard({
+  id,
   name,
   address,
   contactNumber,
