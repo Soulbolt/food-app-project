@@ -1,13 +1,21 @@
 import random
 from faker import Faker
+from faker.providers import BaseProvider
 import psycopg2
 from psycopg2 import sql
 import os
 from dotenv import load_dotenv
 
+class CustomPhoneNumberProvider(BaseProvider):
+    def phone_number(self):
+        formats = ['(###) ###-####', '###-###-####']
+        pattern = self.random_element(formats)
+        return self.numerify(pattern)
+    
 load_dotenv()
 
 fake = Faker()
+fake.add_provider(CustomPhoneNumberProvider)
 
 categories = [ "Italian", "Chinese", "Mexican", "Indian", "American", "Japanese", "French", "Thai", "Greek", "Mediterranean"]
 
@@ -32,7 +40,7 @@ def generate_restaurant(num_restaurants):
 
     for i in range(num_restaurants):
         category = random.choice(categories)
-        name = restaurant_names[i]
+        name = restaurant_names[i].replace("'", '""')
         address = fake.address().replace("\n", ", ").replace("'", "''") # Replace single quotes with two single quotes
         contact_number = fake.phone_number().replace("'", "''") # Replace single quotes with two single quotes
         rating = round(random.uniform(1.0, 5.0), 1)
