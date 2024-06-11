@@ -69,20 +69,21 @@ restaurant_data = generate_restaurant(100)
 # print(restaurants)
 
 # Generate SQL INSERT statements
-insert_statements = []
+insert_restaurant_statements = []
+insert_review_statements = []
 for data in restaurant_data:
     category, name, address, contact_number, rating = data
-    insert_statements.append(f"INSERT INTO restaurant_schema.restaurants (category, name, address, contact_number, rating) VALUES ('{category}', '{name}', '{address}', '{contact_number}', {rating});")
+    insert_restaurant_statements.append(f"INSERT INTO restaurant_schema.restaurants (category, name, address, contact_number, rating) VALUES ('{category}', '{name}', '{address}', '{contact_number}', {rating});")
 
 for data in review_data:
     restaurant_id, username, review, rating = data
-    insert_statements.append(f"INSERT INTO restaurant_schema.reviews (restaurant_id, username, review, rating) VALUES ({restaurant_id}, '{username}', '{review}', {rating});")
+    insert_review_statements.append(f"INSERT INTO restaurant_schema.reviews (restaurant_id, username, review, rating) VALUES ({restaurant_id}, '{username}', '{review}', {rating});")
 
-# Write SQL INSERT statements to file, can comment out if not needed   
-with open("insert_restaurants.sql", "w") as file:
-    file.write("\n".join(insert_statements))
+# Write SQL INSERT statements to file, can comment out if file is not needed   
+# with open("insert_restaurants.sql", "w") as file:
+#     file.write("\n".join(insert_statements))
 
-print("SQL statements written to insert_restaurants.sql successfully")
+# print("SQL statements written to insert_restaurants.sql successfully")
 
 # Dabase configuration
 db_config = {
@@ -111,11 +112,17 @@ def insert_restaurants():
         # Create a cursor object
         cursor = conn.cursor()
 
-        for sql_statement in insert_statements:
+        for sql_statement in insert_restaurant_statements:
             cursor.execute(sql_statement)
 
         conn.commit()
-        print("Restaurants and reviews inserted successfully")
+        print("Restaurants inserted successfully")
+
+        for sql_statement in insert_review_statements:
+            cursor.execute(sql_statement)
+
+        conn.commit()
+        print("Reviews inserted successfully")
     except Exception as e:
         # Rollback the transaction if an error occurs
         conn.rollback()
