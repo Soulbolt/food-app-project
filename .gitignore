@@ -4,4 +4,5 @@ backend/requirements.txt
 backend/instance
 backend/.env
 backend/docker-compose.yml
+backend/scripts/insert_restaurants.sql
 .venv
