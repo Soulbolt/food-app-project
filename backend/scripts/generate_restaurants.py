@@ -1,5 +1,11 @@
 import random
 from faker import Faker
+import psycopg2
+from psycopg2 import sql
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 fake = Faker()
 
@@ -64,8 +70,53 @@ for data in review_data:
     restaurant_id, username, review, rating = data
     insert_statements.append(f"INSERT INTO restaurant_schema.reviews (restaurant_id, username, review, rating) VALUES ({restaurant_id}, '{username}', '{review}', {rating});")
 
-# Write SQL INSERT statements to file   
+# Write SQL INSERT statements to file, can comment out if not needed   
 with open("insert_restaurants.sql", "w") as file:
     file.write("\n".join(insert_statements))
 
 print("SQL statements written to insert_restaurants.sql successfully")
+
+# Dabase configuration
+db_config = {
+    'host': os.getenv('DB_HOST'),
+    'dbname': os.getenv('DB_NAME'),
+    'user': os.getenv('DB_USER'),
+    'password': os.getenv('DB_PASSWORD'),
+    'port': os.getenv('DB_PORT'),
+}
+
+def connect_to_database():
+    try:
+        print("Connecting to the PostgreSQL database...")
+        # Establish connection
+        conn = psycopg2.connect(**db_config)
+        print("Connected to the database!")
+        return conn
+
+    except Exception as e:
+        print("Error connecting to PostgreSQL database: ", e)
+        return None
+    
+def insert_restaurants():
+    conn = connect_to_database()
+    try:
+        # Create a cursor object
+        cursor = conn.cursor()
+
+        for sql_statement in insert_statements:
+            cursor.execute(sql_statement)
+
+        conn.commit()
+        print("Restaurants and reviews inserted successfully")
+    except Exception as e:
+        # Rollback the transaction if an error occurs
+        conn.rollback()
+        print("Error inserting data: ", e)
+    finally:
+        # Close the cursor and connection
+        cursor.close()
+        conn.close()
+        print("Connection to the database closed successfully")
+
+
+insert_restaurants()
