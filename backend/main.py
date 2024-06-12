@@ -262,17 +262,17 @@ def get_restaurant(id: int):
             WHERE r.id = %s;
         """
         cursor.execute(query, (id,))
-        rows = cursor.fetchone()
+        rows = cursor.fetchall()
         if rows is None:
             raise HTTPException(status_code=404, detail="Restaurant not found")
         colnames = [desc[0] for desc in cursor.description]
         
         restaurant_data = {
-            "id": row[0],
-            "name": row[1],
-            "address": row[2],
-            "contact_number": row[3],
-            "rating": float(row[4]), # Convert Decimal to float for JSON serialization
+            "id": rows[0][0],
+            "name": rows[0][1],
+            "address": rows[0][2],
+            "contact_number": rows[0][3],
+            "rating": float(rows[0][4]), # Convert Decimal to float for JSON serialization
             "reviews": []
         }
         
