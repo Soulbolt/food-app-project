@@ -10,6 +10,7 @@ function RestaurantCard({
   contactNumber,
   rating,
   isFavorite,
+  reviews,
   onAddToFavorites,
   onRemoveFromFavorites,
 }) {

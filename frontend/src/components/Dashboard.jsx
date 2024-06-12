@@ -139,29 +139,27 @@ function Dashboard() {
         </div>
         {/*<!-- Glboal Container -->*/}
         <div>
-          {filteredRestaurant > 0 ? (
-            <RestaurantCard
-              key={filteredRestaurant.id}
-              {...filteredRestaurant}
-              onAddToFavorites={() =>
-                handleAddToFavorites(filteredRestaurant.id)
-              }
-              onRemoveFromFavorites={() =>
-                handleRemoveFromFavorites(filteredRestaurant.id)
-              }
-            />
-          ) : (
-            recommendedRestaurants.map((restaurant) => (
-              <RestaurantCard
-                key={restaurant.id}
-                {...restaurant}
-                onAddToFavorites={() => handleAddToFavorites(restaurant.id)}
-                onRemoveFromFavorites={() =>
-                  handleRemoveFromFavorites(restaurant.id)
-                }
-              />
-            ))
-          )}
+          {filteredRestaurant.length > 0
+            ? filteredRestaurant.map((restaurant) => (
+                <RestaurantCard
+                  key={restaurant.id}
+                  {...restaurant}
+                  onAddToFavorites={() => handleAddToFavorites(restaurant.id)}
+                  onRemoveFromFavorites={() =>
+                    handleRemoveFromFavorites(restaurant.id)
+                  }
+                />
+              ))
+            : recommendedRestaurants.map((restaurant) => (
+                <RestaurantCard
+                  key={restaurant.id}
+                  {...restaurant}
+                  onAddToFavorites={() => handleAddToFavorites(restaurant.id)}
+                  onRemoveFromFavorites={() =>
+                    handleRemoveFromFavorites(restaurant.id)
+                  }
+                />
+              ))}
         </div>
       </div>
     </div>
