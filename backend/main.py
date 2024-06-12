@@ -43,13 +43,19 @@ def connect_to_database():
         print("Error connecting to PostgreSQL database: ", e)
         return None
 
+class Review(BaseModel):
+    username: str
+    review: str
+    rating: float
+
 class Restaurant(BaseModel):
     id: int
     name: str
     address: str
     contact_number: str
     rating: float
-    reviews: List
+    isFavorite: bool = False
+    reviews: List[Review] = []
 
 # Mock database in json format
 DB: list[Restaurant] = [{
@@ -164,7 +170,6 @@ async def get_restaurants():
                 r.address,
                 r.contact_number,
                 r.rating AS restaurant_rating,
-                rv.id AS review_id,
                 rv.username,
                 rv.review,
                 rv.rating AS review_rating
@@ -232,7 +237,7 @@ def create_restaurant(restaurant: Restaurant):
         conn.close()
 
 """ Returns the restaurant with the specified ID """
-@app.get("/api/restaurant/{id}")
+@app.get("/api/restaurant/{id}", response_model=Restaurant)
 def get_restaurant(id: int):
     conn = connect_to_database()
     if not conn:
@@ -247,14 +252,13 @@ def get_restaurant(id: int):
                 r.address,
                 r.contact_number,
                 r.rating AS rating,
-                rv.id AS id,
                 rv.username,
                 rv.review,
                 rv.rating AS rating
             FROM 
                 restaurant_schema.restaurants r
             LEFT JOIN 
-                restaurant_schema.reviews rv ON r.id = rv.id
+                restaurant_schema.reviews rv ON r.id = rv.restaurant_id
             WHERE r.id = %s;
         """
         cursor.execute(query, (id,))
