@@ -28,7 +28,7 @@ function Dashboard() {
       setSearch(e.target.value);
 
       if (search.trim() === "") {
-        setFilteredRestaurants(recommendedRestaurants);
+        setFilteredRestaurants([]);
         return;
       }
 
@@ -40,10 +40,10 @@ function Dashboard() {
         if (!filtered) {
           // Handle not found error
           setError("No restaurant found with the given ID.");
-          setFilteredRestaurants([recommendedRestaurants]);
+          setFilteredRestaurants([]);
         } else {
-          setError(null); // Clear any previous error
           setFilteredRestaurants([filtered]);
+          setError(null); // Clear any previous error
         }
       } catch (error) {
         console.error("Error fetching restaurant by ID:", error);
@@ -52,37 +52,9 @@ function Dashboard() {
         setIsLoading(false);
       }
     },
-    [search, recommendedRestaurants],
+    [search],
   );
 
-  // May need a single search function.
-  // const handleSearchSubmit = useCallback(async () => {
-  //   if (!search) {
-  //     setFilteredRestaurants(null);
-  //     setError(null);
-  //     return;
-  //   }
-
-  //   const fetchData = async () => {
-  //     try {
-  //       const response = await fetchRestaurantById(search);
-  //       if (response) {
-  //         setFilteredRestaurants([response]);
-  //         setError(null); // Clear any previous error
-  //       } else {
-  //         // Handle not found error
-  //         setFilteredRestaurants(null);
-  //         setError("No restaurant found with the given ID.");
-  //       }
-  //     } catch (error) {
-  //       setFilteredRestaurants(null);
-  //       console.error("Error fetching restaurant by ID:", error);
-  //       setError("An error occurred while fetching the restaurant.");
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, [search]);
   /**
    * Handles the addition of a restaurant to favorites.
    *
@@ -118,6 +90,7 @@ function Dashboard() {
     fetchRecommendedRestaurants()
       .then((restaurantList) => {
         setRecommendedRestaurants(restaurantList || []);
+        console.log(restaurantList);
         setIsLoading(false);
       })
       .catch((error) => {
@@ -166,7 +139,7 @@ function Dashboard() {
         </div>
         {/*<!-- Glboal Container -->*/}
         <div>
-          {filteredRestaurant ? (
+          {filteredRestaurant > 0 ? (
             <RestaurantCard
               key={filteredRestaurant.id}
               {...filteredRestaurant}
@@ -178,7 +151,6 @@ function Dashboard() {
               }
             />
           ) : (
-            Array.isArray(recommendedRestaurants) &&
             recommendedRestaurants.map((restaurant) => (
               <RestaurantCard
                 key={restaurant.id}

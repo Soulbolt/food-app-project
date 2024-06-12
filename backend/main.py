@@ -242,19 +242,19 @@ def get_restaurant(id: int):
         cursor = conn.cursor()
         query = """
             SELECT 
-                r.id AS restaurant_id,
-                r.name AS restaurant_name,
+                r.id AS id,
+                r.name AS name,
                 r.address,
                 r.contact_number,
-                r.rating AS restaurant_rating,
-                rv.id AS review_id,
+                r.rating AS rating,
+                rv.id AS id,
                 rv.username,
                 rv.review,
-                rv.rating AS review_rating
+                rv.rating AS rating
             FROM 
                 restaurant_schema.restaurants r
             LEFT JOIN 
-                restaurant_schema.reviews rv ON r.id = rv.restaurant_id
+                restaurant_schema.reviews rv ON r.id = rv.id
             WHERE r.id = %s;
         """
         cursor.execute(query, (id,))
