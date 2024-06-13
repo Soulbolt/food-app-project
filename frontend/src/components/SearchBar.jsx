@@ -5,6 +5,35 @@ function SearchBar({ search, setSearch, handleSearch, error }) {
   return (
     <div className="relative">
       <form onSubmit={handleSearch} className="mx-auto max-w-md">
+        <div className="flex">
+          <label
+            htmlFor="search-dropdoown"
+            className="sr-only mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          ></label>
+          <button
+            id="dropdown-button"
+            data-dropdown-toggle="dropdown"
+            class="z-10 inline-flex flex-shrink-0 items-center rounded-s-lg border border-gray-300 bg-gray-100 px-4 py-2.5 text-center text-sm font-medium text-gray-900 hover:bg-gray-200 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-700"
+            type="button"
+          >
+            All categories{" "}
+            <svg
+              class="ms-2.5 h-2.5 w-2.5"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 10 6"
+            >
+              <path
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M1 1l4 4 4-4"
+              ></path>
+            </svg>
+          </button>
+        </div>
         <label
           htmlFor="default-search"
           className="sr-only mb-2 text-sm font-medium text-gray-900 dark:text-white"
