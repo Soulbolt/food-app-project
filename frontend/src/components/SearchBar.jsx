@@ -86,7 +86,7 @@ function SearchBar({ search, setSearch, handleSearch, error }) {
               value={search || ""}
               onChange={(e) => setSearch(e.target.value)}
               className="z-20 block w-full rounded-e-lg border border-s-2 border-gray-300 border-s-gray-50 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:border-s-gray-700  dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500"
-              placeholder={!error ? "Click options to search" : error}
+              placeholder={!error ? "Click options to search" : "Whoops..."}
               required
             />
             <button
