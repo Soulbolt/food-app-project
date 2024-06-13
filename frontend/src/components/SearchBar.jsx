@@ -60,21 +60,21 @@ function SearchBar({ search, setSearch, handleSearch, error }) {
                 </li>
                 <li
                   className="px-4 py-1 hover:bg-gray-200 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-700"
-                  onClick={() => handleCategorySelect("By Name")}
+                  onClick={() => handleCategorySelect("Search By Name")}
                 >
-                  By Name
+                  Search By Name
                 </li>
                 <li
                   className="px-4 py-1 hover:bg-gray-200 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-700"
-                  onClick={() => handleCategorySelect("Category")}
+                  onClick={() => handleCategorySelect("Search Category")}
                 >
-                  Category
+                  Search Category
                 </li>
                 <li
                   className="px-4 py-1 hover:bg-gray-200 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-700"
-                  onClick={() => handleCategorySelect("By Id")}
+                  onClick={() => handleCategorySelect("Search By Id")}
                 >
-                  By Id
+                  Search By Id
                 </li>
               </ul>
             )}
