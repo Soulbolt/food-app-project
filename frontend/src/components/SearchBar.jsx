@@ -6,11 +6,11 @@ function SearchBar({ search, setSearch, handleSearch, error }) {
 
   const toggleDropdown = () => {
     setDropdownOpen((dropdownOpen) => !dropdownOpen);
-    console.log("toggled", dropdownOpen.toString());
   };
 
   const handleCategorySelect = (event) => {
     setSelectedCategory(event);
+    toggleDropdown();
   };
 
   return (
@@ -23,10 +23,10 @@ function SearchBar({ search, setSearch, handleSearch, error }) {
           <button
             id="dropdown-button"
             onClick={toggleDropdown}
-            className="z-60 inline-flex flex-shrink-0 items-center rounded-s-lg border border-gray-300 bg-gray-100 px-4 py-2.5 text-center text-sm font-medium text-gray-900 hover:bg-gray-200 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-700"
+            className="inline-flex flex-shrink-0 items-center rounded-s-lg border border-gray-300 bg-gray-100 px-4 py-2.5 text-center text-sm font-medium text-gray-900 hover:bg-gray-200 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-700"
             type="button"
           >
-            {selectedCategory || "All categories"}
+            {selectedCategory || "Options"}
             <svg
               className="ms-2.5 h-2.5 w-2.5"
               aria-hidden="true"
@@ -45,21 +45,37 @@ function SearchBar({ search, setSearch, handleSearch, error }) {
           </button>
           <div
             id="dropdown"
-            className="z-10 w-44 divide-y divide-gray-100 rounded-lg bg-white shadow dark:bg-gray-700"
+            className="display-none absolute top-10 rounded-lg bg-white shadow dark:bg-gray-700"
           >
             {dropdownOpen && (
               <ul
-                className="py-2 text-sm text-gray-700 dark:text-gray-200"
+                className="p-2 text-sm text-gray-700 dark:text-gray-200"
                 aria-labelledby="dropdown-button"
               >
-                <li onClick={() => handleCategorySelect("Show All")}>
+                <li
+                  className="px-4 py-1 hover:bg-gray-200 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-700"
+                  onClick={() => handleCategorySelect("Show All")}
+                >
                   Show All
                 </li>
-                <li onClick={() => handleCategorySelect("By Name")}>By Name</li>
-                <li onClick={() => handleCategorySelect("Category")}>
+                <li
+                  className="px-4 py-1 hover:bg-gray-200 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-700"
+                  onClick={() => handleCategorySelect("By Name")}
+                >
+                  By Name
+                </li>
+                <li
+                  className="px-4 py-1 hover:bg-gray-200 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-700"
+                  onClick={() => handleCategorySelect("Category")}
+                >
                   Category
                 </li>
-                <li onClick={() => handleCategorySelect("By Id")}>By Id</li>
+                <li
+                  className="px-4 py-1 hover:bg-gray-200 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-700"
+                  onClick={() => handleCategorySelect("By Id")}
+                >
+                  By Id
+                </li>
               </ul>
             )}
           </div>
@@ -70,7 +86,7 @@ function SearchBar({ search, setSearch, handleSearch, error }) {
               value={search || ""}
               onChange={(e) => setSearch(e.target.value)}
               className="z-20 block w-full rounded-e-lg border border-s-2 border-gray-300 border-s-gray-50 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:border-s-gray-700  dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500"
-              placeholder="Search Mockups, Logos, Design Templates..."
+              placeholder="Click options to being your search..."
               required
             />
             <button
