@@ -124,12 +124,13 @@ function Dashboard() {
             Welcome To Your Dashboard
           </h2>
         </div>
-        <div className="sticky top-0 z-50">
+        <div className="sticky top-1 z-50">
           {/* Search Bar Compnent */}
           <SearchBar
             search={search}
             setSearch={setSearch}
             handleSearch={handleSearch}
+            error={error}
           />
         </div>
         <div className="relative flex h-full items-center justify-center">

@@ -23,7 +23,7 @@ function SearchBar({ search, setSearch, handleSearch, error }) {
           <button
             id="dropdown-button"
             onClick={toggleDropdown}
-            className="inline-flex flex-shrink-0 items-center rounded-s-lg border border-gray-300 bg-gray-100 px-4 py-2.5 text-center text-sm font-medium text-gray-900 hover:bg-gray-200 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-700"
+            className="inline-flex flex-shrink-0 items-center rounded-s-lg border border-gray-300 bg-gray-100 px-4 py-2.5 text-center text-sm font-medium text-gray-900 hover:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-700"
             type="button"
           >
             {selectedCategory || "Options"}
@@ -45,7 +45,7 @@ function SearchBar({ search, setSearch, handleSearch, error }) {
           </button>
           <div
             id="dropdown"
-            className="display-none absolute top-10 rounded-lg bg-white shadow dark:bg-gray-700"
+            className="display-none absolute top-11 rounded-lg bg-white shadow dark:bg-gray-700"
           >
             {dropdownOpen && (
               <ul
@@ -86,7 +86,7 @@ function SearchBar({ search, setSearch, handleSearch, error }) {
               value={search || ""}
               onChange={(e) => setSearch(e.target.value)}
               className="z-20 block w-full rounded-e-lg border border-s-2 border-gray-300 border-s-gray-50 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:border-s-gray-700  dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500"
-              placeholder="Click options to being your search..."
+              placeholder={!error ? "Click options to search" : error}
               required
             />
             <button
