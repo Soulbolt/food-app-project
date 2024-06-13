@@ -33,6 +33,48 @@ function SearchBar({ search, setSearch, handleSearch, error }) {
               ></path>
             </svg>
           </button>
+          <div
+            id="dropdown"
+            class="z-10 hidden w-44 divide-y divide-gray-100 rounded-lg bg-white shadow dark:bg-gray-700"
+          >
+            <ul
+              class="py-2 text-sm text-gray-700 dark:text-gray-200"
+              aria-labelledby="dropdown-button"
+            >
+              <li>
+                <button
+                  type="button"
+                  class="inline-flex w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                >
+                  Show All
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  class="inline-flex w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                >
+                  By Name
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  class="inline-flex w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                >
+                  Category
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  class="inline-flex w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                >
+                  By Id
+                </button>
+              </li>
+            </ul>
+          </div>
         </div>
         <label
           htmlFor="default-search"
