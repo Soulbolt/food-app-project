@@ -4,12 +4,14 @@ import { GoSearch } from "react-icons/go";
 function SearchBar({ search, setSearch, handleSearch, error }) {
   return (
     <div className="relative">
-      <form onSubmit={handleSearch} className="mx-auto max-w-md">
-        <div className="flex">
+      <form onSubmit={handleSearch} className="mx-auto max-w-lg">
+        <div class="flex">
           <label
-            htmlFor="search-dropdoown"
-            className="sr-only mb-2 text-sm font-medium text-gray-900 dark:text-white"
-          ></label>
+            for="search-dropdown"
+            class="sr-only mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          >
+            Your Email
+          </label>
           <button
             id="dropdown-button"
             data-dropdown-toggle="dropdown"
@@ -29,8 +31,8 @@ function SearchBar({ search, setSearch, handleSearch, error }) {
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
-                d="M1 1l4 4 4-4"
-              ></path>
+                d="m1 1 4 4 4-4"
+              />
             </svg>
           </button>
           <div
@@ -75,18 +77,22 @@ function SearchBar({ search, setSearch, handleSearch, error }) {
               </li>
             </ul>
           </div>
-        </div>
-        <label
-          htmlFor="default-search"
-          className="sr-only mb-2 text-sm font-medium text-gray-900 dark:text-white"
-        >
-          Search
-        </label>
-        <div className="relative">
-          <div className="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-3">
-            <GoSearch className="dark:placeholder-text-gray-400 h-4 w-4 text-gray-500" />
-            {/* <svg
-                class="h-4 w-4 text-gray-500 dark:text-gray-400"
+          <div class="relative w-full">
+            <input
+              type="search"
+              id="search-dropdown"
+              value={search || ""}
+              onChange={(e) => setSearch(e.target.value)}
+              class="z-20 block w-full rounded-e-lg border border-s-2 border-gray-300 border-s-gray-50 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:border-s-gray-700  dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500"
+              placeholder="Search Mockups, Logos, Design Templates..."
+              required
+            />
+            <button
+              type="submit"
+              class="absolute end-0 top-0 h-full rounded-e-lg border border-blue-700 bg-blue-700 p-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            >
+              <svg
+                class="h-4 w-4"
                 aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -99,22 +105,10 @@ function SearchBar({ search, setSearch, handleSearch, error }) {
                   stroke-width="2"
                   d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
                 />
-              </svg> */}
+              </svg>
+              <span class="sr-only">Search</span>
+            </button>
           </div>
-          <input
-            type="text"
-            value={search || ""}
-            onChange={(e) => setSearch(e.target.value)}
-            className="mb-8 block w-full rounded-lg border border-gray-300 bg-gray-50 p-4 ps-10 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-            placeholder="Search By ID"
-            required
-          />
-          <button
-            type="submit"
-            className="absolute bottom-2.5 end-2.5 rounded-lg bg-blue-700 px-4 py-2 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-          >
-            Search
-          </button>
         </div>
 
         {error && (
