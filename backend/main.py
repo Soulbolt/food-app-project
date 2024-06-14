@@ -1,11 +1,9 @@
-from decimal import Decimal
 from typing import List
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 import psycopg2
-from psycopg2 import sql
 import os
 from dotenv import load_dotenv
 
@@ -170,13 +168,21 @@ async def get_restaurants():
                 r.address,
                 r.contact_number,
                 r.rating AS rating,
-                rv.username,
-                rv.review,
-                rv.rating AS rating
+                COALESCE(
+                    JSON_AGG(
+                        JSON_BUILD_OBJECT(
+                            'username', rv.username,
+                            'review', rv.review,
+                            'rating', rv.rating
+                        )
+                    ) FILTER (WHERE rv.username IS NOT NULL), '[]'
+                ) AS reviews
             FROM 
                 restaurant_schema.restaurants r
             LEFT JOIN 
                 restaurant_schema.reviews rv ON r.id = rv.restaurant_id
+            GROUP BY
+                 r.id, r.name, r.address, r.contact_number, r.rating
             ORDER BY r.id ASC;
         """
         cursor.execute(query)
@@ -193,16 +199,8 @@ async def get_restaurants():
                 "address": row[2],
                 "contact_number": row[3],
                 "rating": float(row[4]), # Convert Decimal to float for JSON serialization
-                "reviews": []
+                "reviews": row[5] if row[5] else [] # Use the aggregated JSON for reviews
             }
-        
-            if row[5]: # Check if there is a review for this restaurant
-                review = {
-                    "username": row[5],
-                    "review": row[6],
-                    "rating": float(row[7]) # Convert Decimal to float for JSON serialization
-                }
-                restaurant_data["reviews"].append(review)
 
             restaurant_list.append(restaurant_data)
 
