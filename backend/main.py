@@ -184,17 +184,17 @@ async def get_restaurants():
             raise HTTPException(status_code=404, detail="Restaurant not found")
         colnames = [desc[0] for desc in cursor.description]
         
-        restaurant_data = {
-            "id": rows[0][0],
-            "name": rows[0][1],
-            "address": rows[0][2],
-            "contact_number": rows[0][3],
-            "rating": float(rows[0][4]), # Convert Decimal to float for JSON serialization
-            "reviews": []
-        }
-        
-
+        restaurant_list = []
         for row in rows:
+            restaurant_data = {
+                "id": row[0],
+                "name": row[1],
+                "address": row[2],
+                "contact_number": row[3],
+                "rating": float(row[4]), # Convert Decimal to float for JSON serialization
+                "reviews": []
+            }
+        
             if row[5]: # Check if there is a review for this restaurant
                 review = {
                     "username": row[5],
@@ -203,7 +203,9 @@ async def get_restaurants():
                 }
                 restaurant_data["reviews"].append(review)
 
-        return restaurant_data
+            restaurant_list.append(restaurant_data)
+
+        return restaurant_list
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     finally:
