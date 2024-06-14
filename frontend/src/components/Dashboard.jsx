@@ -104,7 +104,7 @@ function Dashboard() {
 
   useEffect(() => {
     console.log("selectedOption:", optionSelected);
-    if (optionSelected !== "Search By ID") {
+    if (optionSelected !== "Search By ID" || optionSelected !== "Options") {
       setIsLoading(true);
       setOptionSelected("Show All");
       fetchRestaurants()
@@ -183,6 +183,21 @@ function Dashboard() {
                   }
                 />
               ))}
+          ,
+          {restaurants.length > 0 ? (
+            restaurants.map((restaurant) => (
+              <RestaurantCard
+                key={restaurant.id}
+                {...restaurant}
+                onAddToFavorites={() => handleAddToFavorites(restaurant.id)}
+                onRemoveFromFavorites={() =>
+                  handleRemoveFromFavorites(restaurant.id)
+                }
+              />
+            ))
+          ) : (
+            <p>No restaurants found.</p>
+          )}
         </div>
       </div>
     </div>

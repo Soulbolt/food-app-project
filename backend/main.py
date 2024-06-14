@@ -176,7 +176,8 @@ async def get_restaurants():
             FROM 
                 restaurant_schema.restaurants r
             LEFT JOIN 
-                restaurant_schema.reviews rv ON r.id = rv.restaurant_id;
+                restaurant_schema.reviews rv ON r.id = rv.restaurant_id
+            ORDER BY r.id ASC;
         """
         cursor.execute(query)
         rows = cursor.fetchall()
