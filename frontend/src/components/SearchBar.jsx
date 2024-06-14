@@ -1,15 +1,16 @@
 import React, { useState } from "react";
 
-function SearchBar({ search, setSearch, handleSearch, error }) {
+function SearchBar({ search, setSearch, optionSelected, handleSearch, error }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedOption, setSelectedOption] = useState("");
 
   const toggleDropdown = () => {
     setDropdownOpen((dropdownOpen) => !dropdownOpen);
   };
 
-  const handleCategorySelect = (event) => {
-    setSelectedCategory(event);
+  const handleOptionSelect = (event) => {
+    console.log("Option selected:", event);
+    setSelectedOption(event);
     toggleDropdown();
   };
 
@@ -23,10 +24,11 @@ function SearchBar({ search, setSearch, handleSearch, error }) {
           <button
             id="dropdown-button"
             onClick={toggleDropdown}
+            onChange={(e) => optionSelected(e.target.value)}
             className="inline-flex flex-shrink-0 items-center rounded-s-lg border border-gray-300 bg-gray-100 px-4 py-2.5 text-center text-sm font-medium text-gray-900 hover:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-700"
             type="button"
           >
-            {selectedCategory || "Options"}
+            {selectedOption || "Options"}
             <svg
               className="ms-2.5 h-2.5 w-2.5"
               aria-hidden="true"
@@ -49,30 +51,30 @@ function SearchBar({ search, setSearch, handleSearch, error }) {
           >
             {dropdownOpen && (
               <ul
-                className="p-2 text-sm text-gray-700 dark:text-gray-200"
+                className="left-0 p-2 text-sm text-gray-700 dark:text-gray-200 "
                 aria-labelledby="dropdown-button"
               >
                 <li
                   className="px-4 py-1 hover:bg-gray-200 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-700"
-                  onClick={() => handleCategorySelect("Show All")}
+                  onClick={() => handleOptionSelect("Show All")}
                 >
                   Show All
                 </li>
                 <li
                   className="px-4 py-1 hover:bg-gray-200 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-700"
-                  onClick={() => handleCategorySelect("Search By Name")}
+                  onClick={() => handleOptionSelect("Search By Name")}
                 >
                   Search By Name
                 </li>
                 <li
                   className="px-4 py-1 hover:bg-gray-200 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-700"
-                  onClick={() => handleCategorySelect("Search Category")}
+                  onClick={() => handleOptionSelect("Search Category")}
                 >
                   Search Category
                 </li>
                 <li
                   className="px-4 py-1 hover:bg-gray-200 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-700"
-                  onClick={() => handleCategorySelect("Search By Id")}
+                  onClick={() => handleOptionSelect("Search By Id")}
                 >
                   Search By Id
                 </li>

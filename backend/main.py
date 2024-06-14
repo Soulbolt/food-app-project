@@ -165,14 +165,14 @@ async def get_restaurants():
         cursor = conn.cursor()
         query = """
             SELECT 
-                r.id AS restaurant_id,
-                r.name AS restaurant_name,
+                r.id AS id,
+                r.name AS name,
                 r.address,
                 r.contact_number,
-                r.rating AS restaurant_rating,
+                r.rating AS rating,
                 rv.username,
                 rv.review,
-                rv.rating AS review_rating
+                rv.rating AS rating
             FROM 
                 restaurant_schema.restaurants r
             LEFT JOIN 
@@ -180,34 +180,30 @@ async def get_restaurants():
         """
         cursor.execute(query)
         rows = cursor.fetchall()
+        if rows is None:
+            raise HTTPException(status_code=404, detail="Restaurant not found")
         colnames = [desc[0] for desc in cursor.description]
-        result_dict = {}
-        for row in rows:
-            record = dict(zip(colnames, row))
-            # Convert Decimal to float for JSON serialization
-            for key, value in record.items():
-                if isinstance(value, Decimal):
-                    record[key] = float(value)
-            restaurant_id = record["restaurant_id"]
-            if restaurant_id not in result_dict:
-                result_dict[restaurant_id] = {
-                    "id": record["restaurant_id"],
-                    "name": record["restaurant_name"],
-                    "address": record["address"],
-                    "contact_number": record["contact_number"],
-                    "rating": record["restaurant_rating"],
-                    "reviews": []
-                }
-            if record["review_id"] is not None:
-                review = {
-                    "username": record["username"],
-                    "review": record["review"],
-                    "rating": record["review_rating"]
-                }
-                result_dict[restaurant_id]["reviews"].append(review)
         
-        result = list(result_dict.values())
-        return JSONResponse(content=result)
+        restaurant_data = {
+            "id": rows[0][0],
+            "name": rows[0][1],
+            "address": rows[0][2],
+            "contact_number": rows[0][3],
+            "rating": float(rows[0][4]), # Convert Decimal to float for JSON serialization
+            "reviews": []
+        }
+        
+
+        for row in rows:
+            if row[5]: # Check if there is a review for this restaurant
+                review = {
+                    "username": row[5],
+                    "review": row[6],
+                    "rating": float(row[7]) # Convert Decimal to float for JSON serialization
+                }
+                restaurant_data["reviews"].append(review)
+
+        return restaurant_data
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     finally:
@@ -215,7 +211,7 @@ async def get_restaurants():
         conn.close()
 
 """ Creates a new restaurant """
-@app.post("/api/restaurants")
+@app.post("/api/restaurant")
 def create_restaurant(restaurant: Restaurant):
     conn = connect_to_database()
     if not conn:
