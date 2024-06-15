@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-function SearchBar({ search, setSearch, optionSelected, handleSearch, error }) {
+function SearchBar({ search, setSearch, handleSearch, onSelect, error }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState("");
 
@@ -9,8 +9,8 @@ function SearchBar({ search, setSearch, optionSelected, handleSearch, error }) {
   };
 
   const handleOptionSelect = (event) => {
+    onSelect(event);
     console.log("Option selected:", event);
-    setSelectedOption(event);
     toggleDropdown();
   };
 
@@ -24,7 +24,7 @@ function SearchBar({ search, setSearch, optionSelected, handleSearch, error }) {
           <button
             id="dropdown-button"
             onClick={toggleDropdown}
-            onChange={(e) => optionSelected(e.target.value)}
+            onChange={(e) => setSelectedOption(e.target.value)}
             className="inline-flex flex-shrink-0 items-center rounded-s-lg border border-gray-300 bg-gray-100 px-4 py-2.5 text-center text-sm font-medium text-gray-900 hover:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-700"
             type="button"
           >

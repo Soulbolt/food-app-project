@@ -11,7 +11,6 @@ import RestaurantCard from "./RestaurantCard";
 
 function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
-  const [optionSelected, setOptionSelected] = useState("");
   const [search, setSearch] = useState("");
   const [restaurants, setRestaurants] = useState([]);
   const [recommendedRestaurants, setRecommendedRestaurants] = useState([]);
@@ -102,11 +101,10 @@ function Dashboard() {
       });
   }, []);
 
-  useEffect(() => {
-    console.log("selectedOption:", optionSelected);
-    if (optionSelected !== "Search By ID" || optionSelected !== "Options") {
+  const handleSelect = useCallback(async (value) => {
+    console.log("selectedOption in Dashbord:", value);
+    if (value === "Show All") {
       setIsLoading(true);
-      setOptionSelected("Show All");
       fetchRestaurants()
         .then((restaurantList) => {
           setRestaurants(restaurantList || []);
@@ -119,7 +117,7 @@ function Dashboard() {
           setIsLoading(false);
         });
     }
-  }, [optionSelected]);
+  }, []);
 
   if (isLoading) {
     return <Spinner />;
@@ -151,7 +149,7 @@ function Dashboard() {
             search={search}
             setSearch={setSearch}
             handleSearch={handleSearch}
-            optionSelected={optionSelected}
+            onSelect={handleSelect}
             error={error}
           />
         </div>
