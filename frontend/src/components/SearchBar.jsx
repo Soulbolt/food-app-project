@@ -10,6 +10,7 @@ function SearchBar({ search, setSearch, handleSearch, onSelect, error }) {
 
   const handleOptionSelect = (event) => {
     onSelect(event);
+    setSelectedOption(event);
     console.log("Option selected:", event);
     toggleDropdown();
   };
@@ -24,7 +25,6 @@ function SearchBar({ search, setSearch, handleSearch, onSelect, error }) {
           <button
             id="dropdown-button"
             onClick={toggleDropdown}
-            onChange={(e) => setSelectedOption(e.target.value)}
             className="inline-flex flex-shrink-0 items-center rounded-s-lg border border-gray-300 bg-gray-100 px-4 py-2.5 text-center text-sm font-medium text-gray-900 hover:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-700"
             type="button"
           >
@@ -62,6 +62,18 @@ function SearchBar({ search, setSearch, handleSearch, onSelect, error }) {
                 </li>
                 <li
                   className="px-4 py-1 hover:bg-gray-200 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-700"
+                  onClick={() => handleOptionSelect("Show Recommended")}
+                >
+                  Show Recommended
+                </li>
+                <li
+                  className="px-4 py-1 hover:bg-gray-200 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-700"
+                  onClick={() => handleOptionSelect("Search By Id")}
+                >
+                  Search By Id
+                </li>
+                <li
+                  className="px-4 py-1 hover:bg-gray-200 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-700"
                   onClick={() => handleOptionSelect("Search By Name")}
                 >
                   Search By Name
@@ -71,12 +83,6 @@ function SearchBar({ search, setSearch, handleSearch, onSelect, error }) {
                   onClick={() => handleOptionSelect("Search Category")}
                 >
                   Search Category
-                </li>
-                <li
-                  className="px-4 py-1 hover:bg-gray-200 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-700"
-                  onClick={() => handleOptionSelect("Search By Id")}
-                >
-                  Search By Id
                 </li>
               </ul>
             )}

@@ -16,7 +16,8 @@ function Dashboard() {
   const [recommendedRestaurants, setRecommendedRestaurants] = useState([]);
   const [filteredRestaurant, setFilteredRestaurants] = useState([]);
   const [error, setError] = useState(null);
-
+  const [showRecommended, setShowRecommended] = useState(false);
+  const [subtitle, setSubtitle] = useState("");
   /**
    * Handles the search functionality.
    *
@@ -88,36 +89,53 @@ function Dashboard() {
 
   useEffect(() => {
     console.log("inside the useEffect");
-    fetchRecommendedRestaurants()
-      .then((restaurantList) => {
-        setRecommendedRestaurants(restaurantList || []);
-        console.log(restaurantList);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching recommended restaurants:", error);
-        setError("An error occurred while fetching recommended restaurants.");
-        setIsLoading(false);
-      });
-  }, []);
-
-  const handleSelect = useCallback(async (value) => {
-    console.log("selectedOption in Dashbord:", value);
-    if (value === "Show All") {
-      setIsLoading(true);
-      fetchRestaurants()
+    if (recommendedRestaurants.length === 0) {
+      setShowRecommended(true);
+      fetchRecommendedRestaurants()
         .then((restaurantList) => {
-          setRestaurants(restaurantList || []);
+          setRecommendedRestaurants(restaurantList || []);
           console.log(restaurantList);
           setIsLoading(false);
         })
         .catch((error) => {
-          console.error("Error fetching restaurants:", error);
-          setError("An error occurred while fetching restaurants.");
+          console.error("Error fetching recommended restaurants:", error);
+          setError("An error occurred while fetching recommended restaurants.");
           setIsLoading(false);
         });
     }
-  }, []);
+  }, [recommendedRestaurants]);
+
+  const handleSelect = useCallback(
+    async (value) => {
+      console.log("selectedOption in Dashbord:", value);
+      if (value === "Show All" && restaurants.length === 0) {
+        setIsLoading(true);
+        setSubtitle("Showing all restaurants");
+        fetchRestaurants()
+          .then((restaurantList) => {
+            setRestaurants(restaurantList || []);
+            setShowRecommended(false); // Hide the recommended restaurants
+            console.log(restaurantList);
+            setIsLoading(false);
+          })
+          .catch((error) => {
+            console.error("Error fetching restaurants:", error);
+            setError("An error occurred while fetching restaurants.");
+            setIsLoading(false);
+          });
+      } else if (value === "Show All" && restaurants.length > 0) {
+        setSubtitle("Showing all restaurants");
+        setRestaurants(restaurants);
+        setShowRecommended(false); // Hide the recommended restaurants
+      } else if (value === "Show Recommended") {
+        setSubtitle("Showing recommended restaurants");
+        setRecommendedRestaurants(recommendedRestaurants);
+        setShowRecommended(true);
+      }
+      console.log("subtitle:", subtitle);
+    },
+    [recommendedRestaurants, restaurants, subtitle],
+  );
 
   if (isLoading) {
     return <Spinner />;
@@ -125,21 +143,21 @@ function Dashboard() {
 
   return (
     <div>
-      <div
+      <div className="h-screen-full w-full bg-slate-900">
+        {/* <div
         className="h-screen-full relative w-full bg-zinc-900/90 bg-cover bg-center bg-no-repeat"
         style={{
           backgroundImage: `url(${LoginImg})`,
           backgroundAttachment: "fixed",
         }}
-      >
+      > */}
         {/* <img
         className="absolute h-full w-full object-cover mix-blend-overlay"
         src={LoginImg}
         alt="breakfast"
       /> */}
-
-        <div>
-          <h2 className="mb-8 py-8 text-5xl text-indigo-300">
+        <div className="flex items-center justify-center">
+          <h2 className="mb-8 rounded-lg border bg-zinc-900 p-2 text-5xl text-cyan-500">
             Welcome To Your Dashboard
           </h2>
         </div>
@@ -154,47 +172,50 @@ function Dashboard() {
           />
         </div>
         <div className="relative flex h-full items-center justify-center">
-          <h2 className="mb-8 text-3xl text-indigo-300">
-            Recommendations For You!
+          <h2 className="mb-8 mt-2 rounded-lg border bg-zinc-900 px-2 text-3xl text-cyan-500">
+            {subtitle}
           </h2>
         </div>
         {/*<!-- Glboal Container -->*/}
         <div>
-          {filteredRestaurant.length > 0
-            ? filteredRestaurant.map((restaurant) => (
-                <RestaurantCard
-                  key={restaurant.id}
-                  {...restaurant}
-                  onAddToFavorites={() => handleAddToFavorites(restaurant.id)}
-                  onRemoveFromFavorites={() =>
-                    handleRemoveFromFavorites(restaurant.id)
-                  }
-                />
-              ))
-            : recommendedRestaurants.map((restaurant) => (
-                <RestaurantCard
-                  key={restaurant.id}
-                  {...restaurant}
-                  onAddToFavorites={() => handleAddToFavorites(restaurant.id)}
-                  onRemoveFromFavorites={() =>
-                    handleRemoveFromFavorites(restaurant.id)
-                  }
-                />
-              ))}
-          ,
-          {restaurants.length > 0 ? (
-            restaurants.map((restaurant) => (
-              <RestaurantCard
-                key={restaurant.id}
-                {...restaurant}
-                onAddToFavorites={() => handleAddToFavorites(restaurant.id)}
-                onRemoveFromFavorites={() =>
-                  handleRemoveFromFavorites(restaurant.id)
-                }
-              />
-            ))
+          {showRecommended ? (
+            <div>
+              <div className="flex flex-wrap justify-center gap-4 p-4">
+                {recommendedRestaurants.map((restaurant) => (
+                  <RestaurantCard
+                    key={restaurant.id}
+                    id={restaurant.id}
+                    name={restaurant.name}
+                    address={restaurant.address}
+                    contactNumber={restaurant.contactNumber}
+                    rating={restaurant.rating}
+                    isFavorite={restaurant.isFavorite}
+                    reviews={restaurant.reviews}
+                    onAddToFavorites={handleAddToFavorites}
+                    onRemoveFromFavorites={handleRemoveFromFavorites}
+                  />
+                ))}
+              </div>
+            </div>
           ) : (
-            <p>No restaurants found.</p>
+            <div>
+              <div className="flex flex-wrap justify-center gap-4 p-4">
+                {restaurants.map((restaurant) => (
+                  <RestaurantCard
+                    key={restaurant.id}
+                    id={restaurant.id}
+                    name={restaurant.name}
+                    address={restaurant.address}
+                    contactNumber={restaurant.contactNumber}
+                    rating={restaurant.rating}
+                    isFavorite={restaurant.isFavorite}
+                    reviews={restaurant.reviews}
+                    onAddToFavorites={handleAddToFavorites}
+                    onRemoveFromFavorites={handleRemoveFromFavorites}
+                  />
+                ))}
+              </div>
+            </div>
           )}
         </div>
       </div>
