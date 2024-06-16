@@ -57,10 +57,10 @@ function Dashboard() {
         setShowById(true);
         setShowAll(false);
         setShowRecommended(false);
-        setSubtitle("Showing Resturant by ID");
+        setSubtitle("Showing Resturant by ID: " + filteredRestaurant[0]?.id);
       }
     },
-    [search],
+    [search, filteredRestaurant, setFilteredRestaurants, setIsLoading],
   );
 
   /**
@@ -139,7 +139,7 @@ function Dashboard() {
         setShowById(false);
         setShowAll(true);
       } else if (value === "Show Recommended") {
-        setSubtitle("Your recommended restaurants");
+        setSubtitle("Recommended Restaurants");
         setRecommendedRestaurants(recommendedRestaurants);
         setShowRecommended(true);
         setShowAll(false);
@@ -150,9 +150,11 @@ function Dashboard() {
       ) {
         console.log("search:", search);
         handleSearch();
+        // TODO: Figure out a way to reuse state to return/filter by ID
       } else if (value === "Search By ID" && filteredRestaurant.length > 0) {
-        setSubtitle("Showing restaurants by ID");
         setFilteredRestaurants(filteredRestaurant);
+        setSubtitle("Showing restaurants by ID");
+        console.log("filteredRestaurant:", filteredRestaurant[0].id);
         setShowById(true);
         setShowAll(false);
         setShowRecommended(false);
@@ -205,7 +207,7 @@ function Dashboard() {
         </div>
         <div className="relative flex h-full items-center justify-center">
           <h2 className="mb-8 mt-8 rounded-lg border bg-zinc-900 px-2 text-3xl text-cyan-500">
-            {subtitle}
+            {subtitle ? subtitle : "Recommended Restaurants"}
           </h2>
         </div>
         {/*<!-- Glboal Container -->*/}
