@@ -18,6 +18,7 @@ function Dashboard() {
   const [error, setError] = useState(null);
   const [showRecommended, setShowRecommended] = useState(false);
   const [showAll, setShowAll] = useState(false);
+  const [showById, setShowById] = useState(false);
   const [subtitle, setSubtitle] = useState("");
   /**
    * Handles the search functionality.
@@ -53,6 +54,10 @@ function Dashboard() {
         setError("An error occurred while fetching the restaurant.");
       } finally {
         setIsLoading(false);
+        setShowById(true);
+        setShowAll(false);
+        setShowRecommended(false);
+        setSubtitle("Showing Resturant by ID");
       }
     },
     [search],
@@ -109,7 +114,7 @@ function Dashboard() {
   // TODO: (possible refactor)Add array to handle multiple filters aka Show All and Show Recommended
   const handleSelect = useCallback(
     async (value) => {
-      console.log("selectedOption in Dashbord:", value);
+      console.log("selectedOption in Dashboard:", value);
       if (value === "Show All" && restaurants.length === 0) {
         setIsLoading(true);
         setSubtitle("Showing all restaurants");
@@ -117,6 +122,8 @@ function Dashboard() {
           .then((restaurantList) => {
             setRestaurants(restaurantList || []);
             setShowRecommended(false); // Hide the recommended restaurants
+            setShowById(false);
+            setShowAll(true);
             console.log(restaurantList);
             setIsLoading(false);
           })
@@ -129,20 +136,24 @@ function Dashboard() {
         setSubtitle("Showing all restaurants");
         console.log("List of restaurants:", recommendedRestaurants);
         setShowRecommended(false); // Hide the recommended restaurants
+        setShowById(false);
+        setShowAll(true);
       } else if (value === "Show Recommended") {
-        setSubtitle("Showing recommended restaurants");
+        setSubtitle("Your recommended restaurants");
         setRecommendedRestaurants(recommendedRestaurants);
         setShowRecommended(true);
-      } else if (value === "Search By ID" && filteredRestaurant.length === 0) {
-        setIsLoading(true);
-        setSubtitle("Showing restaurants by ID");
+        setShowAll(false);
+        setShowById(false);
+      } else if (
+        value === "Search By ID" &&
+        (filteredRestaurant.length === 0 || filteredRestaurant.length === 1)
+      ) {
         console.log("search:", search);
         handleSearch();
-        setShowAll(false);
-        setShowRecommended(false);
       } else if (value === "Search By ID" && filteredRestaurant.length > 0) {
         setSubtitle("Showing restaurants by ID");
         setFilteredRestaurants(filteredRestaurant);
+        setShowById(true);
         setShowAll(false);
         setShowRecommended(false);
       }
@@ -199,7 +210,7 @@ function Dashboard() {
         </div>
         {/*<!-- Glboal Container -->*/}
         <div>
-          {showRecommended ? (
+          {showRecommended && recommendedRestaurants.length > 0 ? (
             <div>
               <div className="flex flex-wrap justify-center gap-4 p-4">
                 {recommendedRestaurants.map((restaurant) => (
@@ -218,7 +229,7 @@ function Dashboard() {
                 ))}
               </div>
             </div>
-          ) : (
+          ) : showAll && restaurants.length > 0 ? (
             <div>
               <div className="flex flex-wrap justify-center gap-4 p-4">
                 {restaurants.map((restaurant) => (
@@ -237,8 +248,7 @@ function Dashboard() {
                 ))}
               </div>
             </div>
-          )}
-          {filteredRestaurant.length > 0 ? (
+          ) : showById && filteredRestaurant.length > 0 ? (
             <div>
               <div className="justify-center">
                 {filteredRestaurant.map((restaurant) => (
@@ -257,7 +267,11 @@ function Dashboard() {
                 ))}
               </div>
             </div>
-          ) : null}
+          ) : (
+            <div>
+              <div className="justify-center">No restaurants found</div>
+            </div>
+          )}
         </div>
       </div>
     </div>
