@@ -19,9 +19,6 @@ function SearchBar({ search, setSearch, handleSearch, onSelect, error }) {
     <div className="relative">
       <form onSubmit={handleSearch} className="mx-auto max-w-lg">
         <div className="flex">
-          <label className="sr-only mb-2 text-sm font-medium text-gray-900 dark:text-white">
-            Your Email
-          </label>
           <button
             id="dropdown-button"
             onClick={toggleDropdown}
@@ -47,6 +44,7 @@ function SearchBar({ search, setSearch, handleSearch, onSelect, error }) {
           </button>
           <div
             id="dropdown"
+            onMouseLeave={toggleDropdown}
             className="display-none absolute top-11 rounded-lg bg-white shadow dark:bg-gray-700"
           >
             {dropdownOpen && (

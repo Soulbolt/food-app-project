@@ -204,7 +204,7 @@ function Dashboard() {
           />
         </div>
         <div className="relative flex h-full items-center justify-center">
-          <h2 className="mb-8 mt-2 rounded-lg border bg-zinc-900 px-2 text-3xl text-cyan-500">
+          <h2 className="mb-8 mt-8 rounded-lg border bg-zinc-900 px-2 text-3xl text-cyan-500">
             {subtitle}
           </h2>
         </div>
