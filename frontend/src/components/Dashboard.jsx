@@ -17,6 +17,7 @@ function Dashboard() {
   const [filteredRestaurant, setFilteredRestaurants] = useState([]);
   const [error, setError] = useState(null);
   const [showRecommended, setShowRecommended] = useState(false);
+  const [showByID, setShowByID] = useState(false);
   const [subtitle, setSubtitle] = useState("");
   /**
    * Handles the search functionality.
@@ -105,6 +106,7 @@ function Dashboard() {
     }
   }, [recommendedRestaurants]);
 
+  // TODO: (possible refactor)Add array to handle multiple filters aka Show All and Show Recommended
   const handleSelect = useCallback(
     async (value) => {
       console.log("selectedOption in Dashbord:", value);
@@ -125,16 +127,29 @@ function Dashboard() {
           });
       } else if (value === "Show All" && restaurants.length > 0) {
         setSubtitle("Showing all restaurants");
-        setRestaurants(restaurants);
+        console.log("List of restaurants:", recommendedRestaurants);
         setShowRecommended(false); // Hide the recommended restaurants
       } else if (value === "Show Recommended") {
         setSubtitle("Showing recommended restaurants");
         setRecommendedRestaurants(recommendedRestaurants);
         setShowRecommended(true);
+      } else if (value === "Search By ID" && filteredRestaurant.length === 0) {
+        setIsLoading(true);
+        setSubtitle("Showing restaurants by ID");
+        console.log("search:", search);
+        handleSearch();
+        setShowRecommended(false);
       }
       console.log("subtitle:", subtitle);
     },
-    [recommendedRestaurants, restaurants, subtitle],
+    [
+      recommendedRestaurants,
+      restaurants,
+      subtitle,
+      filteredRestaurant,
+      search,
+      handleSearch,
+    ],
   );
 
   if (isLoading) {
@@ -217,6 +232,26 @@ function Dashboard() {
               </div>
             </div>
           )}
+          {filteredRestaurant.length > 0 ? (
+            <div>
+              <div className="justify-center">
+                {filteredRestaurant.map((restaurant) => (
+                  <RestaurantCard
+                    key={restaurant.id}
+                    id={restaurant.id}
+                    name={restaurant.name}
+                    address={restaurant.address}
+                    contactNumber={restaurant.contactNumber}
+                    rating={restaurant.rating}
+                    isFavorite={restaurant.isFavorite}
+                    reviews={restaurant.reviews}
+                    onAddToFavorites={handleAddToFavorites}
+                    onRemoveFromFavorites={handleRemoveFromFavorites}
+                  />
+                ))}
+              </div>
+            </div>
+          ) : null}
         </div>
       </div>
     </div>
