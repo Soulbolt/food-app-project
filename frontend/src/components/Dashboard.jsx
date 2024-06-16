@@ -17,7 +17,7 @@ function Dashboard() {
   const [filteredRestaurant, setFilteredRestaurants] = useState([]);
   const [error, setError] = useState(null);
   const [showRecommended, setShowRecommended] = useState(false);
-  const [showByID, setShowByID] = useState(false);
+  const [showAll, setShowAll] = useState(false);
   const [subtitle, setSubtitle] = useState("");
   /**
    * Handles the search functionality.
@@ -138,6 +138,12 @@ function Dashboard() {
         setSubtitle("Showing restaurants by ID");
         console.log("search:", search);
         handleSearch();
+        setShowAll(false);
+        setShowRecommended(false);
+      } else if (value === "Search By ID" && filteredRestaurant.length > 0) {
+        setSubtitle("Showing restaurants by ID");
+        setFilteredRestaurants(filteredRestaurant);
+        setShowAll(false);
         setShowRecommended(false);
       }
       console.log("subtitle:", subtitle);
