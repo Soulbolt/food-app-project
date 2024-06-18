@@ -47,6 +47,7 @@ function Dashboard() {
           setFilteredRestaurants([]);
         } else {
           setFilteredRestaurants([filtered]);
+          setSubtitle("Showing Resturant by ID: " + filtered.id);
           setError(null); // Clear any previous error
         }
       } catch (error) {
@@ -57,10 +58,9 @@ function Dashboard() {
         setShowById(true);
         setShowAll(false);
         setShowRecommended(false);
-        setSubtitle("Showing Resturant by ID: " + filteredRestaurant[0]?.id);
       }
     },
-    [search, filteredRestaurant, setFilteredRestaurants, setIsLoading],
+    [search, setFilteredRestaurants, setIsLoading],
   );
 
   /**
@@ -144,31 +144,13 @@ function Dashboard() {
         setShowRecommended(true);
         setShowAll(false);
         setShowById(false);
-      } else if (
-        value === "Search By ID" &&
-        (filteredRestaurant.length === 0 || filteredRestaurant.length === 1)
-      ) {
+      } else if (value === "Search By ID") {
         console.log("search:", search);
         handleSearch();
         // TODO: Figure out a way to reuse state to return/filter by ID
-      } else if (value === "Search By ID" && filteredRestaurant.length > 0) {
-        setFilteredRestaurants(filteredRestaurant);
-        setSubtitle("Showing restaurants by ID");
-        console.log("filteredRestaurant:", filteredRestaurant[0].id);
-        setShowById(true);
-        setShowAll(false);
-        setShowRecommended(false);
       }
-      console.log("subtitle:", subtitle);
     },
-    [
-      recommendedRestaurants,
-      restaurants,
-      subtitle,
-      filteredRestaurant,
-      search,
-      handleSearch,
-    ],
+    [recommendedRestaurants, restaurants, search, handleSearch],
   );
 
   if (isLoading) {
