@@ -193,7 +193,7 @@ function Dashboard() {
           </h2>
         </div>
         {/*<!-- Glboal Container -->*/}
-        <div>
+        <div className="flex min-h-screen w-full flex-col">
           {showRecommended && recommendedRestaurants.length > 0 ? (
             <div>
               <div className="flex flex-wrap justify-center gap-4 p-4">
