@@ -111,7 +111,7 @@ function Dashboard() {
     }
   }, [recommendedRestaurants]);
 
-  // TODO: (possible refactor)Add array to handle multiple filters aka Show All and Show Recommended
+  // TODO: (possible refactor)Add array and for loop to handle multiple conditions for filter options.
   const handleSelect = useCallback(
     async (value) => {
       console.log("selectedOption in Dashboard:", value);
