@@ -54,6 +54,7 @@ function Dashboard() {
           setShowByName(false);
           setShowAll(false);
           setShowRecommended(false);
+          setError(null);
         } else {
           console.log("Fetching restaurant by name:", search);
           filtered = await fetchRestaurantsByName(search);
@@ -63,9 +64,10 @@ function Dashboard() {
           setShowById(false);
           setShowAll(false);
           setShowRecommended(false);
+          setError(null);
         }
 
-        if (!filtered) {
+        if (!filtered || filtered.length === 0) {
           // Handle not found error
           setError("No restaurant found with the given input.");
           setFilteredRestaurants([]);
