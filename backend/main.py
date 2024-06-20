@@ -211,6 +211,66 @@ async def get_restaurants():
         cursor.close()
         conn.close()
 
+""" Returns the restaurant with the matching name """
+@app.get("/api/restaurants_by_name/{restaurant_name}")
+async def get_restaurants_by_name(restaurant_name: str):
+    conn = connect_to_database()
+    if not conn:
+        raise HTTPException(status_code=500, detail="Could not connect to the database")
+    try:
+        print("Connected to the database!")
+        cursor = conn.cursor()
+        query = """
+            SELECT 
+                r.id AS id,
+                r.name AS name,
+                r.address,
+                r.contact_number,
+                r.rating AS rating,
+                COALESCE(
+                    JSON_AGG(
+                        JSON_BUILD_OBJECT(
+                            'username', rv.username,
+                            'review', rv.review,
+                            'rating', rv.rating
+                        )
+                    ) FILTER (WHERE rv.username IS NOT NULL), '[]'
+                ) AS reviews
+            FROM 
+                restaurant_schema.restaurants r
+            LEFT JOIN 
+                restaurant_schema.reviews rv ON r.id = rv.restaurant_id
+            GROUP BY
+                 r.id, r.name, r.address, r.contact_number, r.rating
+            WHERE r.name = %s
+            ORDER BY r.name DESC;
+        """
+        cursor.execute(query)
+        rows = cursor.fetchall()
+        if rows is None:
+            raise HTTPException(status_code=404, detail="Restaurant not found")
+        colnames = [desc[0] for desc in cursor.description]
+        
+        restaurant_list = []
+        for row in rows:
+            restaurant_data = {
+                "id": row[0],
+                "name": row[1],
+                "address": row[2],
+                "contact_number": row[3],
+                "rating": float(row[4]), # Convert Decimal to float for JSON serialization
+                "reviews": row[5] if row[5] else [] # Use the aggregated JSON for reviews
+            }
+
+            restaurant_list.append(restaurant_data)
+
+        return restaurant_list
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+        conn.close()
+
 """ Creates a new restaurant """
 @app.post("/api/restaurant")
 def create_restaurant(restaurant: Restaurant):
