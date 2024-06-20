@@ -241,12 +241,16 @@ async def get_restaurants_by_name(restaurant_name: str):
             LEFT JOIN 
                 restaurant_schema.reviews rv ON r.id = rv.restaurant_id
             WHERE
-                r.name = %(restaurant_name)s
+                LOWER(r.name) LIKE %(restaurant_name)s
             GROUP BY
                 r.id, r.name, r.address, r.contact_number, r.rating
             ORDER BY r.name DESC;
         """
-        cursor.execute(query, {"restaurant_name": restaurant_name})
+        # Convert restaurant_name to lowercase for case-insensitive search
+        restaurant_name = restaurant_name.lower()
+        # Replace spaces with % for SQL wildcard search
+        restaurant_name = restaurant_name.replace(" ", "%")
+        cursor.execute(query, {"restaurant_name": f'%{restaurant_name}%'})
         rows = cursor.fetchall()
         if rows is None:
             raise HTTPException(status_code=404, detail="Restaurant not found")
