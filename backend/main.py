@@ -240,12 +240,13 @@ async def get_restaurants_by_name(restaurant_name: str):
                 restaurant_schema.restaurants r
             LEFT JOIN 
                 restaurant_schema.reviews rv ON r.id = rv.restaurant_id
+            WHERE
+                r.name = %(restaurant_name)s
             GROUP BY
-                 r.id, r.name, r.address, r.contact_number, r.rating
-            WHERE r.name = %s
+                r.id, r.name, r.address, r.contact_number, r.rating
             ORDER BY r.name DESC;
         """
-        cursor.execute(query)
+        cursor.execute(query, {"restaurant_name": restaurant_name})
         rows = cursor.fetchall()
         if rows is None:
             raise HTTPException(status_code=404, detail="Restaurant not found")
