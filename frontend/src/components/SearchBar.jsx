@@ -78,7 +78,7 @@ function SearchBar({ search, setSearch, handleSearch, onSelect, error }) {
                 </li>
                 <li
                   className="px-4 py-1 hover:bg-gray-200 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-700"
-                  onClick={() => handleOptionSelect("Search Category")}
+                  onClick={() => handleOptionSelect("Search By Category")}
                 >
                   Search Category
                 </li>
@@ -92,7 +92,7 @@ function SearchBar({ search, setSearch, handleSearch, onSelect, error }) {
               value={search || ""}
               onChange={(e) => setSearch(e.target.value)}
               className="z-20 block w-full rounded-e-lg border border-s-2 border-gray-300 border-s-gray-50 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:border-s-gray-700  dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500"
-              placeholder={!error ? "Click options to search" : "Whoops..."}
+              placeholder={!error ? "Click options to begin" : "Whoops..."}
               required
             />
             <button
