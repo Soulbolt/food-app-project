@@ -148,6 +148,10 @@ function Dashboard() {
         console.log("search:", search);
         handleSearch();
         // TODO: Figure out a way to reuse state to return/filter by ID
+      } else if (value === "Search By Name") {
+        console.log("search:", search);
+        handleSearch();
+        // TODO: Figure out a way to reuse state to return/filter by Name
       }
     },
     [recommendedRestaurants, restaurants, search, handleSearch],

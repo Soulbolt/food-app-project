@@ -53,3 +53,19 @@ export async function fetchRecommendedRestaurantById(id) {
     console.log("Error fetching data", error);
   }
 }
+
+export async function fetchRestaurantsByName(name) {
+  try {
+    const response = await axios.get(`/api/restaurants?name=${name}`);
+    const restaurantList = response.data.map((restaurant) => {
+      return {
+        ...restaurant,
+        isFavorite: false,
+        id: restaurant.id,
+      };
+    });
+    return restaurantList;
+  } catch (error) {
+    console.log("Error fetching data", error);
+  }
+}
