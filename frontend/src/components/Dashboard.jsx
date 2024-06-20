@@ -2,6 +2,7 @@ import {
   fetchRestaurants,
   fetchRecommendedRestaurants,
   fetchRestaurantById,
+  fetchRestaurantsByName,
 } from "../services/apiRestaurants";
 import Spinner from "./Spinner";
 import React, { useState, useEffect, useCallback } from "react";
@@ -15,10 +16,12 @@ function Dashboard() {
   const [restaurants, setRestaurants] = useState([]);
   const [recommendedRestaurants, setRecommendedRestaurants] = useState([]);
   const [filteredRestaurant, setFilteredRestaurants] = useState([]);
+  const [filteredByName, setFilteredRestaurantsByName] = useState([]); // [fetchRestaurantsByName]
   const [error, setError] = useState(null);
   const [showRecommended, setShowRecommended] = useState(false);
   const [showAll, setShowAll] = useState(false);
   const [showById, setShowById] = useState(false);
+  const [showByName, setShowByName] = useState(false);
   const [subtitle, setSubtitle] = useState("");
   /**
    * Handles the search functionality.
@@ -28,10 +31,10 @@ function Dashboard() {
    */
   const handleSearch = useCallback(
     async (e) => {
-      e.preventDefault();
-      setSearch(e.target.value);
+      e?.preventDefault();
+      setSearch(e?.target.value);
 
-      if (search.trim() === "") {
+      if (search?.trim() === "") {
         setFilteredRestaurants([]);
         return;
       }
@@ -39,7 +42,14 @@ function Dashboard() {
       setIsLoading(true);
 
       try {
-        const filtered = await fetchRestaurantById(search);
+        let filtered = null;
+        if (Number(search)) {
+          console.log("Fetching restaurant by ID:", search);
+          filtered = await fetchRestaurantById(search);
+        } else {
+          console.log("Fetching restaurant by name:", search);
+          filtered = await fetchRestaurantsByName(search);
+        }
 
         if (!filtered) {
           // Handle not found error
@@ -56,6 +66,7 @@ function Dashboard() {
       } finally {
         setIsLoading(false);
         setShowById(true);
+        setShowByName(false);
         setShowAll(false);
         setShowRecommended(false);
       }
@@ -123,6 +134,7 @@ function Dashboard() {
             setRestaurants(restaurantList || []);
             setShowRecommended(false); // Hide the recommended restaurants
             setShowById(false);
+            setShowByName(false);
             setShowAll(true);
             console.log(restaurantList);
             setIsLoading(false);
@@ -137,6 +149,7 @@ function Dashboard() {
         console.log("List of restaurants:", recommendedRestaurants);
         setShowRecommended(false); // Hide the recommended restaurants
         setShowById(false);
+        setShowByName(false);
         setShowAll(true);
       } else if (value === "Show Recommended") {
         setSubtitle("Recommended Restaurants");
@@ -144,6 +157,7 @@ function Dashboard() {
         setShowRecommended(true);
         setShowAll(false);
         setShowById(false);
+        setShowByName(false);
       } else if (value === "Search By ID") {
         console.log("search:", search);
         handleSearch();
@@ -255,9 +269,30 @@ function Dashboard() {
                 ))}
               </div>
             </div>
+          ) : showByName && filteredByName.length > 0 ? (
+            <div>
+              <div className="justify-center">
+                {filteredByName.map((restaurant) => (
+                  <RestaurantCard
+                    key={restaurant.id}
+                    id={restaurant.id}
+                    name={restaurant.name}
+                    address={restaurant.address}
+                    contactNumber={restaurant.contactNumber}
+                    rating={restaurant.rating}
+                    isFavorite={restaurant.isFavorite}
+                    reviews={restaurant.reviews}
+                    onAddToFavorites={handleAddToFavorites}
+                    onRemoveFromFavorites={handleRemoveFromFavorites}
+                  />
+                ))}
+              </div>
+            </div>
           ) : (
             <div>
-              <div className="justify-center">No restaurants found</div>
+              <div className="justify-center">
+                <p>No results found</p>
+              </div>
             </div>
           )}
         </div>
