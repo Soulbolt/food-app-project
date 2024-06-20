@@ -31,47 +31,60 @@ function Dashboard() {
    */
   const handleSearch = useCallback(
     async (e) => {
-      e?.preventDefault();
-      setSearch(e?.target.value);
+      e.preventDefault();
+      setSearch(e.target.value);
 
       if (search?.trim() === "") {
         setFilteredRestaurants([]);
+        setFilteredRestaurantsByName([]);
         return;
       }
 
       setIsLoading(true);
 
       try {
-        let filtered = null;
+        let filtered = [];
         if (Number(search)) {
           console.log("Fetching restaurant by ID:", search);
           filtered = await fetchRestaurantById(search);
+          setFilteredRestaurants([filtered]);
+          setSubtitle(`Showing results for restaurant with ID ${search}`);
+          setIsLoading(false);
+          setShowById(true);
+          setShowByName(false);
+          setShowAll(false);
+          setShowRecommended(false);
         } else {
           console.log("Fetching restaurant by name:", search);
           filtered = await fetchRestaurantsByName(search);
+          setSubtitle("Showing Resturants by Matching Input:");
+          setFilteredRestaurantsByName(filtered);
+          setShowByName(true);
+          setShowById(false);
+          setShowAll(false);
+          setShowRecommended(false);
         }
 
         if (!filtered) {
           // Handle not found error
-          setError("No restaurant found with the given ID.");
+          setError("No restaurant found with the given input.");
           setFilteredRestaurants([]);
-        } else {
-          setFilteredRestaurants([filtered]);
-          setSubtitle("Showing Resturant by ID: " + filtered.id);
-          setError(null); // Clear any previous error
+          setFilteredRestaurantsByName([]);
         }
       } catch (error) {
-        console.error("Error fetching restaurant by ID:", error);
+        console.error("Error fetching restaurant by given input:", error);
         setError("An error occurred while fetching the restaurant.");
       } finally {
         setIsLoading(false);
-        setShowById(true);
-        setShowByName(false);
-        setShowAll(false);
-        setShowRecommended(false);
       }
     },
-    [search, setFilteredRestaurants, setIsLoading],
+    [
+      search,
+      setFilteredRestaurants,
+      setIsLoading,
+      setFilteredRestaurantsByName,
+      setError,
+    ],
   );
 
   /**
@@ -159,16 +172,16 @@ function Dashboard() {
         setShowById(false);
         setShowByName(false);
       } else if (value === "Search By ID") {
-        console.log("search:", search);
-        handleSearch();
+        setSearch("");
+        setFilteredRestaurantsByName([]);
         // TODO: Figure out a way to reuse state to return/filter by ID
       } else if (value === "Search By Name") {
-        console.log("search:", search);
-        handleSearch();
+        setFilteredRestaurants([]);
+        setSearch("");
         // TODO: Figure out a way to reuse state to return/filter by Name
       }
     },
-    [recommendedRestaurants, restaurants, search, handleSearch],
+    [recommendedRestaurants, restaurants, setSearch],
   );
 
   if (isLoading) {
@@ -271,7 +284,7 @@ function Dashboard() {
             </div>
           ) : showByName && filteredByName.length > 0 ? (
             <div>
-              <div className="justify-center">
+              <div className="flex flex-wrap justify-center gap-4 p-4">
                 {filteredByName.map((restaurant) => (
                   <RestaurantCard
                     key={restaurant.id}

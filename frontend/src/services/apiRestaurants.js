@@ -56,7 +56,7 @@ export async function fetchRecommendedRestaurantById(id) {
 
 export async function fetchRestaurantsByName(name) {
   try {
-    const response = await axios.get(`/api/restaurants?name=${name}`);
+    const response = await axios.get(`/api/restaurants_by_name/${name}`);
     const restaurantList = response.data.map((restaurant) => {
       return {
         ...restaurant,
