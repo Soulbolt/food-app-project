@@ -244,7 +244,7 @@ async def get_restaurants_by_name(restaurant_name: str):
                 LOWER(r.name) LIKE %(restaurant_name)s
             GROUP BY
                 r.id, r.name, r.address, r.contact_number, r.rating
-            ORDER BY r.name DESC;
+            ORDER BY r.name ASC;
         """
         # Convert restaurant_name to lowercase for case-insensitive search
         restaurant_name = restaurant_name.lower()
