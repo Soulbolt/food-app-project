@@ -39,6 +39,7 @@ function RestaurantCard({
           {/*<!-- Title -->*/}
           <div className="max-w-sm text-center text-4xl font-medium md:text-left">
             {name}
+            <p className="text-2xl text-gray-400">{address}</p>
           </div>
           {/*<!-- Price -->*/}
           <div className="mb-4 flex flex-col space-y-3 text-center md:text-left">

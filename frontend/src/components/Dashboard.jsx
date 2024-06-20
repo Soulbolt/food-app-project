@@ -207,7 +207,7 @@ function Dashboard() {
       /> */}
         <div className="flex items-center justify-center">
           <h2 className="mb-8 rounded-lg border bg-zinc-900 p-2 text-5xl text-cyan-500">
-            Welcome To Your Dashboard
+            Welcome To Your Search Page
           </h2>
         </div>
         <div className="sticky top-1 z-50">
