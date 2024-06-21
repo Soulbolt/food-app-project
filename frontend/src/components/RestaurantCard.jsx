@@ -1,5 +1,5 @@
 import React from "react";
-import { FaHeartCirclePlus, FaHeartCrack } from "react-icons/fa6";
+import { FaHeartCirclePlus, FaHeartCrack, FaPhone } from "react-icons/fa6";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import CardImage from "../assets/kabobs.jpg";
 
@@ -7,7 +7,7 @@ function RestaurantCard({
   id,
   name,
   address,
-  contactNumber,
+  contact_number,
   rating,
   isFavorite,
   reviews,
@@ -15,6 +15,14 @@ function RestaurantCard({
   onRemoveFromFavorites,
 }) {
   const [showModal, setShowModal] = React.useState(false);
+  console.log("Prop:", {
+    id,
+    name,
+    address,
+    contact_number,
+    rating,
+    isFavorite,
+  });
 
   return (
     <div className="mb-3 flex items-center justify-center">
@@ -41,7 +49,11 @@ function RestaurantCard({
           {/*<!-- Title -->*/}
           <div className="max-w-sm text-center text-4xl font-medium md:text-left">
             {name}
-            <p className="text-2xl text-gray-400">{address}</p>
+            <p className="mb-2 mt-2 text-2xl text-gray-400">{address}</p>
+            <p className="text-2xl text-gray-400">
+              <FaPhone className="text-lime-500" />
+              {contact_number}
+            </p>
           </div>
           {/*<!-- Price -->*/}
           <div className="mb-4 flex flex-col space-y-3 text-center md:text-left">
