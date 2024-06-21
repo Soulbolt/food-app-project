@@ -69,11 +69,21 @@ function RestaurantCard({
           {showModal && (
             <div className="fixed left-0 top-0 flex h-full w-full items-center justify-center bg-black bg-opacity-50">
               <div className="rounded-lg bg-white p-8">
-                <h2 className="text-2xl font-bold">Reviews</h2>
+                <h2 className="text-3xl font-bold">Reviews</h2>
                 <ul>
                   {reviews.map((review) => (
-                    <li key={review.id}>
-                      <p>{review.text}</p>
+                    <li
+                      key={review.id}
+                      className="my-2 border-4 border-slate-300 p-2"
+                    >
+                      <div className="flex flex-col items-start">
+                        <label className="text-l font-bold">User:</label>
+                        <p>{review.username}</p>
+                        <label className="text-l font-bold">Review:</label>
+                        <p>{review.review}</p>
+                        <label className="text-l font-bold">Rating:</label>
+                        <p>{review.rating}</p>
+                      </div>
                     </li>
                   ))}
                 </ul>
