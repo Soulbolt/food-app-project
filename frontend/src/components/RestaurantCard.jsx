@@ -15,14 +15,6 @@ function RestaurantCard({
   onRemoveFromFavorites,
 }) {
   const [showModal, setShowModal] = React.useState(false);
-  console.log("Prop:", {
-    id,
-    name,
-    address,
-    contact_number,
-    rating,
-    isFavorite,
-  });
 
   return (
     <div className="mb-3 flex items-center justify-center">
@@ -50,8 +42,8 @@ function RestaurantCard({
           <div className="max-w-sm text-center text-4xl font-medium md:text-left">
             {name}
             <p className="mb-2 mt-2 text-2xl text-gray-400">{address}</p>
-            <p className="text-2xl text-gray-400">
-              <FaPhone className="text-lime-500" />
+            <p className="flex flex-auto text-2xl text-gray-400">
+              <FaPhone className="mr-2 mt-2 text-lime-500" />
               {contact_number}
             </p>
           </div>
