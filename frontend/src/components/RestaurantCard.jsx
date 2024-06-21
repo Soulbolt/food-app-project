@@ -1,6 +1,7 @@
 import React from "react";
 import { FaHeartCirclePlus, FaHeartCrack, FaPhone } from "react-icons/fa6";
 import { FaMapMarkerAlt } from "react-icons/fa";
+import { MdLocationCity } from "react-icons/md";
 import CardImage from "../assets/kabobs.jpg";
 
 function RestaurantCard({
@@ -41,7 +42,10 @@ function RestaurantCard({
           {/*<!-- Title -->*/}
           <div className="max-w-sm text-center text-4xl font-medium md:text-left">
             {name}
-            <p className="mb-2 mt-2 text-2xl text-gray-400">{address}</p>
+            <p className="mb-2 mt-2 flex flex-auto text-2xl text-gray-400">
+              <MdLocationCity className="mr-2 text-5xl text-zinc-600" />
+              {address}
+            </p>
             <p className="flex flex-auto text-2xl text-gray-400">
               <FaPhone className="mr-2 mt-2 text-lime-500" />
               {contact_number}

@@ -231,18 +231,7 @@ function Dashboard() {
             <div>
               <div className="flex flex-wrap justify-center gap-4 p-4">
                 {recommendedRestaurants.map((restaurant) => (
-                  <RestaurantCard
-                    key={restaurant.id}
-                    id={restaurant.id}
-                    name={restaurant.name}
-                    address={restaurant.address}
-                    contactNumber={restaurant.contactNumber}
-                    rating={restaurant.rating}
-                    isFavorite={restaurant.isFavorite}
-                    reviews={restaurant.reviews}
-                    onAddToFavorites={handleAddToFavorites}
-                    onRemoveFromFavorites={handleRemoveFromFavorites}
-                  />
+                  <RestaurantCard key={restaurant.id} {...restaurant} />
                 ))}
               </div>
             </div>
@@ -250,18 +239,7 @@ function Dashboard() {
             <div>
               <div className="flex flex-wrap justify-center gap-4 p-4">
                 {restaurants.map((restaurant) => (
-                  <RestaurantCard
-                    key={restaurant.id}
-                    id={restaurant.id}
-                    name={restaurant.name}
-                    address={restaurant.address}
-                    contactNumber={restaurant.contactNumber}
-                    rating={restaurant.rating}
-                    isFavorite={restaurant.isFavorite}
-                    reviews={restaurant.reviews}
-                    onAddToFavorites={handleAddToFavorites}
-                    onRemoveFromFavorites={handleRemoveFromFavorites}
-                  />
+                  <RestaurantCard key={restaurant.id} {...restaurant} />
                 ))}
               </div>
             </div>
@@ -269,18 +247,7 @@ function Dashboard() {
             <div>
               <div className="justify-center">
                 {filteredRestaurant.map((restaurant) => (
-                  <RestaurantCard
-                    key={restaurant.id}
-                    id={restaurant.id}
-                    name={restaurant.name}
-                    address={restaurant.address}
-                    contactNumber={restaurant.contactNumber}
-                    rating={restaurant.rating}
-                    isFavorite={restaurant.isFavorite}
-                    reviews={restaurant.reviews}
-                    onAddToFavorites={handleAddToFavorites}
-                    onRemoveFromFavorites={handleRemoveFromFavorites}
-                  />
+                  <RestaurantCard key={restaurant.id} {...restaurant} />
                 ))}
               </div>
             </div>
@@ -288,18 +255,7 @@ function Dashboard() {
             <div>
               <div className="flex flex-wrap justify-center gap-4 p-4">
                 {filteredByName.map((restaurant) => (
-                  <RestaurantCard
-                    key={restaurant.id}
-                    id={restaurant.id}
-                    name={restaurant.name}
-                    address={restaurant.address}
-                    contactNumber={restaurant.contactNumber}
-                    rating={restaurant.rating}
-                    isFavorite={restaurant.isFavorite}
-                    reviews={restaurant.reviews}
-                    onAddToFavorites={handleAddToFavorites}
-                    onRemoveFromFavorites={handleRemoveFromFavorites}
-                  />
+                  <RestaurantCard key={restaurant.id} {...restaurant} />
                 ))}
               </div>
             </div>
