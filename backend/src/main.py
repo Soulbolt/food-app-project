@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from restaurant_modules import Restaurant
+from restaurant_models import Restaurant
 from mock_restaurants_db import DB
 import psycopg2
 import os
