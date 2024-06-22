@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from restaurant_modules import Restaurant
-from mock_data import mock_restaurants_db
+from mock_restaurants_db import DB
 import psycopg2
 import os
 from dotenv import load_dotenv
@@ -78,7 +78,7 @@ async def get_restaurants():
         rows = cursor.fetchall()
         if rows is None:
             raise HTTPException(status_code=404, detail="Restaurant not found")
-        colnames = [desc[0] for desc in cursor.description]
+        [desc[0] for desc in cursor.description]
         
         restaurant_list = []
         for row in rows:
@@ -143,7 +143,7 @@ async def get_restaurants_by_name(restaurant_name: str):
         rows = cursor.fetchall()
         if rows is None:
             raise HTTPException(status_code=404, detail="Restaurant not found")
-        colnames = [desc[0] for desc in cursor.description]
+        [desc[0] for desc in cursor.description]
         
         restaurant_list = []
         for row in rows:
@@ -216,7 +216,7 @@ def get_restaurant(id: int):
         rows = cursor.fetchall()
         if rows is None:
             raise HTTPException(status_code=404, detail="Restaurant not found")
-        colnames = [desc[0] for desc in cursor.description]
+        [desc[0] for desc in cursor.description]
         
         restaurant_data = {
             "id": rows[0][0],
@@ -256,21 +256,21 @@ def get_recommended_restaurants():
             "rating": restaurant["rating"],
             "reviews": restaurant["reviews"]
         }
-        for restaurant in mock_restaurants_db.DB
+        for restaurant in DB
     ]
     return restaurant_list
 
 """ Returns the restaurant with the specified ID """
 @app.get("/api/recommended_restaurant/{id}")
 def get_restaurant(id: int):
-    for restaurant in mock_restaurants_db.DB:
+    for restaurant in DB:
         if restaurant["id"] == id:
             return restaurant
 
 """ Updates the restaurant with the specified ID """
 @app.put("/api/update_restaurant/{id}")
 def update_restaurant(id: int, restaurant: Restaurant):
-    for restaurant in mock_restaurants_db.DB:
+    for restaurant in DB:
         if restaurant["id"] == id:
             restaurant.update(restaurant)
-    return mock_restaurants_db.DB
+    return DB
