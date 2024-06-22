@@ -83,7 +83,7 @@ async def get_restaurants():
         
         restaurant_list = []
         for row in rows:
-            restaurant_data = {
+            restaurant_data: Restaurant = {
                 "id": row[0],
                 "name": row[1],
                 "address": row[2],
@@ -219,7 +219,7 @@ def get_restaurant(id: int):
             raise HTTPException(status_code=404, detail="Restaurant not found")
         [desc[0] for desc in cursor.description]
         
-        restaurant_data = {
+        restaurant_data: R = {
             "id": rows[0][0],
             "name": rows[0][1],
             "address": rows[0][2],
