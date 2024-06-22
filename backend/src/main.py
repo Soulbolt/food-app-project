@@ -219,7 +219,7 @@ def get_restaurant(id: int):
             raise HTTPException(status_code=404, detail="Restaurant not found")
         [desc[0] for desc in cursor.description]
         
-        restaurant_data: R = {
+        restaurant_data: Restaurant = {
             "id": rows[0][0],
             "name": rows[0][1],
             "address": rows[0][2],
