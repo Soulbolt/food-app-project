@@ -1,7 +1,6 @@
 frontend/node_modules
-backend/src/__pycache__
-backend/src/mock_data/__pycache__
-backend/src/restaurant_modules/__pycache__
+**/__pycache__/
+__pycache__/
 backend/requirements.txt
 backend/instance
 backend/.env
