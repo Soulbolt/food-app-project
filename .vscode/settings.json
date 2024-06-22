@@ -1,6 +1,7 @@
 {
   "python.analysis.extraPaths": [
     "./backend/src/restaurant_modules",
-    "./backend/mock_data"
+    "./backend/mock_data",
+    "./backend/src/mock_data"
   ]
 }
