@@ -1,8 +1,6 @@
-from typing import List
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel
 import psycopg2
 import os
 from dotenv import load_dotenv
@@ -40,20 +38,6 @@ def connect_to_database():
     except Exception as e:
         print("Error connecting to PostgreSQL database: ", e)
         return None
-
-class Review(BaseModel):
-    username: str
-    review: str
-    rating: float
-
-class Restaurant(BaseModel):
-    id: int
-    name: str
-    address: str
-    contact_number: str
-    rating: float
-    isFavorite: bool = False
-    reviews: List[Review] = []
 
 """ Returns the entire list of restaurants """
 @app.get("/api/restaurants")

@@ -1,3 +1,5 @@
+from restaurant_models import Restaurant
+
 # Mock database in json format
 DB: list[Restaurant] = [{
         "id": 1,
