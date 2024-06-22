@@ -1,6 +1,8 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from restaurant_modules import Restaurant
+from mock_data import mock_restaurants_db
 import psycopg2
 import os
 from dotenv import load_dotenv
@@ -254,21 +256,21 @@ def get_recommended_restaurants():
             "rating": restaurant["rating"],
             "reviews": restaurant["reviews"]
         }
-        for restaurant in DB
+        for restaurant in mock_restaurants_db.DB
     ]
     return restaurant_list
 
 """ Returns the restaurant with the specified ID """
 @app.get("/api/recommended_restaurant/{id}")
 def get_restaurant(id: int):
-    for restaurant in DB:
+    for restaurant in mock_restaurants_db.DB:
         if restaurant["id"] == id:
             return restaurant
 
 """ Updates the restaurant with the specified ID """
 @app.put("/api/update_restaurant/{id}")
 def update_restaurant(id: int, restaurant: Restaurant):
-    for restaurant in DB:
+    for restaurant in mock_restaurants_db.DB:
         if restaurant["id"] == id:
             restaurant.update(restaurant)
-    return DB
+    return mock_restaurants_db.DB
