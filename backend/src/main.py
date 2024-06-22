@@ -1,11 +1,12 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from restaurant_models import Restaurant
-from mock_restaurants_db import DB
 import psycopg2
 import os
 from dotenv import load_dotenv
+
+from mock_data.mock_restaurants_db import DB
+from restaurant_modules.restaurant import Restaurant
 
 load_dotenv()
 
@@ -147,7 +148,7 @@ async def get_restaurants_by_name(restaurant_name: str):
         
         restaurant_list = []
         for row in rows:
-            restaurant_data = {
+            restaurant_data: Restaurant = {
                 "id": row[0],
                 "name": row[1],
                 "address": row[2],
