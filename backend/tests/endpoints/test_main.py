@@ -38,4 +38,40 @@ def test_read_restaurants(client, db_session):
     db_session.commit()
     yield
 
-    
+    response = client.get("/api/restaurant")
+    assert response.status_code == 200
+    assert len(response.json()) == 10
+
+@pytest.fixture(scope="module")
+def test_read_restaurants_by_name(client, db_session):
+    for i in range(10):
+        restaurant = Restaurant(
+            name=f"restaurant_{i}",
+            address=f"address_{i}",
+            contact_number=f"contact_number_{i}",
+            rating=i,
+        )
+        db_session.add(restaurant)
+    db_session.commit()
+    yield
+
+    response = client.get("/api/restaurants_by_name/restaurant_1")
+    assert response.status_code == 200
+    assert len(response.json()) == 1
+
+    response = client.get("/api/restaurants_by_name/restaurant_5")
+    assert response.status_code == 200
+    assert len(response.json()) == 5
+
+    response = client.get("/api/restaurants_by_name/restaurant_10")
+    assert response.status_code == 200
+    assert len(response.json()) == 0
+
+    response = client.get("/api/restaurants_by_name/restaurant")
+    assert response.status_code == 200
+    assert len(response.json()) == 0
+
+    response = client.get("/api/restaurants_by_name/restaurant_11")
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Restaurant not found"}
+
