@@ -2,7 +2,6 @@ import random
 from faker import Faker
 from faker.providers import BaseProvider
 import psycopg2
-from psycopg2 import sql
 import os
 from dotenv import load_dotenv
 
