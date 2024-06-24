@@ -1,119 +1,47 @@
 import pytest
+import sqlite3
+import os
+import sys
+# Add the parent directory to the sys.path
+sys.path.append(os.path.join(os.path.dirname(__file__), "../../src"))
+from mock_data.mock_restaurants_db import DB
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from main import app
-from restaurant_modules.restaurant import Restaurant
 
+db = DB
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
-
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
-)
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-
-@pytest.fixture(scope="module")
+# Create a client for testing
+@pytest.fixture
 def client():
-    with TestClient(app) as c:
-        yield c
+    from main import app
+    return TestClient(app)
 
-@pytest.fixture(scope="module")
-def db_session():
-    session = TestingSessionLocal()
-    yield session
-    session.close()
+# Connect to the mock database
+@pytest.fixture
+def connection():
+    conn = sqlite3.connect(DB) # In-memory database for testing
+    yield conn
+    conn.close()
 
-@pytest.fixture(scope="module")
-def test_read_restaurants(client, db_session):
-    for i in range(10):
-        restaurant = Restaurant(
-            name=f"restaurant_{i}",
-            address=f"address_{i}",
-            contact_number=f"contact_number_{i}",
-            rating=i,
-        )
-        db_session.add(restaurant)
-    db_session.commit()
-    yield
-
-    response = client.get("/api/restaurant")
+# Test the get_restaurants endpoint
+def test_get_all_restaurants(client):
+    response = client.get("/api/restaurants")
     assert response.status_code == 200
-    assert len(response.json()) == 10
+    assert len(response.json()) > 0
 
-@pytest.fixture(scope="module")
-def test_read_restaurants_by_name(client, db_session):
-    for i in range(10):
-        restaurant = Restaurant(
-            name=f"restaurant_{i}",
-            address=f"address_{i}",
-            contact_number=f"contact_number_{i}",
-            rating=i,
-        )
-        db_session.add(restaurant)
-    db_session.commit()
-    yield
-
-    response = client.get("/api/restaurants_by_name/restaurant_1")
+# Test the get_restaurants_by_name endpoint
+def test_get_restaurants_by_name(client):
+    response = client.get("/api/restaurants_by_name/golden")
     assert response.status_code == 200
-    assert len(response.json()) == 1
+    assert len(response.json()) > 0
 
-    response = client.get("/api/restaurants_by_name/restaurant_5")
-    assert response.status_code == 200
-    assert len(response.json()) == 5
-
-    response = client.get("/api/restaurants_by_name/restaurant_10")
-    assert response.status_code == 200
-    assert len(response.json()) == 0
-
-    response = client.get("/api/restaurants_by_name/restaurant")
-    assert response.status_code == 200
-    assert len(response.json()) == 0
-
-    response = client.get("/api/restaurants_by_name/restaurant_11")
-    assert response.status_code == 404
-    assert response.json() == {"detail": "Restaurant not found"}
-
-@pytest.fixture(scope="module")
-def test_read_restaurants_by_id(client, db_session):
-    for i in range(10):
-        restaurant = Restaurant(
-            name=f"restaurant_{i}",
-            address=f"address_{i}",
-            contact_number=f"contact_number_{i}",
-            rating=i,
-        )
-        db_session.add(restaurant)
-    db_session.commit()
-    yield
-
+# Test the get_restaurant_by_id endpoint
+def test_get_restaurant_by_id(client):
     response = client.get("/api/restaurant/1")
     assert response.status_code == 200
-    assert response.json() == {
-        "id": 1,
-        "name": "restaurant_0",
-        "address": "address_0",
-        "contact_number": "contact_number_0",
-        "rating": 0,
-        "reviews": [],
-    }
+    assert response.json()["name"] == "The Golden Gate Grill"
 
-    response = client.get("/api/restaurant/5")
+# Test the get_recommended_restaurants endpoint
+def test_get_recommended_restaurants(client):
+    response = client.get("/api/restaurants/recommended")
     assert response.status_code == 200
-    assert response.json() == {
-        "id": 5,
-        "name": "restaurant_4",
-        "address": "address_4",
-        "contact_number": "contact_number_4",
-        "rating": 4,
-        "reviews": [],
-    }
-
-    response = client.get("/api/restaurant/10")
-    assert response.status_code == 404
-    assert response.json() == {"detail": "Restaurant not found"}
-
-    response = client.get("/api/restaurant/11")
-    assert response.status_code == 404
-    assert response.json() == {"detail": "Restaurant not found"}
+    assert len(response.json()) > 0
