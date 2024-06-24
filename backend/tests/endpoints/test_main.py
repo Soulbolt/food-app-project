@@ -4,23 +4,32 @@ import os
 import sys
 # Add the parent directory to the sys.path
 sys.path.append(os.path.join(os.path.dirname(__file__), "../../src"))
+from main import app, connect_to_database
 from mock_data.mock_restaurants_db import DB
 from fastapi.testclient import TestClient
 
 db = DB
 
+# Override the connect_to_database function to return an in-memory database
+def override_connect_to_database():
+    conn = sqlite3.connect(DB, uri=True)
+    conn.row_factory = sqlite3.Row
+    yield conn
+    conn.close()
+
+app.dependency_overrides[connect_to_database] = override_connect_to_database
+
 # Create a client for testing
 @pytest.fixture
 def client():
-    from main import app
     return TestClient(app)
 
 # Connect to the mock database
-@pytest.fixture
-def connection():
-    conn = sqlite3.connect(DB) # In-memory database for testing
-    yield conn
-    conn.close()
+# @pytest.fixture
+# def connection():
+#     conn = sqlite3.connect(DB) # In-memory database for testing
+#     yield conn
+#     conn.close()
 
 # Test the get_restaurants endpoint
 def test_get_all_restaurants(client):
