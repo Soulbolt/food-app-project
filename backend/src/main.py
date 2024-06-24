@@ -22,6 +22,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Mock Empty Database for Testing
+app.state.database = {
+    "restaurants": []}
+
 # Database configuration
 db_config = {
     'host': os.getenv('DB_HOST'),
@@ -48,6 +52,11 @@ async def get_restaurants():
     conn = connect_to_database()
     if not conn:
         raise HTTPException(status_code=500, detail="Could not connect to the database")
+    
+    # Check if the mock database for testing is empty
+    if not app.state.database["restaurants"]:
+        raise HTTPException(status_code=404, detail="Restaurant not found")
+    
     try:
         print("Connected to the database!")
         cursor = conn.cursor()
