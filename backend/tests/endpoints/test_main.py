@@ -56,6 +56,15 @@ def test_get_restaurants_by_name(client):
     assert response.status_code == 200
     assert len(response.json()) > 0
 
+# Test the get_restaurants_by_name endpoint with status code 404
+def test_get_restaurants_by_name_not_found(client, name="not_found"):
+    response = client.get(f"/api/restaurants_by_name/{name}")
+    data = response.json()
+    print(data)
+    if response == []:
+        assert response.status_code == 404
+        assert response.json() == {"detail": "Restaurant not found"}
+
 # Test the get_restaurant_by_id endpoint with status code 200
 def test_get_restaurant_by_id(client):
     response = client.get("/api/restaurant/1")
