@@ -22,9 +22,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Mock Empty Database for Testing
-app.state.database = {
-    "restaurants": []}
+# Dependency function to connect to the mock database
+def get_db():
+    return DB
 
 # Database configuration
 db_config = {
@@ -47,15 +47,15 @@ def connect_to_database():
         return None
 
 """ Returns the entire list of restaurants """
-@app.get("/api/restaurants")
+@app.get("/api/restaurants", response_model=list[Restaurant])
 async def get_restaurants():
     conn = connect_to_database()
     if not conn:
         raise HTTPException(status_code=500, detail="Could not connect to the database")
     
     # Check if the mock database for testing is empty
-    if not app.state.database["restaurants"]:
-        raise HTTPException(status_code=404, detail="Restaurant not found")
+    # if not app.state.database["restaurants"]:
+    #     raise HTTPException(status_code=404, detail="Restaurant not found")
     
     try:
         print("Connected to the database!")
@@ -111,7 +111,7 @@ async def get_restaurants():
         conn.close()
 
 """ Returns the restaurant with the matching name """
-@app.get("/api/restaurants_by_name/{restaurant_name}")
+@app.get("/api/restaurants_by_name/{restaurant_name}", response_model=list[Restaurant])
 async def get_restaurants_by_name(restaurant_name: str):
     conn = connect_to_database()
     if not conn:
@@ -168,6 +168,9 @@ async def get_restaurants_by_name(restaurant_name: str):
 
             restaurant_list.append(restaurant_data)
 
+        if restaurant_list == []:
+            raise HTTPException(status_code=500, detail="Restaurant not found")
+
         return restaurant_list
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -176,7 +179,7 @@ async def get_restaurants_by_name(restaurant_name: str):
         conn.close()
 
 """ Creates a new restaurant """
-@app.post("/api/restaurant")
+@app.post("/api/restaurant", response_model=Restaurant)
 def create_restaurant(restaurant: Restaurant):
     conn = connect_to_database()
     if not conn:
@@ -255,7 +258,7 @@ def get_restaurant(id: int):
         conn.close()
 
 """ Returns the recommended list of restaurants """
-@app.get("/api/restaurants/recommended")
+@app.get("/api/restaurants/recommended", response_model=list[Restaurant])
 def get_recommended_restaurants():
     restaurant_list = [
         {
