@@ -60,6 +60,13 @@ def test_get_restaurant_by_id(client):
     assert response.status_code == 200
     assert response.json()["name"] == "The Golden Gate Grill"
 
+# Test the get_restaurant_by_id endpoint with status code 500
+def test_get_retaurant_by_id_not_found(client):
+    response = client.get("/api/restaurant/101")
+    print(response.json())
+    assert response.status_code == 500
+    assert response.json() == {"detail": "list index out of range"} 
+
 # Test the get_recommended_restaurants endpoint with status code 200
 def test_get_recommended_restaurants(client):
     response = client.get("/api/restaurants/recommended")
