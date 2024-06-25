@@ -22,10 +22,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Dependency function to connect to the mock database
-def get_db():
-    return DB
-
 # Database configuration
 db_config = {
     'host': os.getenv('DB_HOST'),
