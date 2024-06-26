@@ -45,6 +45,25 @@ DB: list[Restaurant] = [
             }
         ]
     },
+        {
+        "id": 3,
+        "name": "Thai Curry House",
+        "address": "789 Oak Road, Springfield, IL 62706",
+        "contact_number": "(217) 555-9012",
+        "rating": 4.3,
+        "reviews": [
+            {
+                "username": "thaichef",
+                "review": "The best curry I've ever had. I love it!",
+                "rating": 5
+            },
+            {
+                "username": "johndoe",
+                "review": "I had the chicken and rice curry.",
+                "rating": 3
+            }
+        ]
+    },
     {
     "id": 4,
     "name": "Curry House",
