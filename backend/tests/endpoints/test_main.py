@@ -37,24 +37,24 @@ def test_get_restaurants_not_found(client):
     assert response.json() == {"detail": "Not Found"}
 
 # Test create a new restaurant with status code 201
-# def test_create_restaurant(client):
-#     new_restaurant = {
-#         "name": "New Test Restaurant",
-#         "address": "123 Main St",
-#         "contact_number": "555-555-5555",
-#         "rating": 4.5
-#     }
-#     response = client.post("/api/restaurants", json=new_restaurant)
-#     print("data: ", response.json()) # Print the response for debugging
-#     assert response.status_code == 201
-#     assert response.json()["name"] == new_restaurant["name"]
+def create_restaurant(client):
+    new_restaurant = {
+        "name": "New Test Restaurant",
+        "address": "123 Main St",
+        "contact_number": "555-555-5555",
+        "rating": 4.5
+    }
+    response = client.post("/api/restaurants", json=new_restaurant)
+    print("data: ", response.json()) # Print the response for debugging
+    assert response.status_code == 201
+    assert response.json()["name"] == new_restaurant["name"]
 
-#     # Verify that the restaurant was added to the database
-#     response = client.get("/api/restaurants")
-#     print("data: ", response.json()) # Print the response for debugging
-#     assert response.status_code == 200
-#     assert new_restaurant["name"] in [r["name"] for r in response.json()]
-#     assert len(response.json()) == 6
+    # Verify that the restaurant was added to the database
+    response = client.get("/api/restaurants")
+    print("data: ", response.json()) # Print the response for debugging
+    assert response.status_code == 200
+    assert new_restaurant["name"] in [r["name"] for r in response.json()]
+    assert len(response.json()) == 6
 
 # Test the get_restaurants_by_name endpoint with status code 200
 def test_get_restaurants_by_name(client, name="pizza"):
