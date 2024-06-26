@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import psycopg2
@@ -55,6 +55,12 @@ def connect_to_sqlite(db_name: str ='restaurants.db'):
     except Exception as e:
         print("Error connecting to SQLite database: ", e)
         return None
+    
+def get_db(use_postgres: bool = True):
+    if use_postgres:
+        return connect_to_database()
+    else:
+        return connect_to_sqlite()
 
 """ Returns the entire list of restaurants """
 @app.get("/api/restaurants", response_model=list[Restaurant])
