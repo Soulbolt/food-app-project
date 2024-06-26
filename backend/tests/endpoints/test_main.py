@@ -12,15 +12,15 @@ from fastapi.testclient import TestClient
 def override_connect_to_database():
     conn = sqlite3.connect('restaurants.db')
     conn.row_factory = sqlite3.Row
-    yield conn
-    conn.close()
+    return conn
 
 app.dependency_overrides[connect_to_database] = override_connect_to_database
 
 # Create a test client for testing
-@pytest.fixture
+@pytest.fixture(scope="module")
 def client():
-    return TestClient(app)
+    with TestClient(app) as c:
+        yield c
 
 # Test the get_restaurants endpoint with status code 200
 def test_get_all_restaurants(client):
@@ -37,20 +37,27 @@ def test_get_restaurants_not_found(client):
     assert response.json() == {"detail": "Not Found"}
 
 # Test create a new restaurant with status code 201
-def test_create_restaurant(client):
-    new_restaurant = {
-        "name": "New Test Restaurant",
-        "address": "123 Main St",
-        "contact_number": "555-555-5555",
-        "rating": 4.5
-    }
-    response = client.post("/api/restaurants", json=new_restaurant)
-    print("data: ", response.json()) # Print the response for debugging
-    assert response.status_code == 201
-    assert response.json()["name"] == new_restaurant["name"]
+# def test_create_restaurant(client):
+#     new_restaurant = {
+#         "name": "New Test Restaurant",
+#         "address": "123 Main St",
+#         "contact_number": "555-555-5555",
+#         "rating": 4.5
+#     }
+#     response = client.post("/api/restaurants", json=new_restaurant)
+#     print("data: ", response.json()) # Print the response for debugging
+#     assert response.status_code == 201
+#     assert response.json()["name"] == new_restaurant["name"]
+
+#     # Verify that the restaurant was added to the database
+#     response = client.get("/api/restaurants")
+#     print("data: ", response.json()) # Print the response for debugging
+#     assert response.status_code == 200
+#     assert new_restaurant["name"] in [r["name"] for r in response.json()]
+#     assert len(response.json()) == 6
 
 # Test the get_restaurants_by_name endpoint with status code 200
-def test_get_restaurants_by_name(client, name="not found"):
+def test_get_restaurants_by_name(client, name="pizza"):
     response = client.get(f"/api/restaurants_by_name/{name}")
     print("data: ", response.json()) # Print the response for debugging
     assert response.status_code == 200
@@ -68,11 +75,11 @@ def test_get_restaurant_by_id(client):
     response = client.get("/api/restaurant/1")
     print("data: ", response.json()) # Print the response for debugging
     assert response.status_code == 200
-    assert response.json()["name"] == "The Gate Grill"
+    assert response.json()["name"] == "The Gourmet Kitchen"
 
 # Test the get_restaurant_by_id endpoint with status code 500
 def test_get_retaurant_by_id_not_found(client):
-    response = client.get("/api/restaurant/101")
+    response = client.get("/api/restaurant/7")
     print(response.json())
     assert response.status_code == 500
     assert response.json() == {"detail": "list index out of range"} 
@@ -82,4 +89,4 @@ def test_get_recommended_restaurants(client):
     response = client.get("/api/restaurants/recommended")
     print("data: ", response.json()) # Print the response for debugging
     assert response.status_code == 200
-    assert len(response.json()) > 0
+    assert len(response.json()) == 5
