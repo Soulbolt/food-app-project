@@ -275,6 +275,12 @@ def get_restaurant(id: int):
     for restaurant in DB:
         if restaurant["id"] == id:
             return restaurant
+        
+""" Creates a new restaurant """
+@app.post("/api/restaurant", response_model=Restaurant)
+def create_restaurant(restaurant: Restaurant):
+    DB.append(restaurant.dict())
+    return restaurant
 
 """ Updates the restaurant with the specified ID """
 @app.put("/api/update_restaurant/{id}")
