@@ -1,20 +1,11 @@
-import sqlite3
 import pytest
 import os
 import sys
 
 # Add the parent directory to the sys.path
 sys.path.append(os.path.join(os.path.dirname(__file__), "../../src"))
-from main import app, connect_to_database
+from main import app
 from fastapi.testclient import TestClient
-
-# Override the connect_to_database function to use the existing database
-def override_connect_to_database():
-    conn = sqlite3.connect('restaurants.db')
-    conn.row_factory = sqlite3.Row
-    return conn
-
-app.dependency_overrides[connect_to_database] = override_connect_to_database
 
 # Create a test client for testing
 @pytest.fixture(scope="module")
@@ -75,11 +66,11 @@ def test_get_restaurant_by_id(client):
     response = client.get("/api/restaurant/1")
     print("data: ", response.json()) # Print the response for debugging
     assert response.status_code == 200
-    assert response.json()["name"] == "The Gourmet Kitchen"
+    assert response.json()["name"] == "The Golden Gate Grill"
 
 # Test the get_restaurant_by_id endpoint with status code 500
 def test_get_retaurant_by_id_not_found(client):
-    response = client.get("/api/restaurant/7")
+    response = client.get("/api/restaurant/999")
     print(response.json())
     assert response.status_code == 500
     assert response.json() == {"detail": "list index out of range"} 

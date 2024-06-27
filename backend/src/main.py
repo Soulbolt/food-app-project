@@ -42,25 +42,6 @@ def connect_to_database():
     except Exception as e:
         print("Error connecting to PostgreSQL database: ", e)
         return None
-    
-def connect_to_sqlite(db_name: str ='restaurants.db'):
-    try:
-        print("Connecting to the SQLite database...")
-        # Establish connection
-        conn = sqlite3.connect(db_name)
-        print("Connected to the database!")
-        conn.row_factory = sqlite3.Row
-        return conn
-
-    except Exception as e:
-        print("Error connecting to SQLite database: ", e)
-        return None
-    
-def get_db(use_postgres: bool = True):
-    if use_postgres:
-        return connect_to_database()
-    else:
-        return connect_to_sqlite()
 
 """ Returns the entire list of restaurants """
 @app.get("/api/restaurants", response_model=list[Restaurant])
@@ -68,10 +49,6 @@ async def get_restaurants():
     conn = connect_to_database()
     if not conn:
         raise HTTPException(status_code=500, detail="Could not connect to the database")
-    
-    # Check if the mock database for testing is empty
-    # if not app.state.database["restaurants"]:
-    #     raise HTTPException(status_code=404, detail="Restaurant not found")
     
     try:
         print("Connected to the database!")
