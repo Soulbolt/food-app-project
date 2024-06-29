@@ -9,6 +9,7 @@ class Review(BaseModel):
 
 class Restaurant(BaseModel):
     id: int
+    category: str
     name: str
     address: str
     contact_number: str
