@@ -122,6 +122,7 @@ async def get_restaurants_by_name(restaurant_name: str):
                 r.address,
                 r.contact_number,
                 r.rating AS rating,
+                r.isFavorite AS isFavorite,
                 COALESCE(
                     JSON_AGG(
                         JSON_BUILD_OBJECT(
@@ -138,7 +139,7 @@ async def get_restaurants_by_name(restaurant_name: str):
             WHERE
                 LOWER(r.name) LIKE %(restaurant_name)s
             GROUP BY
-                r.id, r.category, r.name, r.address, r.contact_number, r.rating
+                r.id, r.category, r.name, r.address, r.contact_number, r.rating, r.isFavorite
             ORDER BY r.name ASC;
         """
         # Convert restaurant_name to lowercase for case-insensitive search
@@ -160,7 +161,8 @@ async def get_restaurants_by_name(restaurant_name: str):
                 "address": row[3],
                 "contact_number": row[4],
                 "rating": float(row[5]), # Convert Decimal to float for JSON serialization
-                "reviews": row[6] if row[6] else [] # Use the aggregated JSON for reviews
+                "isFavorite": bool(row[6]), # Convert boolean to bool for JSON serialization
+                "reviews": row[7] if row[7] else [] # Use the aggregated JSON for reviews
             }
 
             restaurant_list.append(restaurant_data)
@@ -185,10 +187,10 @@ def create_restaurant( restaurant: Restaurant):
         print("Connected to the database!")
         cursor = conn.cursor()
         query = """
-            INSERT INTO restaurant_schema.restaurants (category, name, address, contact_number, rating)
+            INSERT INTO restaurant_schema.restaurants (category, name, address, contact_number, rating, isFavorite)
             VALUES (%s, %s, %s, %s);
         """
-        cursor.execute(query, (restaurant.category, restaurant.name, restaurant.address, restaurant.contact_number, restaurant.rating))
+        cursor.execute(query, (restaurant.category, restaurant.name, restaurant.address, restaurant.contact_number, restaurant.rating, restaurant.isFavorite))
         conn.commit()
         return JSONResponse(content={"message": "Restaurant created successfully!"})
     except Exception as e:
@@ -214,6 +216,7 @@ def get_restaurant(id: int):
                 r.address,
                 r.contact_number,
                 r.rating AS rating,
+                r.isFavorite AS isFavorite,
                 rv.username,
                 rv.review,
                 rv.rating AS rating
@@ -236,6 +239,7 @@ def get_restaurant(id: int):
             "address": rows[0][3],
             "contact_number": rows[0][4],
             "rating": float(rows[0][5]), # Convert Decimal to float for JSON serialization
+            "isFavorite": bool(rows[0][6]), # Convert boolean to bool for JSON serialization
             "reviews": []
         }
         
@@ -243,9 +247,9 @@ def get_restaurant(id: int):
         for row in rows:
             if row[5]: # Check if there is a review for this restaurant
                 review = {
-                    "username": row[6],
-                    "review": row[7],
-                    "rating": float(row[8]) # Convert Decimal to float for JSON serialization
+                    "username": row[7],
+                    "review": row[8],
+                    "rating": float(row[9]) # Convert Decimal to float for JSON serialization
                 }
                 restaurant_data["reviews"].append(review)
 
