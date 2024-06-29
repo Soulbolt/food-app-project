@@ -56,6 +56,7 @@ async def get_restaurants():
         query = """
             SELECT 
                 r.id AS id,
+                r.category,
                 r.name AS name,
                 r.address,
                 r.contact_number,
@@ -74,7 +75,7 @@ async def get_restaurants():
             LEFT JOIN 
                 restaurant_schema.reviews rv ON r.id = rv.restaurant_id
             GROUP BY
-                 r.id, r.name, r.address, r.contact_number, r.rating
+                 r.id, r.category, r.name, r.address, r.contact_number, r.rating
             ORDER BY r.id ASC;
         """
         cursor.execute(query)
@@ -87,11 +88,12 @@ async def get_restaurants():
         for row in rows:
             restaurant_data: Restaurant = {
                 "id": row[0],
-                "name": row[1],
-                "address": row[2],
-                "contact_number": row[3],
-                "rating": float(row[4]), # Convert Decimal to float for JSON serialization
-                "reviews": row[5] if row[5] else [] # Use the aggregated JSON for reviews
+                "category": row[1],
+                "name": row[2],
+                "address": row[3],
+                "contact_number": row[4],
+                "rating": float(row[5]), # Convert Decimal to float for JSON serialization
+                "reviews": row[6] if row[6] else [] # Use the aggregated JSON for reviews
             }
 
             restaurant_list.append(restaurant_data)
@@ -115,6 +117,7 @@ async def get_restaurants_by_name(restaurant_name: str):
         query = """
             SELECT 
                 r.id AS id,
+                r.category,
                 r.name AS name,
                 r.address,
                 r.contact_number,
@@ -135,7 +138,7 @@ async def get_restaurants_by_name(restaurant_name: str):
             WHERE
                 LOWER(r.name) LIKE %(restaurant_name)s
             GROUP BY
-                r.id, r.name, r.address, r.contact_number, r.rating
+                r.id, r.category, r.name, r.address, r.contact_number, r.rating
             ORDER BY r.name ASC;
         """
         # Convert restaurant_name to lowercase for case-insensitive search
@@ -152,11 +155,12 @@ async def get_restaurants_by_name(restaurant_name: str):
         for row in rows:
             restaurant_data: Restaurant = {
                 "id": row[0],
-                "name": row[1],
-                "address": row[2],
-                "contact_number": row[3],
-                "rating": float(row[4]), # Convert Decimal to float for JSON serialization
-                "reviews": row[5] if row[5] else [] # Use the aggregated JSON for reviews
+                "category": row[1],
+                "name": row[2],
+                "address": row[3],
+                "contact_number": row[4],
+                "rating": float(row[5]), # Convert Decimal to float for JSON serialization
+                "reviews": row[6] if row[6] else [] # Use the aggregated JSON for reviews
             }
 
             restaurant_list.append(restaurant_data)
@@ -172,8 +176,8 @@ async def get_restaurants_by_name(restaurant_name: str):
         conn.close()
 
 """ Creates a new restaurant """
-@app.post("/api/restaurant", response_model=Restaurant)
-def create_restaurant(restaurant: Restaurant):
+@app.post("/api/new_restaurant", response_model=Restaurant)
+def create_restaurant( restaurant: Restaurant):
     conn = connect_to_database()
     if not conn:
         raise HTTPException(status_code=500, detail="Could not connect to the database")
@@ -181,10 +185,10 @@ def create_restaurant(restaurant: Restaurant):
         print("Connected to the database!")
         cursor = conn.cursor()
         query = """
-            INSERT INTO restaurant_schema.restaurants (name, address, contact_number, rating)
+            INSERT INTO restaurant_schema.restaurants (category, name, address, contact_number, rating)
             VALUES (%s, %s, %s, %s);
         """
-        cursor.execute(query, (restaurant.name, restaurant.address, restaurant.contact_number, restaurant.rating))
+        cursor.execute(query, (restaurant.category, restaurant.name, restaurant.address, restaurant.contact_number, restaurant.rating))
         conn.commit()
         return JSONResponse(content={"message": "Restaurant created successfully!"})
     except Exception as e:
@@ -205,6 +209,7 @@ def get_restaurant(id: int):
         query = """
             SELECT 
                 r.id AS id,
+                r.category,
                 r.name AS name,
                 r.address,
                 r.contact_number,
@@ -226,10 +231,11 @@ def get_restaurant(id: int):
         
         restaurant_data: Restaurant = {
             "id": rows[0][0],
-            "name": rows[0][1],
-            "address": rows[0][2],
-            "contact_number": rows[0][3],
-            "rating": float(rows[0][4]), # Convert Decimal to float for JSON serialization
+            "category": rows[0][1],
+            "name": rows[0][2],
+            "address": rows[0][3],
+            "contact_number": rows[0][4],
+            "rating": float(rows[0][5]), # Convert Decimal to float for JSON serialization
             "reviews": []
         }
         
@@ -237,9 +243,9 @@ def get_restaurant(id: int):
         for row in rows:
             if row[5]: # Check if there is a review for this restaurant
                 review = {
-                    "username": row[5],
-                    "review": row[6],
-                    "rating": float(row[7]) # Convert Decimal to float for JSON serialization
+                    "username": row[6],
+                    "review": row[7],
+                    "rating": float(row[8]) # Convert Decimal to float for JSON serialization
                 }
                 restaurant_data["reviews"].append(review)
 
@@ -276,7 +282,7 @@ def get_restaurant(id: int):
 """ Creates a new restaurant """
 @app.post("/api/mock_restaurant", response_model=Restaurant)
 def create_mock_restaurant(restaurant: Restaurant):
-    DB.append(restaurant.dict())
+    DB.append(restaurant.model_dump())
     return restaurant
 
 """ Updates the restaurant with the specified ID """
