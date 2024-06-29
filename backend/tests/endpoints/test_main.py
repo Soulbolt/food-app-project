@@ -31,24 +31,30 @@ def test_get_restaurants_not_found(client):
 # Test create a new restaurant with status code 201
 def test_create_restaurant(client):
     new_restaurant: Restaurant = {
-        "id": None,
+        "category": "American",
         "name": "New Test Restaurant",
         "address": "123 Main St",
         "contact_number": "555-555-5555",
-        "rating": 4.5,
-        "reviews": []
+        "rating": float(4.5), # Convert Decimal to float for JSON serialization, float(4.5) == 4.5,
     }
-    response = client.post("/api/restaurant", json=new_restaurant)
+
+    response = client.post("/api/new_restaurant", json=new_restaurant)
     print("data for post: ", response.json()) # Print the response for debugging
-    assert response.status_code == 201
-    assert response.json()["name"] == new_restaurant["name"]
+    
+    assert response.status_code == 200
+    data = response.json()
+    assert data["category"] == "American"
+    assert data["name"] == "New Test Restaurant"
+    assert data["address"] == "123 Main St"
+    assert data["contact_number"] == "555-555-5555"
+    assert data["rating"] == float(4.5)
 
     # Verify that the restaurant was added to the database
     response = client.get("/api/restaurants")
     print("data: ", response.json()) # Print the response for debugging
     assert response.status_code == 200
     assert new_restaurant["name"] in [r["name"] for r in response.json()]
-    assert len(response.json()) == 6
+    assert len(response.json()) == 101
 
 # Test the get_restaurants_by_name endpoint with status code 200
 def test_get_restaurants_by_name(client, name="pizza"):
@@ -58,7 +64,7 @@ def test_get_restaurants_by_name(client, name="pizza"):
     assert len(response.json()) > 0 # Check if the response is not empty
 
 # Test the get_restaurants_by_name endpoint with status code 500
-def test_get_restaurants_by_name_not_found(client, name="not found"):
+def test_get_restaurants_by_name_not_found(client, name="new test restaurant"):
     response = client.get(f"/api/restaurants_by_name/{name}")
     print("data: ", response.json())
     assert response.status_code == 500
