@@ -292,12 +292,12 @@ def get_restaurant(id: int):  # noqa: F811
             return restaurant
 
 """ Updates the restaurant with the specified ID in mock database """
-@app.put("/api/mock_update_restaurant/{id}", response_model=Restaurant)
-async def update_restaurant_mock(id: int, restaurant: Restaurant):
-    for restaurant in DB:
-        if restaurant["id"] == id:
-            restaurant.update(restaurant)
-    return DB
+# @app.put("/api/mock_update_restaurant/{id}", response_model=Restaurant)
+# async def update_restaurant_mock(id: int, restaurant: Restaurant):
+#     for restaurant in DB:
+#         if restaurant["id"] == id:
+#             restaurant.update(restaurant)
+#     return DB
 
 """ Updates the restaurant with the specified ID """
 @app.patch("/api/update_restaurant/{id}", response_model=Restaurant)
@@ -308,12 +308,25 @@ async def update_restaurant(id: int, restaurant: Restaurant):
     try:
         print("Connected to the database!")
         cursor = conn.cursor()
-        query = "UPDATE restaurant_schema.restaurants SET category = %s, name = %s, address = %s, contact_number = %s, rating = %s, is_favorite = %s WHERE id = %s;"
-        cursor.execute(query, (restaurant.category, restaurant.name, restaurant.address, restaurant.contact_number, restaurant.rating, restaurant.isFavorite, id))
-        if cursor.rowcount == 0:
-            raise HTTPException(status_code=500, detail=f"Restaurant with specified ID {id} not found")
+        existing_restaurant_query = "SELECT * FROM restaurant_schema.restaurants WHERE id = %s"
+        cursor.execute(existing_restaurant_query, [id,])
+        existing_restaurant = cursor.fetchone()
+        if not existing_restaurant:
+            raise HTTPException(status_code=404, detail="Restaurant not found")
+
+        # Convert the Row object to a dictionary
+        column_names = [desc[0] for desc in cursor.description]
+        existing_restaurant = dict(zip(column_names, existing_restaurant))
+
+        # Update the existing restaurant with the new data from the request
+        update_data = restaurant.model_dump(exclude_unset=True)
+        set_clause = ", ".join([f"{key} = %s" for key in update_data.keys()])
+        query = f"UPDATE restaurant_schema.restaurants SET {set_clause} WHERE id = %s"
+        values = list(update_data.values()) + [id]
+        cursor.execute(query, values)
         conn.commit()
-        return {"message": "Restaurant updated successfully"}
+        updated_restaurant = {**existing_restaurant, **update_data}
+        return updated_restaurant
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     finally:

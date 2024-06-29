@@ -86,6 +86,26 @@ def test_get_recommended_restaurants(client):
     assert response.status_code == 200
     assert len(response.json()) == 5
 
+# Test the update_restaurant endpoint with status code 200
+def test_update_restaurant(client, id=106):
+    update_restaurant: Restaurant = {
+        "category": "American",
+        "name": "New Le Restaurant",
+        "address": "123 Main St",
+        "contact_number": "(555)-555-5556",
+        "rating": float(4.4), # Convert Decimal to float for JSON serialization
+    }
+
+    response = client.patch(f"/api/update_restaurant/{id}", json=update_restaurant)
+    print("data: ", response.json()) # Print the response for debugging
+    assert response.status_code == 200
+
+    # Verify that the restaurant was updated in the database
+    response = client.get(f"/api/restaurant/{id}")
+    print("data: ", response.json()) # Print the response for debugging
+    assert response.status_code == 200
+    assert response.json()["name"] == update_restaurant["name"]
+
 # Test the delete_restaurant endpoint with status code 200
 def test_delete_restaurant(client, id=105):
     response = client.delete(f"/api/delete_restaurant/{id}")
