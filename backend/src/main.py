@@ -61,6 +61,7 @@ async def get_restaurants():
                 r.address,
                 r.contact_number,
                 r.rating AS rating,
+                r.is_favorite AS isFavorite,
                 COALESCE(
                     JSON_AGG(
                         JSON_BUILD_OBJECT(
@@ -75,7 +76,7 @@ async def get_restaurants():
             LEFT JOIN 
                 restaurant_schema.reviews rv ON r.id = rv.restaurant_id
             GROUP BY
-                 r.id, r.category, r.name, r.address, r.contact_number, r.rating
+                 r.id, r.category, r.name, r.address, r.contact_number, r.rating, r.is_favorite
             ORDER BY r.id ASC;
         """
         cursor.execute(query)
@@ -93,7 +94,8 @@ async def get_restaurants():
                 "address": row[3],
                 "contact_number": row[4],
                 "rating": float(row[5]), # Convert Decimal to float for JSON serialization
-                "reviews": row[6] if row[6] else [] # Use the aggregated JSON for reviews
+                "isFavorite": row[6],
+                "reviews": row[7] if row[7] else [] # Use the aggregated JSON for reviews
             }
 
             restaurant_list.append(restaurant_data)
@@ -122,7 +124,7 @@ async def get_restaurants_by_name(restaurant_name: str):
                 r.address,
                 r.contact_number,
                 r.rating AS rating,
-                r.isFavorite AS isFavorite,
+                r.is_favorite AS isFavorite,
                 COALESCE(
                     JSON_AGG(
                         JSON_BUILD_OBJECT(
@@ -187,8 +189,8 @@ def create_restaurant( restaurant: Restaurant):
         print("Connected to the database!")
         cursor = conn.cursor()
         query = """
-            INSERT INTO restaurant_schema.restaurants (category, name, address, contact_number, rating, isFavorite)
-            VALUES (%s, %s, %s, %s);
+            INSERT INTO restaurant_schema.restaurants (category, name, address, contact_number, rating, is_favorite)
+            VALUES (%s, %s, %s, %s, %s, %s);
         """
         cursor.execute(query, (restaurant.category, restaurant.name, restaurant.address, restaurant.contact_number, restaurant.rating, restaurant.isFavorite))
         conn.commit()
@@ -216,7 +218,7 @@ def get_restaurant(id: int):
                 r.address,
                 r.contact_number,
                 r.rating AS rating,
-                r.isFavorite AS isFavorite,
+                r.is_favorite AS isFavorite,
                 rv.username,
                 rv.review,
                 rv.rating AS rating
