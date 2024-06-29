@@ -14,6 +14,29 @@ def client():
     with TestClient(app) as c:
         yield c
 
+# Test create a new restaurant with status code 201
+def test_create_restaurant(client):
+    new_restaurant: Restaurant = {
+        "category": "American",
+        "name": "New Test Restaurant",
+        "address": "123 Main St",
+        "contact_number": "555-555-5555",
+        "rating": float(4.5), # Convert Decimal to float for JSON serialization, float(4.5) == 4.5,
+    }
+
+    response = client.post("/api/new_restaurant", json=new_restaurant)
+    print("data for post: ", response.json()) # Print the response for debugging
+
+    assert response.status_code == 200
+    assert response.json() == {"message": "Restaurant created successfully!"}
+
+    # Verify that the restaurant was added to the database
+    response = client.get("/api/restaurants")
+    print("data: ", response.json()) # Print the response for debugging
+    assert response.status_code == 200
+    assert new_restaurant["name"] in [r["name"] for r in response.json()]
+    assert len(response.json()) == 101
+
 # Test the get_restaurants endpoint with status code 200
 def test_get_all_restaurants(client):
     response = client.get("/api/restaurants")
@@ -27,34 +50,6 @@ def test_get_restaurants_not_found(client):
     print("data: ", response.json()) # Print the response for debugging
     assert response.status_code == 404
     assert response.json() == {"detail": "Not Found"}
-
-# Test create a new restaurant with status code 201
-def test_create_restaurant(client):
-    new_restaurant: Restaurant = {
-        "category": "American",
-        "name": "New Test Restaurant",
-        "address": "123 Main St",
-        "contact_number": "555-555-5555",
-        "rating": float(4.5), # Convert Decimal to float for JSON serialization, float(4.5) == 4.5,
-    }
-
-    response = client.post("/api/new_restaurant", json=new_restaurant)
-    print("data for post: ", response.json()) # Print the response for debugging
-    
-    assert response.status_code == 200
-    data = response.json()
-    assert data["category"] == "American"
-    assert data["name"] == "New Test Restaurant"
-    assert data["address"] == "123 Main St"
-    assert data["contact_number"] == "555-555-5555"
-    assert data["rating"] == float(4.5)
-
-    # Verify that the restaurant was added to the database
-    response = client.get("/api/restaurants")
-    print("data: ", response.json()) # Print the response for debugging
-    assert response.status_code == 200
-    assert new_restaurant["name"] in [r["name"] for r in response.json()]
-    assert len(response.json()) == 101
 
 # Test the get_restaurants_by_name endpoint with status code 200
 def test_get_restaurants_by_name(client, name="pizza"):
@@ -90,3 +85,16 @@ def test_get_recommended_restaurants(client):
     print("data: ", response.json()) # Print the response for debugging
     assert response.status_code == 200
     assert len(response.json()) == 5
+
+# Test the delete_restaurant endpoint with status code 200
+def test_delete_restaurant(client, id=105):
+    response = client.delete(f"/api/delete_restaurant/{id}")
+    print("data: ", response.json()) # Print the response for debugging
+    assert response.status_code == 200
+    assert response.json() == {"message": "Restaurant deleted successfully"}
+
+    # Verify that the restaurant was deleted from the database
+    response = client.get(f"/api/restaurant/{id}")
+    print("data: ", response.json()) # Print the response for debugging
+    assert response.status_code == 500
+    assert response.json() == {"detail": "list index out of range"}

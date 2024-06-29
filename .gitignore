@@ -2,7 +2,6 @@ frontend/node_modules
 **/__pycache__/
 __pycache__/
 **/.pytest_cache/
-backend/requirements.txt
 backend/instance
 backend/.env
 backend/docker-compose.yml

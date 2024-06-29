@@ -8,7 +8,7 @@ class Review(BaseModel):
     rating: float
 
 class Restaurant(BaseModel):
-    id: int
+    # id: int
     category: str
     name: str
     address: str

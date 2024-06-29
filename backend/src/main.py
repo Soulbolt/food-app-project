@@ -43,6 +43,34 @@ def connect_to_database():
         print("Error connecting to PostgreSQL database: ", e)
         return None
 
+""" Creates a new restaurant """
+@app.post("/api/new_restaurant", response_model=Restaurant)
+def create_restaurant( restaurant: Restaurant):
+    conn = connect_to_database()
+    if not conn:
+        raise HTTPException(status_code=500, detail="Could not connect to the database")
+    try:
+        print("Connected to the database!")
+        cursor = conn.cursor()
+        query = """
+            INSERT INTO restaurant_schema.restaurants (category, name, address, contact_number, rating)
+            VALUES (%s, %s, %s, %s, %s);
+        """
+        cursor.execute(query, (restaurant.category, restaurant.name, restaurant.address, restaurant.contact_number, restaurant.rating))
+        conn.commit()
+        return JSONResponse(content={"message": "Restaurant created successfully!"})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+        conn.close()
+
+""" Creates a new restaurant in Mock Data """
+@app.post("/api/mock_restaurant", response_model=Restaurant)
+def create_mock_restaurant(restaurant: Restaurant):
+    DB.append(restaurant.model_dump())
+    return restaurant
+        
 """ Returns the entire list of restaurants """
 @app.get("/api/restaurants", response_model=list[Restaurant])
 async def get_restaurants():
@@ -179,28 +207,6 @@ async def get_restaurants_by_name(restaurant_name: str):
         cursor.close()
         conn.close()
 
-""" Creates a new restaurant """
-@app.post("/api/new_restaurant", response_model=Restaurant)
-def create_restaurant( restaurant: Restaurant):
-    conn = connect_to_database()
-    if not conn:
-        raise HTTPException(status_code=500, detail="Could not connect to the database")
-    try:
-        print("Connected to the database!")
-        cursor = conn.cursor()
-        query = """
-            INSERT INTO restaurant_schema.restaurants (category, name, address, contact_number, rating, is_favorite)
-            VALUES (%s, %s, %s, %s, %s, %s);
-        """
-        cursor.execute(query, (restaurant.category, restaurant.name, restaurant.address, restaurant.contact_number, restaurant.rating, restaurant.isFavorite))
-        conn.commit()
-        return JSONResponse(content={"message": "Restaurant created successfully!"})
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        cursor.close()
-        conn.close()
-
 """ Returns the restaurant with the specified ID """
 @app.get("/api/restaurant/{id}", response_model=Restaurant)
 def get_restaurant(id: int):
@@ -280,16 +286,10 @@ def get_recommended_restaurants():
 
 """ Returns the restaurant with the specified ID """
 @app.get("/api/recommended_restaurant/{id}")
-def get_restaurant(id: int):
+def get_restaurant(id: int):  # noqa: F811
     for restaurant in DB:
         if restaurant["id"] == id:
             return restaurant
-        
-""" Creates a new restaurant """
-@app.post("/api/mock_restaurant", response_model=Restaurant)
-def create_mock_restaurant(restaurant: Restaurant):
-    DB.append(restaurant.model_dump())
-    return restaurant
 
 """ Updates the restaurant with the specified ID """
 @app.put("/api/update_restaurant/{id}")
@@ -298,3 +298,26 @@ def update_restaurant(id: int, restaurant: Restaurant):
         if restaurant["id"] == id:
             restaurant.update(restaurant)
     return DB
+
+""" Deletes the restaurant with the specified ID """
+  # TODO: Consider and define business logic for deleting a restaurant in relation to reviews.
+@app.delete("/api/delete_restaurant/{id}")
+def delete_restaurant(id: int):
+    conn = connect_to_database()
+    if not conn:
+        raise HTTPException(status_code=500, detail="Could not connect to the database")
+    try:
+        print("Connected to the database!")
+        cursor = conn.cursor()
+        query = "DELETE FROM restaurant_schema.restaurants WHERE id = %s;"
+        cursor.execute(query, (id,))
+
+        if cursor.rowcount == 0:
+            raise HTTPException(status_code=500, detail=f"Restaurant with specified ID {id} not found")
+        conn.commit()
+        return {"message": "Restaurant deleted successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+        conn.close()
