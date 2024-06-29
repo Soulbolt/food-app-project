@@ -274,8 +274,8 @@ def get_restaurant(id: int):
             return restaurant
         
 """ Creates a new restaurant """
-@app.post("/api/restaurant", response_model=Restaurant)
-def create_restaurant(restaurant: Restaurant):
+@app.post("/api/mock_restaurant", response_model=Restaurant)
+def create_mock_restaurant(restaurant: Restaurant):
     DB.append(restaurant.dict())
     return restaurant
 

@@ -5,6 +5,7 @@ import sys
 # Add the parent directory to the sys.path
 sys.path.append(os.path.join(os.path.dirname(__file__), "../../src"))
 from main import app
+from restaurant_modules.restaurant import Restaurant
 from fastapi.testclient import TestClient
 
 # Create a test client for testing
@@ -28,15 +29,17 @@ def test_get_restaurants_not_found(client):
     assert response.json() == {"detail": "Not Found"}
 
 # Test create a new restaurant with status code 201
-def create_restaurant(client):
-    new_restaurant = {
+def test_create_restaurant(client):
+    new_restaurant: Restaurant = {
+        "id": None,
         "name": "New Test Restaurant",
         "address": "123 Main St",
         "contact_number": "555-555-5555",
-        "rating": 4.5
+        "rating": 4.5,
+        "reviews": []
     }
-    response = client.post("/api/restaurants", json=new_restaurant)
-    print("data: ", response.json()) # Print the response for debugging
+    response = client.post("/api/restaurant", json=new_restaurant)
+    print("data for post: ", response.json()) # Print the response for debugging
     assert response.status_code == 201
     assert response.json()["name"] == new_restaurant["name"]
 
