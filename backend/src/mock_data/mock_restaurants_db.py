@@ -9,10 +9,12 @@ from restaurant_modules.restaurant import Restaurant
 DB: list[Restaurant] = [
     {
         "id": 1,
+        "category": "Italian",
         "name": "The Gourmet Kitchen",
         "address": "123 Maple Street, Springfield, IL 62704",
         "contact_number": "(217) 555-1234",
         "rating": 4.5,
+        "is_favorite": True,
         "reviews": [
             {
                 "username": "foodie123",
@@ -28,10 +30,12 @@ DB: list[Restaurant] = [
     },
     {
         "id": 2,
+        "category": "Italian",
         "name": "Pizza Paradise",
         "address": "456 Elm Avenue, Springfield, IL 62705",
         "contact_number": "(217) 555-5678",
         "rating": 4.7,
+        "is_favorite": True,
         "reviews": [
             {
                 "username": "sarahjones",
@@ -47,10 +51,12 @@ DB: list[Restaurant] = [
     },
         {
         "id": 3,
+        "category": "Idian",
         "name": "Thai Curry House",
         "address": "789 Oak Road, Springfield, IL 62706",
         "contact_number": "(217) 555-9012",
         "rating": 4.3,
+        "is_favorite": True,
         "reviews": [
             {
                 "username": "thaichef",
@@ -66,10 +72,12 @@ DB: list[Restaurant] = [
     },
     {
     "id": 4,
+    "category": "Thai",
     "name": "Curry House",
     "address": "101 Pine Lane, Springfield, IL 62707",
     "contact_number": "(217) 555-3456",
     "rating": 4.6,
+    "is_favorite": True,
     "reviews": [
         {
             "username": "spicylover",
@@ -85,10 +93,12 @@ DB: list[Restaurant] = [
 },
 {
     "id": 5,
+    "category": "American",
     "name": "Burger Barn",
     "address": "202 Birch Road, Springfield, IL 62708",
     "contact_number": "(217) 555-7890",
     "rating": 4.2,
+    "is_favorite": True,
     "reviews": [
         {
             "username": "burgerking",

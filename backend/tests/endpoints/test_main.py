@@ -52,14 +52,14 @@ def test_get_restaurants_not_found(client):
     assert response.json() == {"detail": "Not Found"}
 
 # Test the get_restaurants_by_name endpoint with status code 200
-def test_get_restaurants_by_name(client, name="pizza"):
+def test_get_restaurants_by_name(client, name="golden"):
     response = client.get(f"/api/restaurants_by_name/{name}")
     print("data: ", response.json()) # Print the response for debugging
     assert response.status_code == 200
     assert len(response.json()) > 0 # Check if the response is not empty
 
 # Test the get_restaurants_by_name endpoint with status code 500
-def test_get_restaurants_by_name_not_found(client, name="new test restaurant"):
+def test_get_restaurants_by_name_not_found(client, name="not found"):
     response = client.get(f"/api/restaurants_by_name/{name}")
     print("data: ", response.json())
     assert response.status_code == 500
@@ -87,13 +87,13 @@ def test_get_recommended_restaurants(client):
     assert len(response.json()) == 5
 
 # Test the update_restaurant endpoint with status code 200
-def test_update_restaurant(client, id=106):
+def test_update_restaurant(client, id=1):
     update_restaurant: Restaurant = {
-        "category": "American",
-        "name": "New Le Restaurant",
-        "address": "123 Main St",
-        "contact_number": "(555)-555-5556",
-        "rating": float(4.4), # Convert Decimal to float for JSON serialization
+        "category": "Mexican",
+        "name": "The Golden Gate Grill",
+        "address": "123 Main St San Francisco, CA 94105",
+        "contact_number": "666-666-6666",
+        "rating": float(4.7), # Convert Decimal to float for JSON serialization
     }
 
     response = client.patch(f"/api/update_restaurant/{id}", json=update_restaurant)
@@ -102,12 +102,12 @@ def test_update_restaurant(client, id=106):
 
     # Verify that the restaurant was updated in the database
     response = client.get(f"/api/restaurant/{id}")
-    print("data: ", response.json()) # Print the response for debugging
+    print("data validation: ", response.json()) # Print the response for debugging
     assert response.status_code == 200
     assert response.json()["name"] == update_restaurant["name"]
 
 # Test the delete_restaurant endpoint with status code 200
-def test_delete_restaurant(client, id=105):
+def test_delete_restaurant(client, id=102):
     response = client.delete(f"/api/delete_restaurant/{id}")
     print("data: ", response.json()) # Print the response for debugging
     assert response.status_code == 200

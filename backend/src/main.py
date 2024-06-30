@@ -89,7 +89,7 @@ async def get_restaurants():
                 r.address,
                 r.contact_number,
                 r.rating AS rating,
-                r.is_favorite AS isFavorite,
+                r.is_favorite,
                 COALESCE(
                     JSON_AGG(
                         JSON_BUILD_OBJECT(
@@ -122,7 +122,7 @@ async def get_restaurants():
                 "address": row[3],
                 "contact_number": row[4],
                 "rating": float(row[5]), # Convert Decimal to float for JSON serialization
-                "isFavorite": row[6],
+                "is_favorite": row[6],
                 "reviews": row[7] if row[7] else [] # Use the aggregated JSON for reviews
             }
 
@@ -152,7 +152,7 @@ async def get_restaurants_by_name(restaurant_name: str):
                 r.address,
                 r.contact_number,
                 r.rating AS rating,
-                r.is_favorite AS isFavorite,
+                r.is_favorite,
                 COALESCE(
                     JSON_AGG(
                         JSON_BUILD_OBJECT(
@@ -169,7 +169,7 @@ async def get_restaurants_by_name(restaurant_name: str):
             WHERE
                 LOWER(r.name) LIKE %(restaurant_name)s
             GROUP BY
-                r.id, r.category, r.name, r.address, r.contact_number, r.rating, r.isFavorite
+                r.id, r.category, r.name, r.address, r.contact_number, r.rating, r.is_favorite
             ORDER BY r.name ASC;
         """
         # Convert restaurant_name to lowercase for case-insensitive search
@@ -191,7 +191,7 @@ async def get_restaurants_by_name(restaurant_name: str):
                 "address": row[3],
                 "contact_number": row[4],
                 "rating": float(row[5]), # Convert Decimal to float for JSON serialization
-                "isFavorite": bool(row[6]), # Convert boolean to bool for JSON serialization
+                "is_favorite": bool(row[6]), # Convert boolean to bool for JSON serialization
                 "reviews": row[7] if row[7] else [] # Use the aggregated JSON for reviews
             }
 
@@ -224,7 +224,7 @@ async def get_restaurant(id: int):
                 r.address,
                 r.contact_number,
                 r.rating AS rating,
-                r.is_favorite AS isFavorite,
+                r.is_favorite,
                 rv.username,
                 rv.review,
                 rv.rating AS rating
@@ -246,8 +246,8 @@ async def get_restaurant(id: int):
             "name": rows[0][2],
             "address": rows[0][3],
             "contact_number": rows[0][4],
-            "rating": float(rows[0][5]), # Convert Decimal to float for JSON serialization
-            "isFavorite": bool(rows[0][6]), # Convert boolean to bool for JSON serialization
+            "rating": rows[0][5], # Convert Decimal to float for JSON serialization
+            "is_favorite": bool(rows[0][6]), # Convert boolean to bool for JSON serialization
             "reviews": []
         }
         
@@ -274,10 +274,12 @@ async def get_recommended_restaurants():
     restaurant_list = [
         {
             "id": restaurant["id"],
+            "category": restaurant["category"],
             "name": restaurant["name"],
             "address": restaurant["address"],
             "contact_number": restaurant["contact_number"],
             "rating": restaurant["rating"],
+            "is_favorite": restaurant["is_favorite"],
             "reviews": restaurant["reviews"]
         }
         for restaurant in DB
@@ -326,6 +328,7 @@ async def update_restaurant(id: int, restaurant: Restaurant):
         cursor.execute(query, values)
         conn.commit()
         updated_restaurant = {**existing_restaurant, **update_data}
+        print("Updated restaurant:", updated_restaurant)
         return updated_restaurant
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

@@ -14,5 +14,5 @@ class Restaurant(BaseModel):
     address: str
     contact_number: str
     rating: float
-    isFavorite: bool = False
+    is_favorite: bool = False
     reviews: List[Review] = []
