@@ -27,7 +27,27 @@ USER_DB: list[User] = [
                         "rating": 4
                     }
                 ]
-            }
+            },
+            {
+                "category": "American",
+                "name": "The Burger Joint",
+                "address": "123 Bacon Street, San Francisco, CA 94215",
+                "contact_number": "(2623) 535-1234",
+                "rating": 4.5,
+                "is_favorite": True,
+                "reviews": [
+                    {
+                        "username": "foodie123",
+                        "review": "Amazing food and great ambiance!",
+                        "rating": 5
+                    },
+                    {
+                        "username": "janedoe",
+                        "review": "Good selection, but a bit pricey.",
+                        "rating": 4
+                    }
+                ]
+            },
         ]
     },
 ]

@@ -49,9 +49,9 @@ DB: list[Restaurant] = [
             }
         ]
     },
-        {
+    {
         "id": 3,
-        "category": "Idian",
+        "category": "Indian",
         "name": "Thai Curry House",
         "address": "789 Oak Road, Springfield, IL 62706",
         "contact_number": "(217) 555-9012",
