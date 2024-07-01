@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from restaurant import Restaurant
 
 """ Pydantic model for User data and Favorites """
 class User(BaseModel):
@@ -7,6 +8,6 @@ class User(BaseModel):
     password: str
     username: str
     name: str
-    favorites: []
+    favorites: list[Restaurant] = []
 
 
