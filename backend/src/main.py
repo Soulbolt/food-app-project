@@ -1,8 +1,7 @@
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import psycopg2
-import sqlite3
 import os
 from dotenv import load_dotenv
 
