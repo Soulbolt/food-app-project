@@ -41,6 +41,10 @@ def connect_to_database():
     except Exception as e:
         print("Error connecting to PostgreSQL database: ", e)
         return None
+    
+#! ----------- User CRUD REST APIs and Authentication ------------###
+    
+#! ------------- Restaurant CRUD REST APIs ---------------------- ###
 
 """ Creates a new restaurant """
 @app.post("/api/new_restaurant", response_model=Restaurant)
