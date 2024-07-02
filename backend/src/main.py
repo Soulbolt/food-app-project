@@ -6,7 +6,7 @@ import os
 from dotenv import load_dotenv
 
 from mock_data.mock_restaurants_db import DB
-from restaurant_modules.restaurant import Restaurant
+from restaurant_modules.restaurant import Restaurant, Review
 
 load_dotenv()
 
@@ -35,7 +35,13 @@ def connect_to_database():
     try:
         print("Connecting to the PostgreSQL database...")
         # Establish connection
-        conn = psycopg2.connect(**db_config)
+        conn = psycopg2.connect(
+            host=db_config['host'],
+            dbname=db_config['dbname'],
+            user=db_config['user'],
+            password=db_config['password'],
+            port=db_config['port']
+        )
         return conn
 
     except Exception as e:
@@ -78,7 +84,7 @@ def create_restaurant( restaurant: Restaurant):
 """ Creates a new restaurant in Mock Data """
 @app.post("/api/mock_restaurant", response_model=Restaurant)
 def create_mock_restaurant(restaurant: Restaurant):
-    DB.append(restaurant.model_dump())
+    DB.append(restaurant)
     return restaurant
         
 """ Returns the entire list of restaurants """
@@ -121,20 +127,22 @@ async def get_restaurants():
         rows = cursor.fetchall()
         if rows is None:
             raise HTTPException(status_code=404, detail="Restaurant not found")
-        [desc[0] for desc in cursor.description]
+        
+        if cursor.description is not None:
+            [desc[0] for desc in cursor.description]
         
         restaurant_list = []
         for row in rows:
-            restaurant_data: Restaurant = {
-                "id": row[0],
-                "category": row[1],
-                "name": row[2],
-                "address": row[3],
-                "contact_number": row[4],
-                "rating": float(row[5]), # Convert Decimal to float for JSON serialization
-                "is_favorite": row[6],
-                "reviews": row[7] if row[7] else [] # Use the aggregated JSON for reviews
-            }
+            restaurant_data: Restaurant = Restaurant(
+                id=row[0],
+                category=row[1],
+                name=row[2],
+                address=row[3],
+                contact_number=row[4],
+                rating=float(row[5]), # Convert Decimal to float for JSON serialization
+                is_favorite=row[6],
+                reviews=row[7] if row[7] else [] # Use the aggregated JSON for reviews
+            )
 
             restaurant_list.append(restaurant_data)
 
@@ -190,20 +198,22 @@ async def get_restaurants_by_name(restaurant_name: str):
         rows = cursor.fetchall()
         if rows is None:
             raise HTTPException(status_code=404, detail="Restaurant not found")
-        [desc[0] for desc in cursor.description]
+        
+        if cursor.description is not None:
+            [desc[0] for desc in cursor.description]
         
         restaurant_list = []
         for row in rows:
-            restaurant_data: Restaurant = {
-                "id": row[0],
-                "category": row[1],
-                "name": row[2],
-                "address": row[3],
-                "contact_number": row[4],
-                "rating": float(row[5]), # Convert Decimal to float for JSON serialization
-                "is_favorite": bool(row[6]), # Convert boolean to bool for JSON serialization
-                "reviews": row[7] if row[7] else [] # Use the aggregated JSON for reviews
-            }
+            restaurant_data = Restaurant(
+                id= row[0],
+                category= row[1],
+                name= row[2],
+                address= row[3],
+                contact_number= row[4],
+                rating= float(row[5]), # Convert Decimal to float for JSON serialization
+                is_favorite= bool(row[6]), # Convert boolean to bool for JSON serialization
+                reviews= row[7] if row[7] else [] # Use the aggregated JSON for reviews
+            )
 
             restaurant_list.append(restaurant_data)
 
@@ -219,7 +229,7 @@ async def get_restaurants_by_name(restaurant_name: str):
 
 """ Returns the restaurant with the specified ID """
 @app.get("/api/restaurant/{id}", response_model=Restaurant)
-async def get_restaurant(id: int):
+async def get_restaurant_by_id(id: int):
     conn = connect_to_database()
     if not conn:
         raise HTTPException(status_code=500, detail="Could not connect to the database")
@@ -248,29 +258,30 @@ async def get_restaurant(id: int):
         rows = cursor.fetchall()
         if rows is None:
             raise HTTPException(status_code=404, detail="Restaurant not found")
-        [desc[0] for desc in cursor.description]
         
-        restaurant_data: Restaurant = {
-            "id": rows[0][0],
-            "category": rows[0][1],
-            "name": rows[0][2],
-            "address": rows[0][3],
-            "contact_number": rows[0][4],
-            "rating": rows[0][5], # Convert Decimal to float for JSON serialization
-            "is_favorite": bool(rows[0][6]), # Convert boolean to bool for JSON serialization
-            "reviews": []
-        }
+        if cursor.description is not None:
+            [desc[0] for desc in cursor.description]
         
-
+        restaurant_data = Restaurant(
+            id=rows[0][0],
+            category=rows[0][1],
+            name=rows[0][2],
+            address=rows[0][3],
+            contact_number=rows[0][4],
+            rating=float(rows[0][5]), # Convert Decimal to float for JSON serialization
+            is_favorite=bool(rows[0][6]), # Convert boolean to bool for JSON serialization
+            reviews=[]
+        )
+        
         for row in rows:
             if row[5]: # Check if there is a review for this restaurant
-                review = {
-                    "username": row[7],
-                    "review": row[8],
-                    "rating": float(row[9]) # Convert Decimal to float for JSON serialization
-                }
-                restaurant_data["reviews"].append(review)
-
+                review = Review(
+                    username=row[7],
+                    review=row[8],
+                    rating=float(row[9]) # Convert Decimal to float for JSON serialization
+                )
+                restaurant_data.reviews.append(review)
+        
         return restaurant_data
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -283,14 +294,14 @@ async def get_restaurant(id: int):
 async def get_recommended_restaurants():
     restaurant_list = [
         {
-            "id": restaurant["id"],
-            "category": restaurant["category"],
-            "name": restaurant["name"],
-            "address": restaurant["address"],
-            "contact_number": restaurant["contact_number"],
-            "rating": restaurant["rating"],
-            "is_favorite": restaurant["is_favorite"],
-            "reviews": restaurant["reviews"]
+            "id": restaurant.id,
+            "category": restaurant.category,
+            "name": restaurant.name,
+            "address": restaurant.address,
+            "contact_number": restaurant.contact_number,
+            "rating": restaurant.rating,
+            "is_favorite": restaurant.is_favorite,
+            "reviews": restaurant.reviews
         }
         for restaurant in DB
     ]
@@ -300,7 +311,8 @@ async def get_recommended_restaurants():
 @app.get("/api/recommended_restaurant/{id}")
 def get_restaurant(id: int):  # noqa: F811
     for restaurant in DB:
-        if restaurant["id"] == id:
+        if restaurant.id == id:
+            return restaurant
             return restaurant
 
 """ Updates the restaurant with the specified ID in mock database """
@@ -327,7 +339,9 @@ async def update_restaurant(id: int, restaurant: Restaurant):
             raise HTTPException(status_code=404, detail="Restaurant not found")
 
         # Convert the Row object to a dictionary
-        column_names = [desc[0] for desc in cursor.description]
+        if cursor.description is not None:
+            column_names = [desc[0] for desc in cursor.description]
+    
         existing_restaurant = dict(zip(column_names, existing_restaurant))
 
         # Update the existing restaurant with the new data from the request
