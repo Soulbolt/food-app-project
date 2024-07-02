@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 
 """ Pydantic models for Restaurant and Review data """
 class Review(BaseModel):
@@ -8,7 +8,7 @@ class Review(BaseModel):
     rating: float
 
 class Restaurant(BaseModel):
-    # id: int
+    id: Optional[int] = None
     category: str
     name: str
     address: str
