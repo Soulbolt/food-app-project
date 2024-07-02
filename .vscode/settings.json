@@ -3,5 +3,6 @@
     "./backend/tests/endpoints",
     "./backend/src",
     "./backend/src/restaurant_modules"
-  ]
+  ],
+  "python.analysis.typeCheckingMode": "basic"
 }
