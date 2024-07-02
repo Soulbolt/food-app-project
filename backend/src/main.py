@@ -43,7 +43,14 @@ def connect_to_database():
         return None
     
 #! ----------- User CRUD REST APIs and Authentication ------------###
-    
+""" create new User """
+# TODO: Create REST API to create new user.
+
+""" Authenticate Existing User """
+
+""" Update Existing User """
+# TODO: Create REST API to edit an existing users properties/settings.
+
 #! ------------- Restaurant CRUD REST APIs ---------------------- ###
 
 """ Creates a new restaurant """
