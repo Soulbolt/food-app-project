@@ -82,7 +82,7 @@ async def test_get_restaurant_by_id(client):
 
 # Test the get_restaurant_by_id endpoint with status code 500
 @pytest.mark.asyncio
-async def test_get_retaurant_by_id_not_found(client):
+async def test_get_restaurant_by_id_not_found(client):
     response = await client.get("/api/restaurant/999")
     print(response.json())
     assert response.status_code == 500
