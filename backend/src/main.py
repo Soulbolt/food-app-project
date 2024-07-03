@@ -8,6 +8,8 @@ from dotenv import load_dotenv
 
 from mock_data.mock_restaurants_db import DB
 from restaurant_modules.restaurant import Restaurant, Review
+from fastapi import Depends
+from mock_data.mock_users_db import USER_DB
 
 load_dotenv()
 
@@ -54,7 +56,19 @@ def connect_to_database():
 # TODO: Create REST API to create new user.
 
 """ Authenticate Existing User """
+def authenticate_user(username: str, password: str):
+    for user in USER_DB:
+        if user.username == username and user.password == password:
+            return user
+    return None
 
+@app.post("/api/authenticate")
+def authenticate(username: str, password: str):
+    user = authenticate_user(username, password)
+    if user:
+        return {"message": "Authentication successful!", "user": user}
+    else:
+        raise HTTPException(status_code=401, detail="Invalid username or password")
 """ Update Existing User """
 # TODO: Create REST API to edit an existing users properties/settings.
 
