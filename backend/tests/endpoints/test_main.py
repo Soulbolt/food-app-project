@@ -1,19 +1,16 @@
 import pytest
-import asyncio
 import os
 import sys
-import httpx
 
 # Add the parent directory to the sys.path
 sys.path.append(os.path.join(os.path.dirname(__file__), "../../src"))
 from main import app
-from restaurant_modules.restaurant import Restaurant
-from fastapi.testclient import TestClient
+from httpx import AsyncClient
 
 # Create a test client for testing
 @pytest.fixture(scope="module")
 async def client():
-    async with httpx.AsyncClient(app=app, base_url="http://test") as c:
+    async with AsyncClient(app=app, base_url="http://test") as c:
         yield c
 
 # Test create a new restaurant with status code 201
