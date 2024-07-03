@@ -1,3 +1,4 @@
+from typing import Any
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -290,7 +291,7 @@ async def get_restaurant_by_id(id: int):
         conn.close()
 
 """ Returns the recommended list of restaurants """
-@app.get("/api/restaurants/recommended", response_model=list[Restaurant])
+@app.get("/api/restaurants/recommended", response_model=list[dict[str, Any]])
 async def get_recommended_restaurants():
     restaurant_list = [
         {
@@ -312,7 +313,6 @@ async def get_recommended_restaurants():
 def get_restaurant(id: int):  # noqa: F811
     for restaurant in DB:
         if restaurant.id == id:
-            return restaurant
             return restaurant
 
 """ Updates the restaurant with the specified ID in mock database """
