@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 from mock_data.mock_restaurants_db import DB
 from restaurant_modules.restaurant import Restaurant, Review
-from fastapi import Depends
+from user_modules.user_model import UserCredentials
 from mock_data.mock_users_db import USER_DB
 
 load_dotenv()
@@ -62,13 +62,14 @@ def authenticate_user(username: str, password: str):
             return user
     return None
 
-@app.post("/api/authenticate")
-def authenticate(username: str, password: str):
-    user = authenticate_user(username, password)
+@app.post("/api/authenticate/")
+def authenticate(credentials: UserCredentials):
+    user = authenticate_user(credentials.username, credentials.password)
     if user:
         return {"message": "Authentication successful!", "user": user}
     else:
         raise HTTPException(status_code=401, detail="Invalid username or password")
+    
 """ Update Existing User """
 # TODO: Create REST API to edit an existing users properties/settings.
 
