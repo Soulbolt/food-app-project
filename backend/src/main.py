@@ -63,14 +63,14 @@ def connect_to_database():
 # TODO: Create REST API to create new user.
 
 """ Authenticate Existing User """
-def authenticate_user(username: str, password: str):
+async def authenticate_user(username: str, password: str):
     for user in USER_DB:
         if user.username == username and user.password == password:
             return user
     return None
 
 @app.post("/api/authenticate/")
-def authenticate(credentials: UserCredentials):
+async def authenticate(credentials: UserCredentials):
     user = authenticate_user(credentials.username, credentials.password)
     if user:
         return {"message": "Authentication successful!", "user": user}
@@ -84,7 +84,7 @@ def authenticate(credentials: UserCredentials):
 
 """ Creates a new restaurant """
 @app.post("/api/new_restaurant", response_model=Restaurant)
-def create_restaurant( restaurant: Restaurant):
+async def create_restaurant( restaurant: Restaurant):
     conn = connect_to_database()
     if not conn:
         raise HTTPException(status_code=500, detail="Could not connect to the database")
@@ -106,7 +106,7 @@ def create_restaurant( restaurant: Restaurant):
 
 """ Creates a new restaurant in Mock Data """
 @app.post("/api/mock_restaurant", response_model=Restaurant)
-def create_mock_restaurant(restaurant: Restaurant):
+async def create_mock_restaurant(restaurant: Restaurant):
     DB.append(restaurant)
     return restaurant
         
