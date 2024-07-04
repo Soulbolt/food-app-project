@@ -34,6 +34,13 @@ db_config = {
     'port': os.getenv('DB_PORT'),
 }
 
+def get_database_connection_string():
+    # Check if we are in a testing environment
+    if os.getenv("ENV") == 'test':
+        return os.getenv('TEST_DB_URL')
+    else:
+        return os.getenv('DB_HOST')
+
 def connect_to_database():
     try:
         print("Connecting to the PostgreSQL database...")

@@ -4,6 +4,7 @@ __pycache__/
 **/.pytest_cache/
 backend/instance
 backend/.env
+backend/.env.test
 backend/docker-compose.yml
 backend/scripts/insert_restaurants.sql
 .venv
