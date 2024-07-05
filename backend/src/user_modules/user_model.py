@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from restaurant_modules.restaurant import Restaurant, Review
 from sqlalchemy import Column, Integer, Float, String, Boolean, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, sessionmaker
+from sqlalchemy.orm import relationship
 
 Base = declarative_base()
 
