@@ -390,11 +390,11 @@ async def get_recommended_restaurants():
     return restaurant_list
 
 """ Returns the restaurant with the specified ID """
-@app.get("/api/recommended_restaurant/{id}")
-def get_restaurant(id: int):  # noqa: F811
-    for restaurant in DB:
-        if restaurant.id == id:
-            return restaurant
+# @app.get("/api/recommended_restaurant/{id}")
+# def get_restaurant(id: int):  # noqa: F811
+#     for restaurant in DB:
+#         if restaurant.id == id:
+#             return restaurant
 
 """ Updates the restaurant with the specified ID in mock database """
 # @app.put("/api/mock_update_restaurant/{id}", response_model=Restaurant)
@@ -406,60 +406,70 @@ def get_restaurant(id: int):  # noqa: F811
 
 """ Updates the restaurant with the specified ID """
 @app.patch("/api/update_restaurant/{id}", response_model=Restaurant)
-async def update_restaurant(id: int, restaurant: Restaurant):
-    conn = connect_to_database()
-    if not conn:
-        raise HTTPException(status_code=500, detail="Could not connect to the database")
-    try:
-        print("Connected to the database!")
-        cursor = conn.cursor()
-        existing_restaurant_query = "SELECT * FROM restaurant_schema.restaurants WHERE id = %s"
-        cursor.execute(existing_restaurant_query, [id,])
-        existing_restaurant = cursor.fetchone()
-        if not existing_restaurant:
-            raise HTTPException(status_code=404, detail="Restaurant not found")
+async def update_restaurant(db: Session, id: int, updates):
+    db_restaurant = db.query(Restaurant).filter(Restaurant.id == id).first()
+    for key, value in updates.items():
+        setattr(db_restaurant, key, value)
+    db.commit()
+    db.refresh(db_restaurant)
+    return db_restaurant
+    # conn = connect_to_database()
+    # if not conn:
+    #     raise HTTPException(status_code=500, detail="Could not connect to the database")
+    # try:
+    #     print("Connected to the database!")
+    #     cursor = conn.cursor()
+    #     existing_restaurant_query = "SELECT * FROM restaurant_schema.restaurants WHERE id = %s"
+    #     cursor.execute(existing_restaurant_query, [id,])
+    #     existing_restaurant = cursor.fetchone()
+    #     if not existing_restaurant:
+    #         raise HTTPException(status_code=404, detail="Restaurant not found")
 
-        # Convert the Row object to a dictionary
-        if cursor.description is not None:
-            column_names = [desc[0] for desc in cursor.description]
+    #     # Convert the Row object to a dictionary
+    #     if cursor.description is not None:
+    #         column_names = [desc[0] for desc in cursor.description]
     
-        existing_restaurant = dict(zip(column_names, existing_restaurant))
+    #     existing_restaurant = dict(zip(column_names, existing_restaurant))
 
-        # Update the existing restaurant with the new data from the request
-        update_data = restaurant.model_dump(exclude_unset=True)
-        set_clause = ", ".join([f"{key} = %s" for key in update_data.keys()])
-        query = f"UPDATE restaurant_schema.restaurants SET {set_clause} WHERE id = %s"
-        values = list(update_data.values()) + [id]
-        cursor.execute(query, values)
-        conn.commit()
-        updated_restaurant = {**existing_restaurant, **update_data}
-        print("Updated restaurant:", updated_restaurant)
-        return updated_restaurant
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        cursor.close()
-        conn.close()
+    #     # Update the existing restaurant with the new data from the request
+    #     update_data = restaurant.model_dump(exclude_unset=True)
+    #     set_clause = ", ".join([f"{key} = %s" for key in update_data.keys()])
+    #     query = f"UPDATE restaurant_schema.restaurants SET {set_clause} WHERE id = %s"
+    #     values = list(update_data.values()) + [id]
+    #     cursor.execute(query, values)
+    #     conn.commit()
+    #     updated_restaurant = {**existing_restaurant, **update_data}
+    #     print("Updated restaurant:", updated_restaurant)
+    #     return updated_restaurant
+    # except Exception as e:
+    #     raise HTTPException(status_code=500, detail=str(e))
+    # finally:
+    #     cursor.close()
+    #     conn.close()
 
 """ Deletes the restaurant with the specified ID """
   # TODO: Consider and define business logic for deleting a restaurant in relation to reviews.
 @app.delete("/api/delete_restaurant/{id}")
-async def delete_restaurant(id: int):
-    conn = connect_to_database()
-    if not conn:
-        raise HTTPException(status_code=500, detail="Could not connect to the database")
-    try:
-        print("Connected to the database!")
-        cursor = conn.cursor()
-        query = "DELETE FROM restaurant_schema.restaurants WHERE id = %s;"
-        cursor.execute(query, (id,))
+async def delete_restaurant(db: Session, id: int):
+    db_restaurant = db.query(Restaurant).filter(Restaurant.id == id).first()
+    db.delete(db_restaurant)
+    db.commit()
+    return {"message": "Restaurant deleted successfully"}
+    # conn = connect_to_database()
+    # if not conn:
+    #     raise HTTPException(status_code=500, detail="Could not connect to the database")
+    # try:
+    #     print("Connected to the database!")
+    #     cursor = conn.cursor()
+    #     query = "DELETE FROM restaurant_schema.restaurants WHERE id = %s;"
+    #     cursor.execute(query, (id,))
 
-        if cursor.rowcount == 0:
-            raise HTTPException(status_code=500, detail=f"Restaurant with specified ID {id} not found")
-        conn.commit()
-        return {"message": "Restaurant deleted successfully"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        cursor.close()
-        conn.close()
+    #     if cursor.rowcount == 0:
+    #         raise HTTPException(status_code=500, detail=f"Restaurant with specified ID {id} not found")
+    #     conn.commit()
+    #     return {"message": "Restaurant deleted successfully"}
+    # except Exception as e:
+    #     raise HTTPException(status_code=500, detail=str(e))
+    # finally:
+    #     cursor.close()
+    #     conn.close()
