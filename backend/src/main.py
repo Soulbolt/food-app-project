@@ -1,18 +1,47 @@
 from typing import Any
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+import sqlite3
 import psycopg2
 import os
 from dotenv import load_dotenv
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, Session
+from passlib.context import CryptContext
 
 from mock_data.mock_restaurants_db import DB
 from restaurant_modules.restaurant import Restaurant, Review
-from user_modules.user_model import UserCredentials
+from user_modules.user_model import UserCredentials, User, Base
 from mock_data.mock_users_db import USER_DB
 
+# Load environment variables
 load_dotenv()
 
+# Passlib context for hashing passwords
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+# Create a database engine
+if DATABASE_URL:
+    engine = create_engine(DATABASE_URL)
+else:
+    raise ValueError("DATABASE_URL is not set.")
+
+# Create a SessionalLocal class
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+Base.metadata.create_all(bind=engine)
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+# Create a FastAPI instance
 app = FastAPI()
 
 origins = ["http://localhost:3000"]
@@ -37,41 +66,64 @@ db_config = {
 def get_database_connection_string():
     # Check if we are in a testing environment
     if os.getenv("ENV") == 'test':
-        return os.getenv('TEST_DB_URL')
+        return os.getenv('TEST_DATABASE_URL')
     else:
-        return os.getenv('DB_HOST')
+        return os.getenv('DATABASE_URL')
 
 def connect_to_database():
+    database_url = get_database_connection_string()
     try:
-        print("Connecting to the PostgreSQL database...")
-        # Establish connection
-        conn = psycopg2.connect(
-            host=db_config['host'],
-            dbname=db_config['dbname'],
-            user=db_config['user'],
-            password=db_config['password'],
-            port=db_config['port']
-        )
-        return conn
+        if database_url and database_url.startswith("postgres://"):
+            print("Connecting to the PostgreSQL database...")
+            # Establish connection
+            conn = psycopg2.connect(
+                host=db_config['host'],
+                dbname=db_config['dbname'],
+                user=db_config['user'],
+                password=db_config['password'],
+                port=db_config['port']
+            )
+            return conn
+        elif database_url and database_url.startswith("sqlite://"):
+            # Establish connection
+            print("Connecting to the SQLite database...")
+            # Extract the file path from the url
+            db_file_path = database_url.replace("sqlite:///", "")
+            conn = sqlite3.connect(db_file_path, check_same_thread=False)
+            return conn
 
     except Exception as e:
-        print("Error connecting to PostgreSQL database: ", e)
+        print("Error connecting to database: ", e)
         return None
+    
+def verify_password(plain_password, hashed_password):
+    return pwd_context.verify(plain_password, hashed_password)
+
+def get_password_hash(password):
+    return pwd_context.hash(password)
     
 #! ----------- User CRUD REST APIs and Authentication ------------###
 """ create new User """
 # TODO: Create REST API to create new user.
+async def create_user(db: Session, user_data):
+    db_user = User(username=user_data.username, email=user_data.email, hashed_password=user_data.hashed_password)
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
 
 """ Authenticate Existing User """
-async def authenticate_user(username: str, password: str):
-    for user in USER_DB:
-        if user.username == username and user.password == password:
-            return user
-    return None
+async def authenticate_user(db, username: str, password: str):
+    user = db.query(User).filter(User.username == username).first()
+    if not user:
+        return False
+    if not verify_password(password, user.hashed_password):
+        return False
+    return user
 
 @app.post("/api/authenticate/")
-async def authenticate(credentials: UserCredentials):
-    user = authenticate_user(credentials.username, credentials.password)
+async def authenticate(db, credentials: UserCredentials):
+    user = authenticate_user(db, credentials.username, credentials.password)
     if user:
         return {"message": "Authentication successful!", "user": user}
     else:
@@ -112,7 +164,7 @@ async def create_mock_restaurant(restaurant: Restaurant):
         
 """ Returns the entire list of restaurants """
 @app.get("/api/restaurants", response_model=list[Restaurant])
-async def get_restaurants():
+async def get_restaurants(db: Session = Depends(get_database_connection_string)):
     conn = connect_to_database()
     if not conn:
         raise HTTPException(status_code=500, detail="Could not connect to the database")
