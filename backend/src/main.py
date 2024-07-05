@@ -310,65 +310,66 @@ async def get_restaurants_by_name(restaurant_name: str):
 
 """ Returns the restaurant with the specified ID """
 @app.get("/api/restaurant/{id}", response_model=Restaurant)
-async def get_restaurant_by_id(id: int):
-    conn = connect_to_database()
-    if not conn:
-        raise HTTPException(status_code=500, detail="Could not connect to the database")
-    try:
-        print("Connected to the database!")
-        cursor = conn.cursor()
-        query = """
-            SELECT 
-                r.id AS id,
-                r.category,
-                r.name AS name,
-                r.address,
-                r.contact_number,
-                r.rating AS rating,
-                r.is_favorite,
-                rv.username,
-                rv.review,
-                rv.rating AS rating
-            FROM 
-                restaurant_schema.restaurants r
-            LEFT JOIN 
-                restaurant_schema.reviews rv ON r.id = rv.restaurant_id
-            WHERE r.id = %s;
-        """
-        cursor.execute(query, (id,))
-        rows = cursor.fetchall()
-        if rows is None:
-            raise HTTPException(status_code=404, detail="Restaurant not found")
+async def get_restaurant_by_id(db: Session, id: int):
+    return db.query(Restaurant).filter(Restaurant.id == id).first()
+    # conn = connect_to_database()
+    # if not conn:
+    #     raise HTTPException(status_code=500, detail="Could not connect to the database")
+    # try:
+    #     print("Connected to the database!")
+    #     cursor = conn.cursor()
+    #     query = """
+    #         SELECT 
+    #             r.id AS id,
+    #             r.category,
+    #             r.name AS name,
+    #             r.address,
+    #             r.contact_number,
+    #             r.rating AS rating,
+    #             r.is_favorite,
+    #             rv.username,
+    #             rv.review,
+    #             rv.rating AS rating
+    #         FROM 
+    #             restaurant_schema.restaurants r
+    #         LEFT JOIN 
+    #             restaurant_schema.reviews rv ON r.id = rv.restaurant_id
+    #         WHERE r.id = %s;
+    #     """
+    #     cursor.execute(query, (id,))
+    #     rows = cursor.fetchall()
+    #     if rows is None:
+    #         raise HTTPException(status_code=404, detail="Restaurant not found")
         
-        if cursor.description is not None:
-            [desc[0] for desc in cursor.description]
+    #     if cursor.description is not None:
+    #         [desc[0] for desc in cursor.description]
         
-        restaurant_data = Restaurant(
-            id=rows[0][0],
-            category=rows[0][1],
-            name=rows[0][2],
-            address=rows[0][3],
-            contact_number=rows[0][4],
-            rating=float(rows[0][5]), # Convert Decimal to float for JSON serialization
-            is_favorite=bool(rows[0][6]), # Convert boolean to bool for JSON serialization
-            reviews=[]
-        )
+    #     restaurant_data = Restaurant(
+    #         id=rows[0][0],
+    #         category=rows[0][1],
+    #         name=rows[0][2],
+    #         address=rows[0][3],
+    #         contact_number=rows[0][4],
+    #         rating=float(rows[0][5]), # Convert Decimal to float for JSON serialization
+    #         is_favorite=bool(rows[0][6]), # Convert boolean to bool for JSON serialization
+    #         reviews=[]
+    #     )
         
-        for row in rows:
-            if row[5]: # Check if there is a review for this restaurant
-                review = Review(
-                    username=row[7],
-                    review=row[8],
-                    rating=float(row[9]) # Convert Decimal to float for JSON serialization
-                )
-                restaurant_data.reviews.append(review)
+    #     for row in rows:
+    #         if row[5]: # Check if there is a review for this restaurant
+    #             review = Review(
+    #                 username=row[7],
+    #                 review=row[8],
+    #                 rating=float(row[9]) # Convert Decimal to float for JSON serialization
+    #             )
+    #             restaurant_data.reviews.append(review)
         
-        return restaurant_data
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        cursor.close()
-        conn.close()
+    #     return restaurant_data
+    # except Exception as e:
+    #     raise HTTPException(status_code=500, detail=str(e))
+    # finally:
+    #     cursor.close()
+    #     conn.close()
 
 """ Returns the recommended list of restaurants """
 @app.get("/api/restaurants/recommended", response_model=list[dict[str, Any]])
