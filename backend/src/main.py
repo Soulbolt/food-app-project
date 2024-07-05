@@ -102,7 +102,7 @@ def verify_password(plain_password, hashed_password):
 def get_password_hash(password):
     return pwd_context.hash(password)
     
-#! ----------- User CRUD REST APIs and Authentication ------------###
+#* ----------- User CRUD REST APIs and Authentication ------------###
 """ create new User """
 # TODO: Create REST API to create new user.
 async def create_user(db: Session, user_data):
@@ -132,29 +132,34 @@ async def authenticate(db, credentials: UserCredentials):
 """ Update Existing User """
 # TODO: Create REST API to edit an existing users properties/settings.
 
-#! ------------- Restaurant CRUD REST APIs ---------------------- ###
+#* ------------- Restaurant CRUD REST APIs ---------------------- ###
 
 """ Creates a new restaurant """
 @app.post("/api/new_restaurant", response_model=Restaurant)
-async def create_restaurant( restaurant: Restaurant):
-    conn = connect_to_database()
-    if not conn:
-        raise HTTPException(status_code=500, detail="Could not connect to the database")
-    try:
-        print("Connected to the database!")
-        cursor = conn.cursor()
-        query = """
-            INSERT INTO restaurant_schema.restaurants (category, name, address, contact_number, rating)
-            VALUES (%s, %s, %s, %s, %s);
-        """
-        cursor.execute(query, (restaurant.category, restaurant.name, restaurant.address, restaurant.contact_number, restaurant.rating))
-        conn.commit()
-        return JSONResponse(content={"message": "Restaurant created successfully!"})
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        cursor.close()
-        conn.close()
+async def create_restaurant(db: Session, restaurant_data):
+    # conn = connect_to_database()
+    db_restaurant = Restaurant(**restaurant_data)
+    db.add(db_restaurant)
+    db.commit()
+    db.refresh(db_restaurant)
+    return db_restaurant
+    # if not conn:
+    #     raise HTTPException(status_code=500, detail="Could not connect to the database")
+    # try:
+    #     print("Connected to the database!")
+    #     cursor = conn.cursor()
+    #     query = """
+    #         INSERT INTO restaurant_schema.restaurants (category, name, address, contact_number, rating)
+    #         VALUES (%s, %s, %s, %s, %s);
+    #     """
+    #     cursor.execute(query, (restaurant.category, restaurant.name, restaurant.address, restaurant.contact_number, restaurant.rating))
+    #     conn.commit()
+    #     return JSONResponse(content={"message": "Restaurant created successfully!"})
+    # except Exception as e:
+    #     raise HTTPException(status_code=500, detail=str(e))
+    # finally:
+    #     cursor.close()
+    #     conn.close()
 
 """ Creates a new restaurant in Mock Data """
 @app.post("/api/mock_restaurant", response_model=Restaurant)
@@ -164,69 +169,70 @@ async def create_mock_restaurant(restaurant: Restaurant):
         
 """ Returns the entire list of restaurants """
 @app.get("/api/restaurants", response_model=list[Restaurant])
-async def get_restaurants(db: Session = Depends(get_database_connection_string)):
-    conn = connect_to_database()
-    if not conn:
-        raise HTTPException(status_code=500, detail="Could not connect to the database")
+async def get_restaurants(db: Session = Depends(get_database_connection_string), skip: int = 0, limit: int = 100):
+    return db.query(Restaurant).offset(skip).limit(limit).all()
+    # conn = connect_to_database()
+    # if not conn:
+    #     raise HTTPException(status_code=500, detail="Could not connect to the database")
     
-    try:
-        print("Connected to the database!")
-        cursor = conn.cursor()
-        query = """
-            SELECT 
-                r.id AS id,
-                r.category,
-                r.name AS name,
-                r.address,
-                r.contact_number,
-                r.rating AS rating,
-                r.is_favorite,
-                COALESCE(
-                    JSON_AGG(
-                        JSON_BUILD_OBJECT(
-                            'username', rv.username,
-                            'review', rv.review,
-                            'rating', rv.rating
-                        )
-                    ) FILTER (WHERE rv.username IS NOT NULL), '[]'
-                ) AS reviews
-            FROM 
-                restaurant_schema.restaurants r
-            LEFT JOIN 
-                restaurant_schema.reviews rv ON r.id = rv.restaurant_id
-            GROUP BY
-                 r.id, r.category, r.name, r.address, r.contact_number, r.rating, r.is_favorite
-            ORDER BY r.id ASC;
-        """
-        cursor.execute(query)
-        rows = cursor.fetchall()
-        if rows is None:
-            raise HTTPException(status_code=404, detail="Restaurant not found")
+    # try:
+    #     print("Connected to the database!")
+    #     cursor = conn.cursor()
+    #     query = """
+    #         SELECT 
+    #             r.id AS id,
+    #             r.category,
+    #             r.name AS name,
+    #             r.address,
+    #             r.contact_number,
+    #             r.rating AS rating,
+    #             r.is_favorite,
+    #             COALESCE(
+    #                 JSON_AGG(
+    #                     JSON_BUILD_OBJECT(
+    #                         'username', rv.username,
+    #                         'review', rv.review,
+    #                         'rating', rv.rating
+    #                     )
+    #                 ) FILTER (WHERE rv.username IS NOT NULL), '[]'
+    #             ) AS reviews
+    #         FROM 
+    #             restaurant_schema.restaurants r
+    #         LEFT JOIN 
+    #             restaurant_schema.reviews rv ON r.id = rv.restaurant_id
+    #         GROUP BY
+    #              r.id, r.category, r.name, r.address, r.contact_number, r.rating, r.is_favorite
+    #         ORDER BY r.id ASC;
+    #     """
+    #     cursor.execute(query)
+    #     rows = cursor.fetchall()
+    #     if rows is None:
+    #         raise HTTPException(status_code=404, detail="Restaurant not found")
         
-        if cursor.description is not None:
-            [desc[0] for desc in cursor.description]
+    #     if cursor.description is not None:
+    #         [desc[0] for desc in cursor.description]
         
-        restaurant_list = []
-        for row in rows:
-            restaurant_data: Restaurant = Restaurant(
-                id=row[0],
-                category=row[1],
-                name=row[2],
-                address=row[3],
-                contact_number=row[4],
-                rating=float(row[5]), # Convert Decimal to float for JSON serialization
-                is_favorite=row[6],
-                reviews=row[7] if row[7] else [] # Use the aggregated JSON for reviews
-            )
+    #     restaurant_list = []
+    #     for row in rows:
+    #         restaurant_data: Restaurant = Restaurant(
+    #             id=row[0],
+    #             category=row[1],
+    #             name=row[2],
+    #             address=row[3],
+    #             contact_number=row[4],
+    #             rating=float(row[5]), # Convert Decimal to float for JSON serialization
+    #             is_favorite=row[6],
+    #             reviews=row[7] if row[7] else [] # Use the aggregated JSON for reviews
+    #         )
 
-            restaurant_list.append(restaurant_data)
+    #         restaurant_list.append(restaurant_data)
 
-        return restaurant_list
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        cursor.close()
-        conn.close()
+    #     return restaurant_list
+    # except Exception as e:
+    #     raise HTTPException(status_code=500, detail=str(e))
+    # finally:
+    #     cursor.close()
+    #     conn.close()
 
 """ Returns the restaurant with the matching name """
 @app.get("/api/restaurants_by_name/{restaurant_name}", response_model=list[Restaurant])
