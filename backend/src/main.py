@@ -8,6 +8,7 @@ import os
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.exc import SQLAlchemyError
 from passlib.context import CryptContext
 
 from mock_data.mock_restaurants_db import DB
@@ -137,12 +138,18 @@ async def authenticate(db, credentials: UserCredentials):
 """ Creates a new restaurant """
 @app.post("/api/new_restaurant", response_model=Restaurant)
 async def create_restaurant(db: Session, restaurant_data):
+    try:
+        db_restaurant = Restaurant(**restaurant_data)
+        db.add(db_restaurant)
+        db.commit()
+        db.refresh(db_restaurant)
+        return db_restaurant
+    except SQLAlchemyError as e:
+        print("Error creating restaurant: ", e)
+        raise HTTPException(status_code=500, detail="Database transaction failed")
+    finally:
+        db.close()
     # conn = connect_to_database()
-    db_restaurant = Restaurant(**restaurant_data)
-    db.add(db_restaurant)
-    db.commit()
-    db.refresh(db_restaurant)
-    return db_restaurant
     # if not conn:
     #     raise HTTPException(status_code=500, detail="Could not connect to the database")
     # try:
@@ -164,13 +171,22 @@ async def create_restaurant(db: Session, restaurant_data):
 """ Creates a new restaurant in Mock Data """
 @app.post("/api/mock_restaurant", response_model=Restaurant)
 async def create_mock_restaurant(restaurant: Restaurant):
-    DB.append(restaurant)
-    return restaurant
+    try:
+        DB.append(restaurant)
+        return restaurant
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
         
 """ Returns the entire list of restaurants """
 @app.get("/api/restaurants", response_model=list[Restaurant])
-async def get_restaurants(db: Session = Depends(get_database_connection_string), skip: int = 0, limit: int = 100):
-    return db.query(Restaurant).offset(skip).limit(limit).all()
+async def get_restaurants(db: Session = Depends(get_database_connection_string), skip: int = 0, limit: int = 150):
+    try:
+        return db.query(Restaurant).offset(skip).limit(limit).all()
+    except SQLAlchemyError as e:
+        print("Error fetching restaurants: ", e)
+        raise HTTPException(status_code=500, detail="Database transaction failed")
+    finally:
+        db.close()
     # conn = connect_to_database()
     # if not conn:
     #     raise HTTPException(status_code=500, detail="Could not connect to the database")
@@ -237,7 +253,13 @@ async def get_restaurants(db: Session = Depends(get_database_connection_string),
 """ Returns the restaurant with the matching name """
 @app.get("/api/restaurants_by_name/{restaurant_name}", response_model=list[Restaurant])
 async def get_restaurants_by_name(db: Session, restaurant_name: str):
-    return db.query(Restaurant).filter(Restaurant.name.ilike(f"%{restaurant_name}%")).all()
+    try:
+        return db.query(Restaurant).filter(Restaurant.name.ilike(f"%{restaurant_name}%")).all()
+    except SQLAlchemyError as e:
+        print("Error fetching restaurants: ", e)
+        raise HTTPException(status_code=500, detail="Database transaction failed")  
+    finally:
+        db.close()
     # conn = connect_to_database()
     # if not conn:
     #     raise HTTPException(status_code=500, detail="Could not connect to the database")
@@ -312,7 +334,13 @@ async def get_restaurants_by_name(db: Session, restaurant_name: str):
 """ Returns the restaurant with the specified ID """
 @app.get("/api/restaurant/{id}", response_model=Restaurant)
 async def get_restaurant_by_id(db: Session, id: int):
-    return db.query(Restaurant).filter(Restaurant.id == id).first()
+    try:
+        return db.query(Restaurant).filter(Restaurant.id == id).first()
+    except SQLAlchemyError as e:
+        print("Error fetching restaurant: ", e)
+        raise HTTPException(status_code=500, detail="Database transaction failed")
+    finally:
+        db.close()
     # conn = connect_to_database()
     # if not conn:
     #     raise HTTPException(status_code=500, detail="Could not connect to the database")
@@ -408,12 +436,18 @@ async def get_recommended_restaurants():
 """ Updates the restaurant with the specified ID """
 @app.patch("/api/update_restaurant/{id}", response_model=Restaurant)
 async def update_restaurant(db: Session, id: int, updates):
-    db_restaurant = db.query(Restaurant).filter(Restaurant.id == id).first()
-    for key, value in updates.items():
-        setattr(db_restaurant, key, value)
-    db.commit()
-    db.refresh(db_restaurant)
-    return db_restaurant
+    try:
+        db_restaurant = db.query(Restaurant).filter(Restaurant.id == id).first()
+        for key, value in updates.items():
+            setattr(db_restaurant, key, value)
+        db.commit()
+        db.refresh(db_restaurant)
+        return db_restaurant
+    except SQLAlchemyError as e:
+        print("Error updating restaurant: ", e)
+        raise HTTPException(status_code=500, detail="Database transaction failed")
+    finally:
+        db.close()
     # conn = connect_to_database()
     # if not conn:
     #     raise HTTPException(status_code=500, detail="Could not connect to the database")
@@ -452,10 +486,16 @@ async def update_restaurant(db: Session, id: int, updates):
   # TODO: Consider and define business logic for deleting a restaurant in relation to reviews.
 @app.delete("/api/delete_restaurant/{id}")
 async def delete_restaurant(db: Session, id: int):
-    db_restaurant = db.query(Restaurant).filter(Restaurant.id == id).first()
-    db.delete(db_restaurant)
-    db.commit()
-    return {"message": "Restaurant deleted successfully"}
+    try:
+        db_restaurant = db.query(Restaurant).filter(Restaurant.id == id).first()
+        db.delete(db_restaurant)
+        db.commit()
+        return {"message": "Restaurant deleted successfully"}
+    except SQLAlchemyError as e:
+        print("Error deleting restaurant: ", e)
+        raise HTTPException(status_code=500, detail="Database transaction failed")
+    finally:
+        db.close()
     # conn = connect_to_database()
     # if not conn:
     #     raise HTTPException(status_code=500, detail="Could not connect to the database")
