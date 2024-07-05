@@ -236,77 +236,78 @@ async def get_restaurants(db: Session = Depends(get_database_connection_string),
 
 """ Returns the restaurant with the matching name """
 @app.get("/api/restaurants_by_name/{restaurant_name}", response_model=list[Restaurant])
-async def get_restaurants_by_name(restaurant_name: str):
-    conn = connect_to_database()
-    if not conn:
-        raise HTTPException(status_code=500, detail="Could not connect to the database")
-    try:
-        print("Connected to the database!")
-        cursor = conn.cursor()
-        query = """
-            SELECT 
-                r.id AS id,
-                r.category,
-                r.name AS name,
-                r.address,
-                r.contact_number,
-                r.rating AS rating,
-                r.is_favorite,
-                COALESCE(
-                    JSON_AGG(
-                        JSON_BUILD_OBJECT(
-                            'username', rv.username,
-                            'review', rv.review,
-                            'rating', rv.rating
-                        )
-                    ) FILTER (WHERE rv.username IS NOT NULL), '[]'
-                ) AS reviews
-            FROM 
-                restaurant_schema.restaurants r
-            LEFT JOIN 
-                restaurant_schema.reviews rv ON r.id = rv.restaurant_id
-            WHERE
-                LOWER(r.name) LIKE %(restaurant_name)s
-            GROUP BY
-                r.id, r.category, r.name, r.address, r.contact_number, r.rating, r.is_favorite
-            ORDER BY r.name ASC;
-        """
-        # Convert restaurant_name to lowercase for case-insensitive search
-        restaurant_name = restaurant_name.lower()
-        # Replace spaces with % for SQL wildcard search
-        restaurant_name = restaurant_name.replace(" ", "%")
-        cursor.execute(query, {"restaurant_name": f'%{restaurant_name}%'})
-        rows = cursor.fetchall()
-        if rows is None:
-            raise HTTPException(status_code=404, detail="Restaurant not found")
+async def get_restaurants_by_name(db: Session, restaurant_name: str):
+    return db.query(Restaurant).filter(Restaurant.name.ilike(f"%{restaurant_name}%")).all()
+    # conn = connect_to_database()
+    # if not conn:
+    #     raise HTTPException(status_code=500, detail="Could not connect to the database")
+    # try:
+    #     print("Connected to the database!")
+    #     cursor = conn.cursor()
+    #     query = """
+    #         SELECT 
+    #             r.id AS id,
+    #             r.category,
+    #             r.name AS name,
+    #             r.address,
+    #             r.contact_number,
+    #             r.rating AS rating,
+    #             r.is_favorite,
+    #             COALESCE(
+    #                 JSON_AGG(
+    #                     JSON_BUILD_OBJECT(
+    #                         'username', rv.username,
+    #                         'review', rv.review,
+    #                         'rating', rv.rating
+    #                     )
+    #                 ) FILTER (WHERE rv.username IS NOT NULL), '[]'
+    #             ) AS reviews
+    #         FROM 
+    #             restaurant_schema.restaurants r
+    #         LEFT JOIN 
+    #             restaurant_schema.reviews rv ON r.id = rv.restaurant_id
+    #         WHERE
+    #             LOWER(r.name) LIKE %(restaurant_name)s
+    #         GROUP BY
+    #             r.id, r.category, r.name, r.address, r.contact_number, r.rating, r.is_favorite
+    #         ORDER BY r.name ASC;
+    #     """
+    #     # Convert restaurant_name to lowercase for case-insensitive search
+    #     restaurant_name = restaurant_name.lower()
+    #     # Replace spaces with % for SQL wildcard search
+    #     restaurant_name = restaurant_name.replace(" ", "%")
+    #     cursor.execute(query, {"restaurant_name": f'%{restaurant_name}%'})
+    #     rows = cursor.fetchall()
+    #     if rows is None:
+    #         raise HTTPException(status_code=404, detail="Restaurant not found")
         
-        if cursor.description is not None:
-            [desc[0] for desc in cursor.description]
+    #     if cursor.description is not None:
+    #         [desc[0] for desc in cursor.description]
         
-        restaurant_list = []
-        for row in rows:
-            restaurant_data = Restaurant(
-                id= row[0],
-                category= row[1],
-                name= row[2],
-                address= row[3],
-                contact_number= row[4],
-                rating= float(row[5]), # Convert Decimal to float for JSON serialization
-                is_favorite= bool(row[6]), # Convert boolean to bool for JSON serialization
-                reviews= row[7] if row[7] else [] # Use the aggregated JSON for reviews
-            )
+    #     restaurant_list = []
+    #     for row in rows:
+    #         restaurant_data = Restaurant(
+    #             id= row[0],
+    #             category= row[1],
+    #             name= row[2],
+    #             address= row[3],
+    #             contact_number= row[4],
+    #             rating= float(row[5]), # Convert Decimal to float for JSON serialization
+    #             is_favorite= bool(row[6]), # Convert boolean to bool for JSON serialization
+    #             reviews= row[7] if row[7] else [] # Use the aggregated JSON for reviews
+    #         )
 
-            restaurant_list.append(restaurant_data)
+    #         restaurant_list.append(restaurant_data)
 
-        if restaurant_list == []:
-            raise HTTPException(status_code=500, detail="Restaurant not found")
+    #     if restaurant_list == []:
+    #         raise HTTPException(status_code=500, detail="Restaurant not found")
 
-        return restaurant_list
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        cursor.close()
-        conn.close()
+    #     return restaurant_list
+    # except Exception as e:
+    #     raise HTTPException(status_code=500, detail=str(e))
+    # finally:
+    #     cursor.close()
+    #     conn.close()
 
 """ Returns the restaurant with the specified ID """
 @app.get("/api/restaurant/{id}", response_model=Restaurant)
