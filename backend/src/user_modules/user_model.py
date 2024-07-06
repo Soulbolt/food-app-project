@@ -1,15 +1,14 @@
 from pydantic import BaseModel
 from restaurant_modules.restaurant import Restaurant, Review
 from sqlalchemy import Column, Integer, Float, String, Boolean, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, declarative_base
 
 Base = declarative_base()
 
 """ Pydantic model for User data and Favorites """
 class Favorite(Base):
     __tablename__ = 'favorites'
-    
+    id = Column(Integer, primary_key=True, index=True)
     category= Column(String)
     name= Column(String)
     address= Column(String)
@@ -23,60 +22,60 @@ class User(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String, unique=True, index=True)
-    hashed_password = Column(String)
-    username = Column(String, unique=True, index=True)
+    password = Column(String, nullable=False)
+    username = Column(String, unique=True, nullable=False, index=True)
     name = Column(String)
     favorites = Column(String)
 
-class UserCredentials(BaseModel):
-    username: str
-    password: str
+# class UserCredentials(BaseModel):
+#     username: str
+#     password: str
 
-class UserInDB(User):
-    hashed_password: str
-    class Config:
-        from_attributes = True
+# class UserInDB(User):
+#     hashed_password: str
+#     class Config:
+#         from_attributes = True
 
-class UserInResponse(BaseModel):
-    id: int
-    email: str
-    username: str
-    name: str
-    favorites: list[Favorite]
-    class Config:
-        from_attributes = True
+# class UserInResponse(BaseModel):
+#     id: int
+#     email: str
+#     username: str
+#     name: str
+#     favorites: list[Favorite]
+#     class Config:
+#         from_attributes = True
 
-class UserInResponseWithToken(UserInResponse):
-    access_token: str
-    token_type: str
-    class Config:
-        from_attributes = True
+# class UserInResponseWithToken(UserInResponse):
+#     access_token: str
+#     token_type: str
+#     class Config:
+#         from_attributes = True
 
-class CreateUser(BaseModel):
-    email: str
-    password: str
-    username: str
-    name: str
-    class Config:
-        from_attributes = True
+# class CreateUser(BaseModel):
+#     email: str
+#     password: str
+#     username: str
+#     name: str
+#     class Config:
+#         from_attributes = True
 
-class UpdateUser(BaseModel):
-    email: str
-    password: str
-    username: str
-    name: str
-    class Config:
-        from_attributes = True
+# class UpdateUser(BaseModel):
+#     email: str
+#     password: str
+#     username: str
+#     name: str
+#     class Config:
+#         from_attributes = True
 
-class UpdateUserPassword(BaseModel):
-    password: str
-    class Config:
-        from_attributes = True
+# class UpdateUserPassword(BaseModel):
+#     password: str
+#     class Config:
+#         from_attributes = True
 
-class UpdateUserFavorites(BaseModel):
-    favorites: list[Favorite]
-    class Config:
-        from_attributes = True
+# class UpdateUserFavorites(BaseModel):
+#     favorites: list[Favorite]
+#     class Config:
+#         from_attributes = True
 
 # Compare this snippet from backend/src/user_modules/user_service.py:
 # from fastapi import HTTPException, status
