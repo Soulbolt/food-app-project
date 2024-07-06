@@ -1,4 +1,4 @@
-from restaurant_modules.restaurant import Restaurant
+from restaurant_modules.restaurant import Restaurant, Review
 
 # Mock database in json format
 # class DB:
@@ -6,8 +6,9 @@ from restaurant_modules.restaurant import Restaurant
 #         self.DB = self.generate_mock_db()
 
 #     f generate_mock_db(self):
-DB: list[Restaurant] = [
-    Restaurant(**restaurant) for restaurant in [
+DB: list[Restaurant] = []
+
+mock_data =[
         {
             "id": 1,
             "category": "Italian",
@@ -114,6 +115,12 @@ DB: list[Restaurant] = [
         
         ]
     }
-        ]
 ]
+
+for restaurant in mock_data:
+    reviews = restaurant.pop("reviews") # Remove reviews from the restaurant dictionary
+    restaurant_obj = Restaurant(**restaurant) # Create a Restaurant object
+    review_objs = [Review(**review, restaurant_id=restaurant_obj.id) for review in reviews] # Create a list of Review objects
+    restaurant_obj.reviews = review_objs # Assign the list of Review objects to the restaurant's reviews attribute
+    DB.append(restaurant_obj) # Add the restaurant object to the database
     
