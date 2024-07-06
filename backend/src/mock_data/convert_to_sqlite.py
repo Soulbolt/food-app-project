@@ -4,10 +4,12 @@ import sqlite3
 DB = [
     {
         "id": 1,
+        "category": "American",
         "name": "The Gourmet Kitchen",
         "address": "123 Maple Street, Springfield, IL 62704",
         "contact_number": "(217) 555-1234",
         "rating": 4.5,
+        "is_favorite": "True",
         "reviews": [
             {
                 "username": "foodie123",
@@ -23,10 +25,12 @@ DB = [
     },
     {
         "id": 2,
+        "category": "Italian",
         "name": "Pizza Paradise",
         "address": "456 Elm Avenue, Springfield, IL 62705",
         "contact_number": "(217) 555-5678",
         "rating": 4.7,
+        "is_favorite": "True",
         "reviews": [
             {
                 "username": "sarahjones",
@@ -42,10 +46,12 @@ DB = [
     },
     {
         "id": 3,
+        "category": "Thai",
         "name": "Thai Curry House",
         "address": "789 Oak Road, Springfield, IL 62706",
         "contact_number": "(217) 555-9012",
         "rating": 4.3,
+        "is_favorite": "False",
         "reviews": [
             {
                 "username": "thaichef",
@@ -61,10 +67,12 @@ DB = [
     },
     {
         "id": 4,
+        "category": "Indian",
         "name": "Curry House",
         "address": "101 Pine Lane, Springfield, IL 62707",
         "contact_number": "(217) 555-3456",
         "rating": 4.6,
+        "is_favorite": "True",
         "reviews": [
             {
                 "username": "spicylover",
@@ -80,10 +88,12 @@ DB = [
     },
     {
         "id": 5,
+        "category": "American",
         "name": "Burger Barn",
         "address": "202 Birch Road, Springfield, IL 62708",
         "contact_number": "(217) 555-7890",
         "rating": 4.2,
+        "is_favorite": "True",
         "reviews": [
             {
                 "username": "burgerking",
@@ -107,10 +117,12 @@ cursor = conn.cursor()
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS restaurants (
     id INTEGER PRIMARY KEY,
+    category TEXT NOT NULL,
     name TEXT NOT NULL,
     address TEXT NOT NULL,
     contact_number TEXT NOT NULL,
-    rating REAL NOT NULL
+    rating REAL NOT NULL,
+    is_favorite BOOLEAN NOT NULL DEFAULT FALSE
 )
 ''')
 
@@ -128,9 +140,9 @@ CREATE TABLE IF NOT EXISTS reviews (
 # Insert data into restaurants table
 for restaurant in DB:
     cursor.execute('''
-    INSERT INTO restaurants (id, name, address, contact_number, rating)
-    VALUES (?, ?, ?, ?, ?)
-    ''', (restaurant['id'], restaurant['name'], restaurant['address'], restaurant['contact_number'], restaurant['rating']))
+    INSERT INTO restaurants (id, category, name, address, contact_number, rating, is_favorite)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+    ''', (restaurant['id'], restaurant["category"], restaurant['name'], restaurant['address'], restaurant['contact_number'], restaurant['rating'], restaurant['is_favorite']))
 
     # Insert data into reviews table
     for review in restaurant['reviews']:
