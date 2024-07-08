@@ -50,3 +50,15 @@ class RestaurantModel(BaseModel):
 
     model_config = {}
     model_config['from_attributes'] = True
+
+class RestaurantCreate(BaseModel):
+    category: str
+    name: str
+    address: str
+    contact_number: str
+    rating: float
+    is_favorite: bool
+    reviews: list[ReviewModel] = []
+
+    model_config = {}
+    model_config['from_attributes'] = True
