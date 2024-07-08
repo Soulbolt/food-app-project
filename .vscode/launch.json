@@ -1,0 +1,22 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Uvicorn",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "uvicorn",
+            "args": [
+                "main:app",
+                "--reload",
+                "--port", "8001"
+            ],
+            "python": "${workspaceFolder}/.venv/bin/python", // Adjust this path to match your Python interpreter location
+            "cwd": "${workspaceFolder}/backend/src", // Set the working directory to your project root
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}" // This can help with module resolution
+            },
+            "console": "integratedTerminal"
+        }
+    ]
+}

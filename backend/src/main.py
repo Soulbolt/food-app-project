@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Optional, Any
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -7,23 +7,24 @@ import psycopg2
 import os
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import sessionmaker, Session, joinedload
 from sqlalchemy.exc import SQLAlchemyError
-from passlib.context import CryptContext
+import bcrypt
 
 from mock_data.mock_restaurants_db import DB
-from restaurant_modules.restaurant import Restaurant, Review
-from user_modules.user_model import UserCredentials, User, Base
+from restaurant_modules.restaurant import Restaurant, RestaurantModel, ReviewModel
+from user_modules.user_model import User, Base
 from mock_data.mock_users_db import USER_DB
+import logging
 
 # Load environment variables
 load_dotenv()
 
 # Passlib context for hashing passwords
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = bcrypt.hashpw
 
-DATABASE_URL = os.getenv("DATABASE_URL")
-
+DATABASE_URL = os.getenv("TEST_DATABASE_URL")
+logging.info("DATABASE_URL: ", DATABASE_URL)
 # Create a database engine
 if DATABASE_URL:
     engine = create_engine(DATABASE_URL)
@@ -56,35 +57,46 @@ app.add_middleware(
 )
 
 # Database configuration
-db_config = {
-    'host': os.getenv('DB_HOST'),
-    'dbname': os.getenv('DB_NAME'),
-    'user': os.getenv('DB_USER'),
-    'password': os.getenv('DB_PASSWORD'),
-    'port': os.getenv('DB_PORT'),
-}
+# db_config = {
+#     'host': os.getenv('DB_HOST'),
+#     'dbname': os.getenv('DB_NAME'),
+#     'user': os.getenv('DB_USER'),
+#     'password': os.getenv('DB_PASSWORD'),
+#     'port': os.getenv('DB_PORT'),
+# }
 
 def get_database_connection_string():
+    print("inside get_database_connection_string: ")
     # Check if we are in a testing environment
     if os.getenv("ENV") == 'test':
-        return os.getenv('TEST_DATABASE_URL')
+        database_url = os.getenv('TEST_DATABASE_URL')
     else:
-        return os.getenv('DATABASE_URL')
+        database_url = os.getenv('DATABASE_URL')
+    
+    if database_url and "5432" in database_url:
+        database_url = database_url.replace(":5432", ":5433")
+
+    return database_url
 
 def connect_to_database():
     database_url = get_database_connection_string()
     try:
-        if database_url and database_url.startswith("postgres://"):
-            print("Connecting to the PostgreSQL database...")
-            # Establish connection
-            conn = psycopg2.connect(
-                host=db_config['host'],
-                dbname=db_config['dbname'],
-                user=db_config['user'],
-                password=db_config['password'],
-                port=db_config['port']
-            )
+        if database_url:
+            print(f"Connecting to the database at {database_url}...")
+            engine = create_engine(database_url)
+            conn = engine.connect()
             return conn
+        # if database_url and database_url.startswith("postgres://"):
+        #     print("Connecting to the PostgreSQL database...")
+            # Establish connection
+            # conn = psycopg2.connect(
+            #     host=db_config['host'],
+            #     dbname=db_config['dbname'],
+            #     user=db_config['user'],
+            #     password=db_config['password'],
+            #     port=db_config['port']
+            # )
+            # return conn
         elif database_url and database_url.startswith("sqlite://"):
             # Establish connection
             print("Connecting to the SQLite database...")
@@ -106,29 +118,40 @@ def get_password_hash(password):
 #* ----------- User CRUD REST APIs and Authentication ------------###
 """ create new User """
 # TODO: Create REST API to create new user.
-async def create_user(db: Session, user_data):
-    db_user = User(username=user_data.username, email=user_data.email, hashed_password=user_data.hashed_password)
+def create_user(user_data, db: Session = Depends(get_db)):
+    db_user = User(username=user_data.username, email=user_data.email, hashed_password=user_data.password)
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
     return db_user
 
 """ Authenticate Existing User """
-async def authenticate_user(db, username: str, password: str):
+@app.post("/api/authenticate/")
+def authenticate_user(username: str, password: str, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.username == username).first()
     if not user:
         return False
-    if not verify_password(password, user.hashed_password):
+    if not verify_password(password, user.password):
         return False
     return user
 
-@app.post("/api/authenticate/")
-async def authenticate(db, credentials: UserCredentials):
-    user = authenticate_user(db, credentials.username, credentials.password)
-    if user:
-        return {"message": "Authentication successful!", "user": user}
-    else:
-        raise HTTPException(status_code=401, detail="Invalid username or password")
+
+# @app.post("/api/authenticate/")
+# async def authenticate(db, credentials: UserCredentials):
+#     user = authenticate_user(db, credentials.username, credentials.password)
+#     if user:
+#         return {"message": "Authentication successful!", "user": user}
+#     else:
+#         raise HTTPException(status_code=401, detail="Invalid username or password")
+    
+    
+# @app.post("/api/authenticate/")
+# async def authenticate(db, credentials: UserCredentials):
+    # user = authenticate_user(db, credentials.username, credentials.password)
+    # if user:
+    #     return {"message": "Authentication successful!", "user": user}
+    # else:
+    #     raise HTTPException(status_code=401, detail="Invalid username or password")
     
 """ Update Existing User """
 # TODO: Create REST API to edit an existing users properties/settings.
@@ -136,14 +159,14 @@ async def authenticate(db, credentials: UserCredentials):
 #* ------------- Restaurant CRUD REST APIs ---------------------- ###
 
 """ Creates a new restaurant """
-@app.post("/api/new_restaurant", response_model=Restaurant)
-async def create_restaurant(db: Session, restaurant_data):
+@app.post("/api/new_restaurant", response_model=RestaurantModel)
+def create_restaurant(restaurant_data, db: Session = Depends(get_db)):
     try:
         db_restaurant = Restaurant(**restaurant_data)
         db.add(db_restaurant)
         db.commit()
         db.refresh(db_restaurant)
-        return db_restaurant
+        return RestaurantModel.model_validate(db_restaurant)
     except SQLAlchemyError as e:
         print("Error creating restaurant: ", e)
         raise HTTPException(status_code=500, detail="Database transaction failed")
@@ -169,95 +192,45 @@ async def create_restaurant(db: Session, restaurant_data):
     #     conn.close()
 
 """ Creates a new restaurant in Mock Data """
-@app.post("/api/mock_restaurant", response_model=Restaurant)
-async def create_mock_restaurant(restaurant: Restaurant):
-    try:
-        DB.append(restaurant)
-        return restaurant
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+# @app.post("/api/mock_restaurant", response_model=RestaurantModel)
+# async def create_mock_restaurant(restaurant: Restaurant):
+#     try:
+#         DB.append(restaurant)
+#         return RestaurantModel.from_orm(restaurant)
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=str(e))
         
-""" Returns the entire list of restaurants """
-@app.get("/api/restaurants", response_model=list[Restaurant])
-async def get_restaurants(db: Session = Depends(get_database_connection_string), skip: int = 0, limit: int = 150):
+""" Returns the entire list of restaurants or return restaurants based on the local_kw query parameter"""
+@app.get("/api/restaurants/", response_model=list[RestaurantModel])
+def get_restaurants(name: Optional[str] = None, skip: int = 0, limit: int = 150, db: Session = Depends(get_db)):
+    logging.info(f"Querying restaurants with name: {name}, skip: {skip}, limit: {limit}")
+    query = db.query(Restaurant)
     try:
-        return db.query(Restaurant).offset(skip).limit(limit).all()
+        if name:
+            query = query.filter(Restaurant.name.ilike(f"%{name}%"))
+        restaurants = query.offset(skip).limit(limit).all()
+        if restaurants:
+            return [RestaurantModel.model_validate(restaurant) for restaurant in restaurants]
+        else:
+            raise HTTPException(status_code=404, detail="Restaurant not found")
     except SQLAlchemyError as e:
         print("Error fetching restaurants: ", e)
-        raise HTTPException(status_code=500, detail="Database transaction failed")
+        raise HTTPException(status_code=500, detail="Restaurant not found")
     finally:
         db.close()
-    # conn = connect_to_database()
-    # if not conn:
-    #     raise HTTPException(status_code=500, detail="Could not connect to the database")
-    
-    # try:
-    #     print("Connected to the database!")
-    #     cursor = conn.cursor()
-    #     query = """
-    #         SELECT 
-    #             r.id AS id,
-    #             r.category,
-    #             r.name AS name,
-    #             r.address,
-    #             r.contact_number,
-    #             r.rating AS rating,
-    #             r.is_favorite,
-    #             COALESCE(
-    #                 JSON_AGG(
-    #                     JSON_BUILD_OBJECT(
-    #                         'username', rv.username,
-    #                         'review', rv.review,
-    #                         'rating', rv.rating
-    #                     )
-    #                 ) FILTER (WHERE rv.username IS NOT NULL), '[]'
-    #             ) AS reviews
-    #         FROM 
-    #             restaurant_schema.restaurants r
-    #         LEFT JOIN 
-    #             restaurant_schema.reviews rv ON r.id = rv.restaurant_id
-    #         GROUP BY
-    #              r.id, r.category, r.name, r.address, r.contact_number, r.rating, r.is_favorite
-    #         ORDER BY r.id ASC;
-    #     """
-    #     cursor.execute(query)
-    #     rows = cursor.fetchall()
-    #     if rows is None:
-    #         raise HTTPException(status_code=404, detail="Restaurant not found")
-        
-    #     if cursor.description is not None:
-    #         [desc[0] for desc in cursor.description]
-        
-    #     restaurant_list = []
-    #     for row in rows:
-    #         restaurant_data: Restaurant = Restaurant(
-    #             id=row[0],
-    #             category=row[1],
-    #             name=row[2],
-    #             address=row[3],
-    #             contact_number=row[4],
-    #             rating=float(row[5]), # Convert Decimal to float for JSON serialization
-    #             is_favorite=row[6],
-    #             reviews=row[7] if row[7] else [] # Use the aggregated JSON for reviews
-    #         )
-
-    #         restaurant_list.append(restaurant_data)
-
-    #     return restaurant_list
-    # except Exception as e:
-    #     raise HTTPException(status_code=500, detail=str(e))
-    # finally:
-    #     cursor.close()
-    #     conn.close()
 
 """ Returns the restaurant with the matching name """
-@app.get("/api/restaurants_by_name/{restaurant_name}", response_model=list[Restaurant])
-async def get_restaurants_by_name(db: Session, restaurant_name: str):
+@app.get("/api/restaurants_by_name/{name}", response_model=list[RestaurantModel])
+def get_restaurants_by_name(name: str, db: Session = Depends(get_db)):
     try:
-        return db.query(Restaurant).filter(Restaurant.name.ilike(f"%{restaurant_name}%")).all()
+        restaurants = db.query(Restaurant).filter(Restaurant.name.ilike(f"%{name}%")).all()
+        if restaurants:
+            return [RestaurantModel.model_validate(restaurant) for restaurant in restaurants]
+        else:
+            raise HTTPException(status_code=404, detail="Restaurant not found")
     except SQLAlchemyError as e:
         print("Error fetching restaurants: ", e)
-        raise HTTPException(status_code=500, detail="Database transaction failed")  
+        raise HTTPException(status_code=500, detail="Error fetching restaurants")  
     finally:
         db.close()
     # conn = connect_to_database()
@@ -332,13 +305,16 @@ async def get_restaurants_by_name(db: Session, restaurant_name: str):
     #     conn.close()
 
 """ Returns the restaurant with the specified ID """
-@app.get("/api/restaurant/{id}", response_model=Restaurant)
-async def get_restaurant_by_id(db: Session, id: int):
+@app.get("/api/restaurant/{id}", response_model=RestaurantModel)
+def get_restaurant_by_id(id: int, db: Session=(Depends(get_db)) ):
+    restaurant = db.query(Restaurant).filter(Restaurant.id == id).first()
     try:
-        return db.query(Restaurant).filter(Restaurant.id == id).first()
+        if restaurant is None:
+            raise HTTPException(status_code=404, detail="Restaurant not found")
+        return RestaurantModel.model_validate(restaurant)
     except SQLAlchemyError as e:
         print("Error fetching restaurant: ", e)
-        raise HTTPException(status_code=500, detail="Database transaction failed")
+        raise HTTPException(status_code=500, detail="list index out of range")
     finally:
         db.close()
     # conn = connect_to_database()
@@ -370,7 +346,7 @@ async def get_restaurant_by_id(db: Session, id: int):
     #     if rows is None:
     #         raise HTTPException(status_code=404, detail="Restaurant not found")
         
-    #     if cursor.description is not None:
+    #     if cursor.description is not, None:
     #         [desc[0] for desc in cursor.description]
         
     #     restaurant_data = Restaurant(
@@ -402,7 +378,7 @@ async def get_restaurant_by_id(db: Session, id: int):
 
 """ Returns the recommended list of restaurants """
 @app.get("/api/restaurants/recommended", response_model=list[dict[str, Any]])
-async def get_recommended_restaurants():
+def get_recommended_restaurants():
     restaurant_list = [
         {
             "id": restaurant.id,
@@ -434,15 +410,15 @@ async def get_recommended_restaurants():
 #     return DB
 
 """ Updates the restaurant with the specified ID """
-@app.patch("/api/update_restaurant/{id}", response_model=Restaurant)
-async def update_restaurant(db: Session, id: int, updates):
+@app.patch("/api/update_restaurant/{id}", response_model=RestaurantModel)
+def update_restaurant(id: int, updates, db: Session = Depends(get_db)):
     try:
         db_restaurant = db.query(Restaurant).filter(Restaurant.id == id).first()
         for key, value in updates.items():
             setattr(db_restaurant, key, value)
         db.commit()
         db.refresh(db_restaurant)
-        return db_restaurant
+        return RestaurantModel.model_validate(db_restaurant)
     except SQLAlchemyError as e:
         print("Error updating restaurant: ", e)
         raise HTTPException(status_code=500, detail="Database transaction failed")
@@ -483,9 +459,9 @@ async def update_restaurant(db: Session, id: int, updates):
     #     conn.close()
 
 """ Deletes the restaurant with the specified ID """
-  # TODO: Consider and define business logic for deleting a restaurant in relation to reviews.
+# TODO: Consider and define business logic for deleting a restaurant in relation to reviews.
 @app.delete("/api/delete_restaurant/{id}")
-async def delete_restaurant(db: Session, id: int):
+def delete_restaurant(id: int, db: Session = Depends(get_db)):
     try:
         db_restaurant = db.query(Restaurant).filter(Restaurant.id == id).first()
         db.delete(db_restaurant)
