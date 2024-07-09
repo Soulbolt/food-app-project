@@ -1,20 +1,20 @@
-from typing import Optional, Any
+from typing import Any, Optional
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import sqlite3
-import psycopg2
+import sys
 import os
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, Session, joinedload
+from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.exc import SQLAlchemyError
 import bcrypt
 
 from restaurant_modules.restaurant import Restaurant, RestaurantModel, ReviewModel, RestaurantCreate
 from user_modules.user_model import User, Base
 from mock_data.mock_users_db import USER_DB
-from mock_data.mock_restaurants_db import DB
+from mock_data.mock_restaurants_db import get_mock_data
 import logging
 
 # Load environment variables
@@ -40,6 +40,13 @@ def get_db():
     db = SessionLocal()
     try:
         yield db
+    finally:
+        db.close()
+
+def get_db2():
+    db = SessionLocal()
+    try:
+        return db
     finally:
         db.close()
 
@@ -153,7 +160,7 @@ def create_restaurant(restaurant_data: RestaurantCreate, db: Session = Depends(g
     finally:
         db.close()
         
-""" Returns the entire list of restaurants or return restaurants based on the local_kw query parameter"""
+""" Returns the entire list of restaurants or return restaurants based on name parameter """
 @app.get("/api/restaurants/{name}", response_model=list[RestaurantModel])
 def get_restaurants(name: Optional[str] = None, skip: int = 0, limit: int = 150, db: Session = Depends(get_db)):
     logging.info(f"Querying restaurants with name: {name}, skip: {skip}, limit: {limit}")
@@ -203,25 +210,14 @@ def get_restaurant_by_id(id: int, db: Session=(Depends(get_db)) ):
 
 """ Returns the recommended list of restaurants """
 @app.get("/api/restaurants/recommended", response_model=list[RestaurantModel])
-def get_recommended_restaurants():
-    # Verify that the mock database is not empty
-    if not DB:
-        raise HTTPException(status_code=404, detail="No restaurants found")
+def get_recommended_restaurants(db: Session = Depends(get_db2), skip: int = 0, limit: int = 150):
+    try:
+        recommended_restaurants = get_mock_data()
+        return [RestaurantModel.model_validate(restaurant) for restaurant in recommended_restaurants]
+    except SQLAlchemyError as e:
+        print("Error fetching recommended restaurants: ", e)
+        raise HTTPException(status_code=500, detail="Database transaction failed")
     
-    restaurant_list = [
-        {
-            "id": restaurant.id,
-            "category": restaurant.category,
-            "name": restaurant.name,
-            "address": restaurant.address,
-            "contact_number": restaurant.contact_number,
-            "rating": restaurant.rating,
-            "is_favorite": restaurant.is_favorite,
-            "reviews": restaurant.reviews
-        }
-        for restaurant in DB
-    ]
-    return restaurant_list
 
 """ Updates the restaurant with the specified ID """
 @app.patch("/api/update_restaurant/{id}", response_model=RestaurantModel)
