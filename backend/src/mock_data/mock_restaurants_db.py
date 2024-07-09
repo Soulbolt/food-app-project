@@ -1,4 +1,8 @@
-from restaurant_modules.restaurant import Restaurant, Review
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), "../../src/restaurant_modules"))
+from restaurant import Restaurant, Review 
+import sqlite3
 
 # Mock database in json format
 # class DB:
@@ -8,7 +12,8 @@ from restaurant_modules.restaurant import Restaurant, Review
 #     f generate_mock_db(self):
 DB: list[Restaurant] = []
 
-mock_data =[
+def get_mock_data():
+    return [
         {
             "id": 1,
             "category": "Italian",
@@ -116,11 +121,50 @@ mock_data =[
         ]
     }
 ]
+def create_restaurants_table():
+    conn = sqlite3.connect('rcmd_restaurants.db')
+    c = conn.cursor()
+    c.execute('''CREATE TABLE IF NOT EXISTS restaurants
+                 (id INTEGER PRIMARY KEY,
+                 category TEXT,
+                 name TEXT,
+                 address TEXT,
+                 contact_number TEXT,
+                 rating REAL,
+                 is_favorite INTEGER)''')
+    conn.commit()
+    conn.close()
 
-for restaurant in mock_data:
-    reviews = restaurant.pop("reviews") # Remove reviews from the restaurant dictionary
-    restaurant_obj = Restaurant(**restaurant) # Create a Restaurant object
-    review_objs = [Review(**review, restaurant_id=restaurant_obj.id) for review in reviews] # Create a list of Review objects
-    restaurant_obj.reviews = review_objs # Assign the list of Review objects to the restaurant's reviews attribute
-    DB.append(restaurant_obj) # Add the restaurant object to the database
-    
+def create_reviews_table():
+    conn = sqlite3.connect('rcmd_restaurants.db')
+    c = conn.cursor()
+    c.execute('''CREATE TABLE IF NOT EXISTS reviews
+                 (id INTEGER PRIMARY KEY,
+                 username TEXT,
+                 review TEXT,
+                 rating INTEGER,
+                 restaurant_id INTEGER,
+                 FOREIGN KEY (restaurant_id) REFERENCES restaurants (id))''')
+    conn.commit()
+    conn.close()
+
+def populate_db():
+    conn = sqlite3.connect('rcmd_restaurants.db')
+    c = conn.cursor()
+    for restaurant in get_mock_data():
+        reviews = restaurant.pop("reviews")
+        c.execute('''INSERT INTO restaurants (category, name, address, contact_number, rating, is_favorite)
+                     VALUES (?, ?, ?, ?, ?, ?)''',
+                  (restaurant["category"], restaurant["name"], restaurant["address"], restaurant["contact_number"],
+                   restaurant["rating"], restaurant["is_favorite"]))
+        restaurant_id = c.lastrowid
+        for review in reviews:
+            c.execute('''INSERT INTO reviews (username, review, rating, restaurant_id)
+                         VALUES (?, ?, ?, ?)''',
+                      (review["username"], review["review"], review["rating"], restaurant_id))
+    conn.commit()
+    conn.close()
+
+create_restaurants_table()
+create_reviews_table()
+populate_db()
