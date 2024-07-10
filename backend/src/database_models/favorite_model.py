@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, Float, Boolean
 from database_models.base import Base
 
-""" SQLAlchemy model for Favorites """
+""" SQLAlchemy Favorite Model for Favorite Data """
 class Favorite(Base):
     __tablename__ = 'favorites'
     id = Column(Integer, primary_key=True, index=True)

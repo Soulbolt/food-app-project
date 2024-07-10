@@ -5,11 +5,15 @@ from fastapi.responses import JSONResponse
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session, declarative_base
 from sqlalchemy.exc import SQLAlchemyError
-from database_models.restaurant_model import Restaurant, RestaurantModel, ReviewModel, RestaurantCreate, Settings
-from database_models.user_model import User, UserCredentials, UserCreateModel
-from mock_data.mock_users_db import USER_DB
+from database_models.base_settings import Settings
+from database_models.restaurant_model import Restaurant
+from database_models.user_model import User
 import logging
 import bcrypt
+
+from pydantic_models.restaurant_create_and_update_schema import RestaurantCreate
+from pydantic_models.restaurant_schema import RestaurantModel
+from pydantic_models.user_schema import UserCreateModel, UserCredentials
 
 settings = Settings()
 # Passlib context for hashing passwords
