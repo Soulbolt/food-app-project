@@ -1,11 +1,11 @@
 from pydantic import BaseModel
-from restaurant_modules.restaurant import Restaurant, Review
+from database_models.restaurant_model import Restaurant, Review
 from sqlalchemy import Column, Integer, Float, String, Boolean, ForeignKey
 from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
 
-""" Pydantic model for User data and Favorites """
+""" SQLAlchemy model for User data and Favorites """
 class Favorite(Base):
     __tablename__ = 'favorites'
     id = Column(Integer, primary_key=True, index=True)
@@ -26,6 +26,23 @@ class User(Base):
     username = Column(String, unique=True, nullable=False, index=True)
     name = Column(String)
     favorites = Column(String)
+
+""" Pydantic models for User data and Favorites """
+class FavoriteModel(BaseModel):
+    category: str
+    name: str
+    address: str
+    contact_number: str
+    rating: float
+    is_favorite: bool
+    reviews: list[Review]
+
+class UserCreateModel(BaseModel):
+    email: str
+    password: str
+    username: str
+    name: str
+    favorites: list[FavoriteModel]
 
 class UserCredentials(BaseModel):
     username: str

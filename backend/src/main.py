@@ -5,8 +5,8 @@ from fastapi.responses import JSONResponse
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session, declarative_base
 from sqlalchemy.exc import SQLAlchemyError
-from restaurant_modules.restaurant import Restaurant, RestaurantModel, ReviewModel, RestaurantCreate, Settings
-from user_modules.user_model import User, UserCredentials
+from database_models.restaurant_model import Restaurant, RestaurantModel, ReviewModel, RestaurantCreate, Settings
+from database_models.user_model import User, UserCredentials, UserCreateModel
 from mock_data.mock_users_db import USER_DB
 import logging
 import bcrypt
@@ -71,7 +71,8 @@ def get_password_hash(password):
 #* ----------- User CRUD REST APIs and Authentication ------------###
 """ create new User """
 # TODO: Create REST API to create new user.
-def create_user(user_data, db: Session = Depends(get_db)):
+@app.post("/api/new_user")
+def create_user(user_data: UserCreateModel, db: Session = Depends(get_db)):
     db_user = User(username=user_data.username, email=user_data.email, hashed_password=user_data.password)
     db.add(db_user)
     db.commit()
@@ -87,7 +88,6 @@ def authenticate_user(username: str, password: str, db: Session = Depends(get_db
     if not verify_password(password, user.password):
         return False
     return user
-
 
 @app.post("/api/authenticate/")
 def authenticate(credentials: UserCredentials):

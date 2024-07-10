@@ -1,5 +1,5 @@
-from user_modules.user_model import User, Favorite
-from restaurant_modules.restaurant import Review
+from database_models.user_model import User, Favorite
+from database_models.restaurant_model import Review
 
 USER_DB: list[User] = [
     User(
