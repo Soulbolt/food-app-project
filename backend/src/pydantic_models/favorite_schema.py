@@ -1,0 +1,3 @@
+
+
+""" FavoriteModel goes here. """
