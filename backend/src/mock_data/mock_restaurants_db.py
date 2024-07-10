@@ -165,6 +165,6 @@ def populate_db():
     conn.commit()
     conn.close()
 
-create_restaurants_table()
-create_reviews_table()
-populate_db()
+# create_restaurants_table()
+# create_reviews_table()
+# populate_db()
