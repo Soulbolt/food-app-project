@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from restaurant_modules.restaurant import Restaurant, Review
 from sqlalchemy import Column, Integer, Float, String, Boolean, ForeignKey
-from sqlalchemy.orm import relationship, declarative_base
+from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
 
@@ -27,9 +27,9 @@ class User(Base):
     name = Column(String)
     favorites = Column(String)
 
-# class UserCredentials(BaseModel):
-#     username: str
-#     password: str
+class UserCredentials(BaseModel):
+    username: str
+    password: str
 
 # class UserInDB(User):
 #     hashed_password: str
