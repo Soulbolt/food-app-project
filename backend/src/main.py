@@ -6,7 +6,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session, declarative_base
 from sqlalchemy.exc import SQLAlchemyError
 from restaurant_modules.restaurant import Restaurant, RestaurantModel, ReviewModel, RestaurantCreate, Settings
-from user_modules.user_model import User
+from user_modules.user_model import User, UserCredentials
 from mock_data.mock_users_db import USER_DB
 import logging
 import bcrypt
@@ -79,7 +79,7 @@ def create_user(user_data, db: Session = Depends(get_db)):
     return db_user
 
 """ Authenticate Existing User """
-@app.post("/api/authenticate/")
+# @app.post("/api/authenticate/")
 def authenticate_user(username: str, password: str, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.username == username).first()
     if not user:
@@ -89,22 +89,13 @@ def authenticate_user(username: str, password: str, db: Session = Depends(get_db
     return user
 
 
-# @app.post("/api/authenticate/")
-# async def authenticate(db, credentials: UserCredentials):
-#     user = authenticate_user(db, credentials.username, credentials.password)
-#     if user:
-#         return {"message": "Authentication successful!", "user": user}
-#     else:
-#         raise HTTPException(status_code=401, detail="Invalid username or password")
-    
-    
-# @app.post("/api/authenticate/")
-# async def authenticate(db, credentials: UserCredentials):
-    # user = authenticate_user(db, credentials.username, credentials.password)
-    # if user:
-    #     return {"message": "Authentication successful!", "user": user}
-    # else:
-    #     raise HTTPException(status_code=401, detail="Invalid username or password")
+@app.post("/api/authenticate/")
+def authenticate(credentials: UserCredentials):
+    user = authenticate_user( credentials.username, credentials.password)
+    if user:
+        return {"message": "Authentication successful!", "user": user}
+    else:
+        raise HTTPException(status_code=401, detail="Invalid username or password")
     
 """ Update Existing User """
 # TODO: Create REST API to edit an existing users properties/settings.
