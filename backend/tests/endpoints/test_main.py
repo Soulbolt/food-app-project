@@ -4,21 +4,18 @@ import os
 import sys
 
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, close_all_sessions, declarative_base
+from sqlalchemy.orm import sessionmaker
 
 # Add the parent directory to the sys.path
 sys.path.append(os.path.join(os.path.dirname(__file__), "../../src"))
-from main import SessionLocal, app, get_db
-from user_modules.user_model import Base
-from httpx import AsyncClient
+from main import app, get_db
 from dotenv import load_dotenv
 
 load_dotenv()
 
 # Define the test database URL
-test_database_url = os.getenv("TEST_DATABASE_URL")
+test_database_url = os.getenv("DATABASE_URL")
 
-# test_database_url = "sqlite:///./restaurants.db"
 
 # Create a test database
 if test_database_url is not None:
@@ -28,15 +25,6 @@ else:
     raise ValueError("Test database URL is not defined.")
 
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-@pytest.fixture(scope="module")
-def test_db():
-    # Create the test database and the test tables
-    Base.metadata.create_all(bind=engine)
-    yield
-    # Teardown: drop the test tables and the test database
-    # Base.metadata.drop_all(bind=engine)
-    close_all_sessions()
 
 # Define the override_get_db function
 def override_get_db():
@@ -76,7 +64,7 @@ def test_create_restaurant(client):
     assert response.json() == {"message": "Restaurant created successfully!"}
 
     # Verify that the restaurant was added to the database
-    response = client.get(f"/api/restaurants/{new_restaurant['name']}")
+    response = client.get(f"/api/restaurants_by_name/{new_restaurant['name']}")
     print("data: ", response.json()) # Print the response for debugging
     assert response.status_code == 200
     assert new_restaurant["name"] in [r["name"] for r in response.json()]
@@ -84,22 +72,17 @@ def test_create_restaurant(client):
 
 # Test the get_restaurants endpoint with status code 200
 def test_get_all_restaurants(client):
-    names = "pizza"
+    names = ""
     response = client.get(f"/api/restaurants/{names}")
     
-    # Check if the reponse is JSON before attempting to parse it
-    # if 'application/json' in response.headers.get('content-type', ''):
     data = response.json()
     print("get all response: ", data) # Print the response for debugging
     assert response.status_code == 200
     assert len(data) > 0 # Check if the response is not empty
-    # else:
-    #     # Handle non-JSON response
-    #     print("Response is not JSON: ", response)
-    #     assert False, "Expected JSON response"
+
 
 # Test the get_restaurants endpoint with status code 404
-def get_restaurants_not_found(client):
+def test_get_restaurants_not_found(client):
     response = client.get("/api/restaurants/10")
     print("data: ", response.json()) # Print the response for debugging
     assert response.status_code == 404
