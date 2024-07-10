@@ -1,57 +1,47 @@
-from typing import Any, Optional
+from typing import Optional
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-import sqlite3
-import sys
-import os
-from dotenv import load_dotenv
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import sessionmaker, Session, declarative_base
 from sqlalchemy.exc import SQLAlchemyError
+from restaurant_modules.restaurant import Restaurant, RestaurantModel, ReviewModel, RestaurantCreate, Settings
+from user_modules.user_model import User
+from mock_data.mock_users_db import USER_DB
+import logging
 import bcrypt
 
-from restaurant_modules.restaurant import Restaurant, RestaurantModel, ReviewModel, RestaurantCreate
-from user_modules.user_model import User, Base
-from mock_data.mock_users_db import USER_DB
-from mock_data.mock_restaurants_db import get_mock_data
-import logging
-
-# Load environment variables
-load_dotenv()
-
+settings = Settings()
 # Passlib context for hashing passwords
 pwd_context = bcrypt.hashpw
 
-DATABASE_URL = os.getenv("TEST_DATABASE_URL")
-logging.info("DATABASE_URL: ", DATABASE_URL)
-# Create a database engine
-if DATABASE_URL:
-    engine = create_engine(DATABASE_URL)
-else:
-    raise ValueError("DATABASE_URL is not set.")
+# Create engines for the primary and secondary databases
+primary_engine = create_engine(settings.primary_database_url, pool_pre_ping=True)
+PrimarySessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=primary_engine)
 
-# Create a SessionalLocal class
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+secondary_engine = create_engine(settings.secondary_database_url, pool_pre_ping=True)
+SecondarySessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=secondary_engine)
 
-Base.metadata.create_all(bind=engine)
+Base = declarative_base()
+Base.metadata.create_all(bind=primary_engine)
+
+# Create a FastAPI instance
+app = FastAPI()
 
 def get_db():
-    db = SessionLocal()
+    db = PrimarySessionLocal()
     try:
         yield db
     finally:
         db.close()
 
-def get_db2():
-    db = SessionLocal()
+def get_secondary_db():
+    db = SecondarySessionLocal()
     try:
-        return db
+        yield db
     finally:
         db.close()
 
-# Create a FastAPI instance
-app = FastAPI()
 
 origins = ["http://localhost:3000"]
 
@@ -71,30 +61,6 @@ app.add_middleware(
 #     'password': os.getenv('DB_PASSWORD'),
 #     'port': os.getenv('DB_PORT'),
 # }
-
-#     return database_url
-print("DATABASE_URL: ", DATABASE_URL)
-def connect_to_database():
-    # database_url = get_database_connection_string()
-    database_url = os.getenv("TEST_DATABASE_URL")
-    try:
-        if database_url:
-            print(f"Connecting to the database at {database_url}...")
-            engine = create_engine(database_url)
-            conn = engine.connect()
-            return conn
-
-        elif database_url and database_url.startswith("sqlite://"):
-            # Establish connection
-            print("Connecting to the SQLite database...")
-            # Extract the file path from the url
-            db_file_path = database_url.replace("sqlite:///", "")
-            conn = sqlite3.connect(db_file_path, check_same_thread=False)
-            return conn
-
-    except Exception as e:
-        print("Error connecting to database: ", e)
-        return None
     
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
@@ -161,11 +127,17 @@ def create_restaurant(restaurant_data: RestaurantCreate, db: Session = Depends(g
         db.close()
         
 """ Returns the entire list of restaurants or return restaurants based on name parameter """
-@app.get("/api/restaurants/{name}", response_model=list[RestaurantModel])
+@app.get("/api/restaurants", response_model=list[RestaurantModel])
 def get_restaurants(name: Optional[str] = None, skip: int = 0, limit: int = 150, db: Session = Depends(get_db)):
     logging.info(f"Querying restaurants with name: {name}, skip: {skip}, limit: {limit}")
     query = db.query(Restaurant)
     try:
+        if not name:
+            restaurants = query.offset(skip).limit(limit).all()
+            if restaurants:
+                return [RestaurantModel.model_validate(restaurant) for restaurant in restaurants]
+            else:
+                raise HTTPException(status_code=404, detail="Restaurant not found")
         if name:
             query = query.filter(Restaurant.name.ilike(f"%{name}%"))
         restaurants = query.offset(skip).limit(limit).all()
@@ -210,13 +182,19 @@ def get_restaurant_by_id(id: int, db: Session=(Depends(get_db)) ):
 
 """ Returns the recommended list of restaurants """
 @app.get("/api/restaurants/recommended", response_model=list[RestaurantModel])
-def get_recommended_restaurants(db: Session = Depends(get_db2), skip: int = 0, limit: int = 150):
+def get_recommended_restaurants(db: Session = Depends(get_secondary_db), skip: int = 0, limit: int = 150, recommended: bool = False):
+    # Query the database for the recommended restaurants
     try:
-        recommended_restaurants = get_mock_data()
-        return [RestaurantModel.model_validate(restaurant) for restaurant in recommended_restaurants]
+        recommended_restaurants = db.query(Restaurant).offset(skip).limit(limit).all()
+        if recommended_restaurants:
+            return [RestaurantModel.model_validate(restaurant) for restaurant in recommended_restaurants]
+        else:
+            raise HTTPException(status_code=404, detail="No recommended restaurants found")
     except SQLAlchemyError as e:
         print("Error fetching recommended restaurants: ", e)
-        raise HTTPException(status_code=500, detail="Database transaction failed")
+        raise HTTPException(status_code=500, detail="Error fetching recommended restaurants")
+    finally:
+        db.close()
     
 
 """ Updates the restaurant with the specified ID """
