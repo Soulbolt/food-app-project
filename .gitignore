@@ -7,7 +7,8 @@ backend/.env
 backend/.env.test
 backend/src/restaurants.db
 backend/src/rcmd_restaurants.db
-backend/tests/endpoints/restaurants.db
 backend/docker-compose.yml
 backend/scripts/insert_restaurants.sql
 .venv
+backend/tests/endpoints/rcmd_restaurants.db
+backend/tests/endpoints/restaurants.db
