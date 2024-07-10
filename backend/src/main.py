@@ -182,7 +182,7 @@ def get_restaurant_by_id(id: int, db: Session=(Depends(get_db)) ):
 
 """ Returns the recommended list of restaurants """
 @app.get("/api/restaurants/recommended", response_model=list[RestaurantModel])
-def get_recommended_restaurants(db: Session = Depends(get_secondary_db), skip: int = 0, limit: int = 150, recommended: bool = False):
+def get_recommended_restaurants(db: Session = Depends(get_secondary_db), skip: int = 0, limit: int = 150):
     # Query the database for the recommended restaurants
     try:
         recommended_restaurants = db.query(Restaurant).offset(skip).limit(limit).all()
