@@ -7,6 +7,7 @@ from sqlalchemy.orm import sessionmaker, Session, declarative_base
 from sqlalchemy.exc import SQLAlchemyError
 from database_models.base_settings import Settings
 from database_models.restaurant_model import Restaurant
+from database_models.review_model import Review
 from database_models.user_model import User
 import logging
 import bcrypt
