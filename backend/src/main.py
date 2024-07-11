@@ -78,10 +78,12 @@ def verify_password(plain_password, hashed_password):
 
 """ Password reset token and email """
 def generate_password_reset_token():
-    # Generate a secure token. INSECURE: Use a more secure method to generate tokens
+    # Generate a secure token. 
+    # TODO: INSECURE: Use a more secure method to generate tokens
     return secrets.token_urlsafe()
 
 def send_reset_password_email(email: str, token: str):
+    # TODO Implement a function to send an email to the user with the token
     # Send the email with the token to the user
     print(f"Reset password email sent to {email} with token: {token}")
 
@@ -93,6 +95,7 @@ def password_reset_request(email: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User not found")
     token = user.get_password_reset_token()
     # Store the token and its expiration time in the database associated with the user
+    # TODO Add the token and its expiration time to the user's record in the database
     # Example: user.password_reset_token = token, user.password_reset_token_expires = datetime.now() + timedelta(hours=1)
     db.add(user)
     db.commit()
