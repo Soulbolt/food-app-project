@@ -9,7 +9,7 @@ from database_models.base_settings import Settings
 from database_models.restaurant_model import Restaurant
 from database_models.review_model import Review  # noqa This import is necessary for the database to be created as is expected by the ORM
 from database_models.user_model import User
-from passlib.context import CryptContext
+from passlib.hash import bcrypt
 import logging
 
 from pydantic_models.restaurant_create_and_update_schema import RestaurantCreate
@@ -18,7 +18,7 @@ from pydantic_models.user_schema import UserCreateModel, UserCredentials
 
 settings = Settings()
 # Passlib context for hashing passwords
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = bcrypt.using(rounds=10)
 
 # Create engines for the primary and secondary databases
 primary_engine = create_engine(settings.primary_database_url, pool_pre_ping=True)
