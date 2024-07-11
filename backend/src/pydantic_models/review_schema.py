@@ -1,9 +1,9 @@
 from pydantic import BaseModel
-
-
+from typing import Optional
+        
 """ Pydantic model for Review data """
 class ReviewModel(BaseModel):
-    id: int
+    id: Optional[int]
     username: str
     review: str
     rating: float

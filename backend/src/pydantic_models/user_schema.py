@@ -4,6 +4,7 @@ from pydantic_models.favorite_schema import FavoriteModel
 
 """ Pydantic model for UserCreate and UseCredentials data"""
 class UserCreateModel(BaseModel):
+    id: int
     email: str
     password: str
     username: str

@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from database_models.review_model import Review
+from pydantic_models.review_schema import ReviewModel
 
 """ Pydantic model for Favorite data """
 class FavoriteModel(BaseModel):
@@ -10,4 +10,4 @@ class FavoriteModel(BaseModel):
     contact_number: str
     rating: float
     is_favorite: bool
-    reviews: list[Review]
+    reviews: list[ReviewModel]

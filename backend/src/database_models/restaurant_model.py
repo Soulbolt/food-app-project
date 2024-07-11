@@ -1,10 +1,8 @@
-from pydantic import BaseModel
 from sqlalchemy import Column, Integer, String, Float, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
-from base import Base
+from database_models.base import Base
 import os
 from dotenv import load_dotenv
-from pydantic_settings import BaseSettings
 
 load_dotenv()
 

@@ -1,8 +1,7 @@
 from sqlalchemy import ForeignKey, Integer, String, Column, Float
 from sqlalchemy.orm import relationship
 from database_models.restaurant_model import SCHEMA_NAME
-from base import Base
-
+from database_models.base import Base
 
 """ SQLAlchmey Review Model for Review data"""
 class Review(Base):
