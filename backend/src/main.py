@@ -1,3 +1,5 @@
+from datetime import datetime
+import secrets
 from typing import Optional
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
@@ -66,14 +68,55 @@ app.add_middleware(
 #     'password': os.getenv('DB_PASSWORD'),
 #     'port': os.getenv('DB_PORT'),
 # }
-    
+
+#* --------------- Password Hashing and Verification ---------------------- ###
 def get_password_hash(password):
     return pwd_context.hash(password)
 
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
-    
+""" Password reset token and email """
+def generate_password_reset_token():
+    # Generate a secure token. INSECURE: Use a more secure method to generate tokens
+    return secrets.token_urlsafe()
+
+def send_reset_password_email(email: str, token: str):
+    # Send the email with the token to the user
+    print(f"Reset password email sent to {email} with token: {token}")
+
+#* --------------- Password Reset REST APIs ---------------------- ###
+@app.post("/api/passowrd-rest-request/")
+def password_reset_request(email: str, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    token = user.get_password_reset_token()
+    # Store the token and its expiration time in the database associated with the user
+    # Example: user.password_reset_token = token, user.password_reset_token_expires = datetime.now() + timedelta(hours=1)
+    db.add(user)
+    db.commit()
+    send_reset_password_email(email, token)
+    return {"message": "Password reset email sent"}
+
+@app.post("/api/password-reset/")
+def password_reset(token: str, new_password: str, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.password_reset_token == token).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    # Check if the token has expired
+    if user.password_reset_token_expires < datetime.now():
+        raise HTTPException(status_code=400, detail="Token expired")
+    # Update the user's password
+    hashed_password = get_password_hash(new_password)
+    user.hash_password = hashed_password
+    # Remove the token and its expiration time
+    user.password_reset_token = None
+    user.password_reset_token_expires = None
+    db.add(user)
+    db.commit()
+    return {"message": "Password reset successful"}
+
 #* ----------- User CRUD REST APIs and Authentication ------------###
 """ create new User """
 # TODO: Create Conditional to verify user data meets requirements.
