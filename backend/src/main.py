@@ -9,8 +9,8 @@ from database_models.base_settings import Settings
 from database_models.restaurant_model import Restaurant
 from database_models.review_model import Review  # noqa This import is necessary for the database to be created as is expected by the ORM
 from database_models.user_model import User
+from passlib.context import CryptContext
 import logging
-import bcrypt
 
 from pydantic_models.restaurant_create_and_update_schema import RestaurantCreate
 from pydantic_models.restaurant_schema import RestaurantModel
@@ -18,7 +18,7 @@ from pydantic_models.user_schema import UserCreateModel, UserCredentials
 
 settings = Settings()
 # Passlib context for hashing passwords
-pwd_context = bcrypt.hashpw
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # Create engines for the primary and secondary databases
 primary_engine = create_engine(settings.primary_database_url, pool_pre_ping=True)
@@ -67,40 +67,34 @@ app.add_middleware(
 #     'port': os.getenv('DB_PORT'),
 # }
     
+def get_password_hash(password):
+    return pwd_context.hash(password)
+
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
-def get_password_hash(password):
-    return pwd_context.hash(password)
     
 #* ----------- User CRUD REST APIs and Authentication ------------###
 """ create new User """
-# TODO: Create REST API to create new user.
+# TODO: Create Conditional to verify user data meets requirements.
 @app.post("/api/new_user")
 def create_user(user_data: UserCreateModel, db: Session = Depends(get_db)):
-    db_user = User(username=user_data.username, email=user_data.email, hashed_password=user_data.password)
+    # Hash the password before storing it in the database
+    hashed_password = get_password_hash(user_data.hash_password)
+    # Add the user to the database
+    db_user = User(username=user_data.username, email=user_data.email, password=hashed_password, name=user_data.name)
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
-    return db_user
+    return JSONResponse(content={"message": "User created successfully!"})
 
 """ Authenticate Existing User """
-# @app.post("/api/authenticate/")
-def authenticate_user(username: str, password: str, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.username == username).first()
-    if not user:
-        return False
-    if not verify_password(password, user.password):
-        return False
-    return user
-
 @app.post("/api/authenticate/")
-def authenticate(credentials: UserCredentials):
-    user = authenticate_user( credentials.username, credentials.password)
-    if user:
-        return {"message": "Authentication successful!", "user": user}
-    else:
+def authenticate_user(credentials: UserCredentials, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.username == credentials.username).first()
+    if not user or not verify_password(credentials.password, user.password):
         raise HTTPException(status_code=401, detail="Invalid username or password")
+    return {"message": "Authentication successful!"}
     
 """ Update Existing User """
 # TODO: Create REST API to edit an existing users properties/settings.

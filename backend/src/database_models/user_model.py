@@ -11,7 +11,7 @@ class User(Base):
     password = Column(String, nullable=False)
     username = Column(String, unique=True, nullable=False, index=True)
     name = Column(String)
-    favorites = Column(String)
+    favorites = Column(String, nullable=True)
 
 # class UserInDB(User):
 #     hashed_password: str

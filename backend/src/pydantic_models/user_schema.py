@@ -1,15 +1,11 @@
-from pydantic import BaseModel
-
-from pydantic_models.favorite_schema import FavoriteModel
+from pydantic import BaseModel, EmailStr
 
 """ Pydantic model for UserCreate and UseCredentials data"""
 class UserCreateModel(BaseModel):
-    id: int
-    email: str
-    password: str
     username: str
+    email: EmailStr
+    hash_password: str
     name: str
-    favorites: list[FavoriteModel]
 
 class UserCredentials(BaseModel):
     username: str
