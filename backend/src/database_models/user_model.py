@@ -1,5 +1,5 @@
 from database_models.base import Base
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, DateTime
 
 
 """ SQLAlchemy model for User data """
@@ -12,6 +12,8 @@ class User(Base):
     username = Column(String, unique=True, nullable=False, index=True)
     name = Column(String)
     favorites = Column(String, nullable=True)
+    time_expired = Column(DateTime, nullable=True)
+    token = Column(String, nullable=True)
 
 # class UserInDB(User):
 #     hashed_password: str
