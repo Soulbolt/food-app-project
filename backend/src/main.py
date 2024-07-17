@@ -18,7 +18,6 @@ import logging
 from pydantic_models.restaurant_create_and_update_schema import RestaurantCreate
 from pydantic_models.restaurant_schema import RestaurantModel
 from pydantic_models.user_create_and_credentials_schema import UserCreateModel, UserCredentials
-# from pydantic_models.user_schema import User
 
 settings = Settings()
 # Passlib context for hashing passwords
@@ -81,55 +80,47 @@ def verify_password(plain_password, hashed_password):
 """ Password reset token and email """
 def generate_password_reset_token():
     # Generate a secure token.
-    # Store the token and its expiration time in the database associated with the user
-    # TODO Add the token and its expiration time to the user's record in the database
-    # Example: user.password_reset_token = token, user.password_reset_token_expires = datetime.now() + timedelta(hours=1)
     password_reset_token = secrets.token_urlsafe()
     return password_reset_token
 
 def send_reset_password_email(email: str, token: str):
     # TODO Implement a function to send an email to the user with the token
     # Send the email with the token to the user
-    print(f"Reset password email sent to {email} with token: {token}")
+    print(f"Reset password email sent to {email} with token")
 
 #* --------------- Password Reset REST APIs ---------------------- ###
-@app.post("/api/passowrd-rest-request/")
-def password_reset_request(email: str, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.email == email ).first()
-    if not user:
+@app.patch("/api/password_rest_request/")
+def password_reset_request(email: EmailStr, db: Session = Depends(get_db)):
+    # Generate a new token
+    new_token = generate_password_reset_token()
+    # Query the database for the user with the specified email
+    query_result = db.query(User).filter(User.email == email ) \
+    .update({"token": new_token, "time_expired": datetime.now() + timedelta(minutes=5)} )
+    if not query_result:
         raise HTTPException(status_code=404, detail="User not found")
-    token = generate_password_reset_token()
     # Store the token and its expiration time in the database associated with the user
-    # TODO Add the token and its expiration time to the user's record in the database
-    # Example: user.password_reset_token = token, user.password_reset_token_expires = datetime.now() + timedelta(hours=1)
-    user.password_reset_token = token
-    user.password_reset_token_expires = datetime.now() + timedelta(hours=1)
-    db.add(user)
     db.commit()
-    send_reset_password_email(email, token)
-    return {"message": "Password reset email sent"}
+    send_reset_password_email(email, new_token)
+    return {"message": "Password reset email sent. expires in 5 minutes"}
 
-@app.post("/api/password-reset/")
+@app.patch("/api/password_reset/")
 def password_reset(token: str, new_password: str, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.password_reset_token == token).first()
-    if not user:
+    user = db.query(User)
+    user_pw_rest = user.filter(User.token == token).first()
+    if not user_pw_rest:
         raise HTTPException(status_code=404, detail="User not found")
     # Check if the token has expired
-    if user.password_reset_token_expires < datetime.now():
+    if user_pw_rest.time_expired <= datetime.now(): # type: ignore
         raise HTTPException(status_code=400, detail="Token expired")
     # Update the user's password
     hashed_password = get_password_hash(new_password)
-    user.hash_password = hashed_password
     # Remove the token and its expiration time
-    user.password_reset_token = None
-    user.password_reset_token_expires = None
-    db.add(user)
+    user.filter(user_pw_rest.token == token).update({"password": hashed_password, "token": None, "time_expired": None})
     db.commit()
     return {"message": "Password reset successful"}
 
 #* ----------- User CRUD REST APIs and Authentication ------------###
 """ create new User """
-# TODO: Create Conditional to verify user data meets requirements.
 @app.post("/api/new_user")
 def create_user(user_data: UserCreateModel, db: Session = Depends(get_db)):
     # Hash the password before storing it in the database
