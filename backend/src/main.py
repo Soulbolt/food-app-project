@@ -141,7 +141,18 @@ def authenticate_user(credentials: UserCredentials, db: Session = Depends(get_db
     return {"message": "Authentication successful!"}
     
 """ Update Existing User """
-# TODO: Create REST API to edit an existing users properties/settings.
+# Updates user's name (For now)
+@app.patch("/api/update_user/{id}")
+def update_user(id: int, name: str, db: Session = Depends(get_db)):
+    # Query the database for the user with the specified ID
+    user = db.query(User).filter(User.id == id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    # Update the user's name
+    db.query(User).filter(User.id == id).update({"name": name})
+    db.commit()
+    db.refresh(user)
+    return {"message": "User updated successfully!"}
 
 #* ------------- Restaurant CRUD REST APIs ---------------------- ###
 
