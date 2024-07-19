@@ -4,6 +4,7 @@ from typing import Optional
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import EmailStr
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session, declarative_base
@@ -22,6 +23,7 @@ from pydantic_models.user_create_and_credentials_schema import UserCreateModel, 
 settings = Settings()
 # Passlib context for hashing passwords
 pwd_context = bcrypt.using(rounds=10)
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 # Create engines for the primary and secondary databases
 primary_engine = create_engine(settings.primary_database_url, pool_pre_ping=True)
@@ -70,12 +72,18 @@ app.add_middleware(
 #     'port': os.getenv('DB_PORT'),
 # }
 
-#* --------------- Password Hashing and Verification ---------------------- ###
+#* --------------- Password Hashing, Verification and authenticaiton  ---------------------- ###
 def get_password_hash(password):
     return pwd_context.hash(password)
 
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
+
+def authenticate_user(username: str, password: str, db: Session):
+    user = db.query(User).filter(User.username == username).first()
+    if not user or not verify_password(password, user.password):
+        raise HTTPException(status_code=401, detail="Invalid username or password")
+    return user
 
 """ Password reset token and email """
 def generate_password_reset_token():
@@ -133,12 +141,7 @@ def create_user(user_data: UserCreateModel, db: Session = Depends(get_db)):
     return JSONResponse(content={"message": "User created successfully!"})
 
 """ Authenticate Existing User """
-@app.post("/api/authenticate/")
-def authenticate_user(credentials: UserCredentials, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.username == credentials.username).first()
-    if not user or not verify_password(credentials.password, user.password):
-        raise HTTPException(status_code=401, detail="Invalid username or password")
-    return {"message": "Authentication successful!"}
+
     
 """ Update Existing User """
 # Updates user's name (For now)
