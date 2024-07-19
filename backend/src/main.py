@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 import secrets
+import os
 from typing import Optional
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
@@ -14,16 +15,23 @@ from database_models.restaurant_model import Restaurant
 from database_models.review_model import Review  # noqa This import is necessary for the database to be created as is expected by the ORM
 from database_models.user_model import User
 from passlib.hash import bcrypt
+from jose import JWTError, jwt
+from dotenv import load_dotenv
 import logging
 
 from pydantic_models.restaurant_create_and_update_schema import RestaurantCreate
 from pydantic_models.restaurant_schema import RestaurantModel
 from pydantic_models.user_create_and_credentials_schema import UserCreateModel, UserCredentials
 
+load_dotenv()
+
 settings = Settings()
 # Passlib context for hashing passwords
 pwd_context = bcrypt.using(rounds=10)
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+secret_key = os.getenv("SECRET_KEY")
+algorithm = os.getenv("ALGORITHM")
+print(secrets.token_urlsafe(32))
 
 # Create engines for the primary and secondary databases
 primary_engine = create_engine(settings.primary_database_url, pool_pre_ping=True)
@@ -72,7 +80,7 @@ app.add_middleware(
 #     'port': os.getenv('DB_PORT'),
 # }
 
-#* --------------- Password Hashing, Verification and authenticaiton  ---------------------- ###
+#* --------------- Password Hashing, Verification, authenticaiton and token access  ---------------------- ###
 def get_password_hash(password):
     return pwd_context.hash(password)
 
@@ -84,6 +92,20 @@ def authenticate_user(username: str, password: str, db: Session):
     if not user or not verify_password(password, user.password):
         raise HTTPException(status_code=401, detail="Invalid username or password")
     return user
+
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.now() + expires_delta
+    else:
+        expire = datetime.now() + timedelta(minutes=15)
+    to_encode.update({"exp": expire})
+
+    if algorithm and secret_key is not None:
+        encoded_jwt = jwt.encode(to_encode, secret_key, algorithm=algorithm)
+    else:
+        raise ValueError("Algorithm is not specified in the settings.")
+    return encoded_jwt
 
 """ Password reset token and email """
 def generate_password_reset_token():
