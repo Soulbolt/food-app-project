@@ -31,7 +31,6 @@ pwd_context = bcrypt.using(rounds=10)
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 secret_key = os.getenv("SECRET_KEY")
 algorithm = os.getenv("ALGORITHM")
-print(secrets.token_urlsafe(32))
 
 # Create engines for the primary and secondary databases
 primary_engine = create_engine(settings.primary_database_url, pool_pre_ping=True)
