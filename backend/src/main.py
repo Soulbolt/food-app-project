@@ -31,6 +31,7 @@ pwd_context = bcrypt.using(rounds=10)
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 secret_key = os.getenv("SECRET_KEY")
 algorithm = os.getenv("ALGORITHM")
+TIME_EXPIRES = os.getenv("TIME_EXPIRES")
 
 # Create engines for the primary and secondary databases
 primary_engine = create_engine(settings.primary_database_url, pool_pre_ping=True)
@@ -161,8 +162,18 @@ def create_user(user_data: UserCreateModel, db: Session = Depends(get_db)):
     db.refresh(db_user)
     return JSONResponse(content={"message": "User created successfully!"})
 
-""" Authenticate Existing User """
-
+""" User Login """
+@app.post("/api/login")
+def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    user = authenticate_user(form_data.username, form_data.password, db)
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid username or password", headers={"WWW-Authenticate": "Bearer"})
+    if not TIME_EXPIRES:
+        raise ValueError("TIME_EXPIRES must be set in .env file")
+    
+    access_token_expires = timedelta(minutes=int(TIME_EXPIRES))
+    access_token = create_access_token(data={"sub": user.username}, expires_delta=access_token_expires)
+    return {"access_token": access_token, "token_type": "bearer"}
     
 """ Update Existing User """
 # Updates user's name (For now)
