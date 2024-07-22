@@ -30,7 +30,6 @@ settings = Settings()
 pwd_context = bcrypt.using(rounds=10)
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 secret_key = os.getenv("SECRET_KEY")
-algorithm = os.getenv("ALGORITHM")
 TIME_EXPIRES = os.getenv("TIME_EXPIRES")
 
 # Create engines for the primary and secondary databases
@@ -101,10 +100,10 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
         expire = datetime.now() + timedelta(minutes=15)
     to_encode.update({"exp": expire})
 
-    if algorithm and secret_key is not None:
-        encoded_jwt = jwt.encode(to_encode, secret_key, algorithm=algorithm)
+    if secret_key is not None:
+        encoded_jwt = jwt.encode(to_encode, secret_key)
     else:
-        raise ValueError("Algorithm is not specified in the settings.")
+        raise ValueError("secret_key is not specified in the settings.")
     return encoded_jwt
 
 """ Password reset token and email """
@@ -171,7 +170,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
     if not TIME_EXPIRES:
         raise ValueError("TIME_EXPIRES must be set in .env file")
     
-    access_token_expires = timedelta(minutes=int(TIME_EXPIRES))
+    access_token_expires = timedelta(minutes=float(TIME_EXPIRES))
     access_token = create_access_token(data={"sub": user.username}, expires_delta=access_token_expires)
     return {"access_token": access_token, "token_type": "bearer"}
     
