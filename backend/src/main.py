@@ -115,15 +115,16 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+    print("Token: ", token)
     try:
         if secret_key is None:
             raise ValueError("SECRET_KEY not set in .env file")
         payload = jwt.decode(token, secret_key)
 
         username: str = payload.get("sub", "")
-        if username is None:
+        if username == "":
             raise credentials_exception
-        token_data = UserCredentials(username=username, password="")
+        token_data = TokenData(username=username)
     except JWTError:
         raise credentials_exception
     user = db.query(User).filter(User.username == token_data.username).first()
@@ -204,7 +205,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
 
 """ Get Current User """
 @app.get("/api/users/me")
-def get_current_user(current_user: User = Depends(get_current_user)):
+def read_users_me(current_user: User = Depends(get_current_user)):
     return current_user
     
 """ Update Existing User """
