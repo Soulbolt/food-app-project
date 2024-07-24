@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 import secrets
 import os
 from typing import Optional
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends, Security
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -22,6 +22,8 @@ import logging
 from pydantic_models.restaurant_create_and_update_schema import RestaurantCreate
 from pydantic_models.restaurant_schema import RestaurantModel
 from pydantic_models.user_create_and_credentials_schema import UserCreateModel, UserCredentials
+from user_roles.token_data import TokenData
+from user_roles.roles import Role, permissions
 
 load_dotenv()
 
@@ -109,7 +111,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     return encoded_jwt
 
 """ Access Token and Current User Verification """
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+def get_current_user(token: str = Depends(oauth2_scheme)) -> TokenData:
     credentials_exception = HTTPException(
         status_code=401,
         detail="Could not validate credentials",
@@ -122,16 +124,23 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         payload = jwt.decode(token, secret_key)
 
         username: str = payload.get("sub", "")
-        if username == "":
+        roles: list = payload.get("roles", [])
+        if username is None or roles is None:
             raise credentials_exception
-        token_data = TokenData(username=username)
+        token_data = TokenData(username=username, roles=roles)
     except JWTError:
         raise credentials_exception
-    user = db.query(User).filter(User.username == token_data.username).first()
-    if user is None:
-        raise credentials_exception
     
-    return user
+    return token_data
+
+""" User Roles """
+def has_permissions(permission: str, current_user: TokenData = Security(get_current_user)):
+    user_permissions = []
+    for role in current_user.roles:
+        user_permissions.extend(permissions.get(Role(str(role)), []))
+    if permission not in user_permissions:
+        raise HTTPException(status_code=403, detail="Permission denied")
+    return True
 
 """ Password reset token and email """
 def generate_password_reset_token():
